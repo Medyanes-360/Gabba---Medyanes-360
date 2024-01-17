@@ -24,6 +24,7 @@ const NavigationButton = ({
         }}
         className={classNames("flex items-center h-fit gap-4 rounded-lg py-3 relative px-4 text-sm font-medium", "cursor-pointer group", "transition-all duration-200 ease-in-out", active ? "!bg-muted-foreground" : "bg-muted hover:bg-trans-purple",)}
     >
+        {level > 1 && !active && <div className="w-1.5 h-1.5 absolute left-0 rounded-full bg-muted-foreground" />}
         {Icon && <Icon className={classNames(
             !active ? "stroke-muted-foreground" : "stroke-muted"
         )}/>}
