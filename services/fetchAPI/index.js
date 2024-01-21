@@ -12,9 +12,9 @@ const postAPI = async (URL, body, method="POST", headers = {'Content-Type': 'app
             body: JSON.stringify(body),
             cache: 'no-store' ,
 
-            // cache önemli! her çalıştığında cache'deki veri yerine -> güncel veriyi almasını sağlar. 
+            // cache önemli! her çalıştığında cache'deki veri yerine -> güncel veriyi almasını sağlar.
             // bu olmaz ise üncel veriyi almayabiliyor dikkat et.
-            // Dinamik sayfalarda burası kullanılıyorsa o sayfalara -> export const dynamic = 'force-dynamic' ekle! 
+            // Dinamik sayfalarda burası kullanılıyorsa o sayfalara -> export const dynamic = 'force-dynamic' ekle!
 
         }).then(res =>{
             if(res.url.includes("/notification") && res.redirected){
@@ -23,14 +23,14 @@ const postAPI = async (URL, body, method="POST", headers = {'Content-Type': 'app
             else{
                 return res.json();
             }
-            
+
         }).catch(err => console.log(err))
-        
+
         return data;
 
     } catch (err) {
         throw new Error(`API request failed: ${err}`);
-    }        
+    }
 }
 
 // Öğrenci (kayıt) işlemleri için kullanılan servis
@@ -43,14 +43,14 @@ const getAPI = async (URL, headers = {'Content-Type': 'application/json'}) => {
 
     }).then(res =>{
         if(res.redirected){
-            
+
             // bazı yerlerde window'u bulamıyor kontrol et
             //return window.location.href = res.url;
         }
         else{
             return res.json();
         }
-        
+
     }).catch(err => console.log(err))
 
     return data;

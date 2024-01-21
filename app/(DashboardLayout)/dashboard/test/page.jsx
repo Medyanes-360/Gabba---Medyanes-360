@@ -1,16 +1,16 @@
+"use client"
 import CustomTable from '@/components/table/CustomTable'
-import {addCompany, langs} from '@/lib/table/data'
-import {companyColumn} from '@/lib/table/table'
+import {langs} from '@/lib/table/data'
+import {TestColumn} from '@/lib/table/table'
 import React from 'react'
 
-const Addcompany = () => {
+const Test = () => {
     return (
         <div>
             <CustomTable
-                table_name="Company"
-                columns={companyColumn}
+                api_route="/test"
+                columns={TestColumn}
                 langs={langs}
-                initial_dt={addCompany}
                 perPage={10}
                 pagination={true}
                 paginationType="page"
@@ -20,4 +20,4 @@ const Addcompany = () => {
     )
 }
 
-export default Addcompany
+export default Test

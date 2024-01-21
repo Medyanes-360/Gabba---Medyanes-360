@@ -1,6 +1,6 @@
 'use client'
 
-import {useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -39,10 +39,12 @@ import {
     DotsHorizontalIcon,
 } from "@radix-ui/react-icons"
 import {DropdownMenuItemIndicator} from "@radix-ui/react-dropdown-menu";
+import {getAllData} from "@/services/serviceOperations";
+import {getAPI, postAPI} from "@/services/fetchAPI";
 
 const CustomTable = ({
+                         api_route,
                          columns,
-                         initial_dt,
                          perPage = 10,
                          paginationType = "page",
                          pagination = true,
@@ -50,7 +52,6 @@ const CustomTable = ({
                          defaultLang,
                          searchTable = true,
                          changeVisible = true,
-                         updateData = true,
                          setLanguage = true,
                          themeChanger = true,
                          selectedDelete = true,
@@ -63,7 +64,7 @@ const CustomTable = ({
                      }) => {
     {/* Stateler */
     }
-    const [data, setData] = useState(initial_dt);
+    const [data, setData] = useState([]);
     const [page, setPage] = useState({
         pageSize: perPage, pageIndex: 0,
     });
@@ -121,6 +122,78 @@ const CustomTable = ({
     const table = TableFunctions({
         columns, visible, data, filters, pagination, page, sorting, isSelectedAll, setFilters, setSorting, setSelection
     });
+
+    const getData = async () => {
+        try {
+            const response = await getAPI(api_route);
+
+            if(!response){
+                throw new Error("Veri çekilemedi 2");
+            }
+
+            if(response.status !== "success"){
+                throw new Error("Veri çekilemedi 3");
+            }
+
+            setData(response.data);
+        } catch (error) {
+            toast.error(error.message);
+            console.log(error);
+        }
+    }
+
+    const deleteData = async (id) => {
+        try {
+            const response = await postAPI(api_route, {id}, "DELETE");
+
+            if(!response){
+                throw new Error("Veri Silinemedi (table)");
+            }
+
+            if(response.status !== "success"){
+                throw new Error("Veri Silinmesi başarılı olmadı (table)");
+            }
+
+            setSelection({})
+            setFilters({global: "", columns: []});
+
+            toast.warning(`Deleted Data`);
+            getData().then(() => {
+                toast.success(`Data GÜncellendi`);
+            })
+        } catch (error) {
+            toast.error(error.message);
+            console.log(error);
+        }
+    }
+
+    const updateData = async (id, newData) => {
+        try {
+            const response = await postAPI(api_route, {id, newData}, "PUT");
+
+            if(!response){
+                throw new Error("Veri güncellemesi (table)");
+            }
+
+            if(response.status !== "success"){
+                throw new Error("Veri Güncellemesi başarılı olmadı (table)");
+            }
+
+            // Reset state variables
+            setAddModalLang(null);
+            setUpdateDataState({});
+            setAddModalLang(null);
+            toast.success(`Data Güncellendi Data`);
+            await getData()
+        } catch (error) {
+            toast.error(error.message);
+            console.log(error);
+        }
+    }
+
+    useEffect(() => {
+        getData()
+    }, []);
 
     return (<div className=" h-full flex flex-col gap-4">
         {/* TABLE-TOP */}
@@ -445,16 +518,7 @@ const CustomTable = ({
                                                 </DropdownMenuLabel>
                                                 {actions && actions?.delete && (
                                                     <DropdownMenuItem
-                                                        onClick={() => {
-                                                            const filteredData = data.filter((item, index) => dt_idx !== index);
-
-                                                            setData(filteredData);
-                                                            setSelection({})
-                                                            setFilters({global: "", columns: []});
-
-                                                            toast.warning(`Deleted Data`);
-                                                        }}
-                                                    >
+                                                        onClick={() => deleteData(dt.id)}>
                                                         Delete
                                                     </DropdownMenuItem>
                                                 )}
@@ -478,24 +542,15 @@ const CustomTable = ({
                                                 className="outline-none rounded-md py-4"
                                                 onSubmit={(e) => {
                                                     e.preventDefault();
+                                                    const filtered = Object.keys(updateDataState).filter(objKey =>
+                                                        objKey !== 'id').reduce((newObj, key) =>
+                                                        {
+                                                            newObj[key] = updateDataState[key];
+                                                            return newObj;
+                                                        }, {}
+                                                    );
 
-                                                    // Find the index of the data to be updated
-                                                    const dataIndex = data.findIndex((_, index) => index === dt_idx);
-
-                                                    // Update the state immutably
-                                                    setData((prevState) => [
-                                                        ...prevState.slice(0, dataIndex),
-                                                        updateDataState,
-                                                        ...prevState.slice(dataIndex + 1)
-                                                    ]);
-
-                                                    // Close the modal and provide success feedback
-                                                    setAddModalLang(null);
-                                                    toast.success("Successfully updated data");
-
-                                                    // Reset state variables
-                                                    setUpdateDataState({});
-                                                    setAddModalLang(null);
+                                                    updateData(dt.id, filtered)
                                                 }}
                                             >
                                                 <div className="w-full flex items-start pr-8">
@@ -582,7 +637,7 @@ const CustomTable = ({
          1.buton load => her tıklandığında aşağı doğru perPage değeri kadar daha veri ekler
          2.buton page => next ve previous butonu ile sayfalar arası geçiş sağlar
          */}
-        {paginationType === "load" && (<Button
+        {paginationType === "load" && data.length > 0 && (<Button
             disabled={data.length <= (page.pageIndex + 1) * perPage}
             onClick={() => setPage((prev) => ({
                 pageSize: prev.pageSize + perPage, pageIndex: 0,
@@ -591,7 +646,7 @@ const CustomTable = ({
         >
             Load more...
         </Button>)}
-        {paginationType === "page" && (<div className="mr-auto flex gap-3 items-center">
+        {paginationType === "page" && data.length > 0 && (<div className="mr-auto flex gap-3 items-center">
             <Button
                 disabled={canPreviousPage()}
                 onClick={handlePrevious}
