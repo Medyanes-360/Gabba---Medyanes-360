@@ -38,8 +38,6 @@ import {Checkbox} from "@/components/ui/checkbox";
 import {
     DotsHorizontalIcon,
 } from "@radix-ui/react-icons"
-import {DropdownMenuItemIndicator} from "@radix-ui/react-dropdown-menu";
-import {getAllData} from "@/services/serviceOperations";
 import {getAPI, postAPI} from "@/services/fetchAPI";
 
 const CustomTable = ({
@@ -127,11 +125,11 @@ const CustomTable = ({
         try {
             const response = await getAPI(api_route);
 
-            if(!response){
+            if (!response) {
                 throw new Error("Veri çekilemedi 2");
             }
 
-            if(response.status !== "success"){
+            if (response.status !== "success") {
                 throw new Error("Veri çekilemedi 3");
             }
 
@@ -146,11 +144,11 @@ const CustomTable = ({
         try {
             const response = await postAPI(api_route, {id, type: "one"}, "DELETE");
 
-            if(!response){
+            if (!response) {
                 throw new Error("Veri Silinemedi (table)");
             }
 
-            if(response.status !== "success"){
+            if (response.status !== "success") {
                 throw new Error("Veri Silinmesi başarılı olmadı (table)");
             }
 
@@ -171,11 +169,11 @@ const CustomTable = ({
         try {
             const response = await postAPI(api_route, {ids, type: "selected"}, "DELETE");
 
-            if(!response){
+            if (!response) {
                 throw new Error("Veri Silinemedi (table)");
             }
 
-            if(response.status !== "success"){
+            if (response.status !== "success") {
                 throw new Error("Veri Silinmesi başarılı olmadı (table)");
             }
 
@@ -196,11 +194,11 @@ const CustomTable = ({
         try {
             const response = await postAPI(api_route, {type: "all"}, "DELETE");
 
-            if(!response){
+            if (!response) {
                 throw new Error("Veri Silinemedi (table)");
             }
 
-            if(response.status !== "success"){
+            if (response.status !== "success") {
                 throw new Error("Veri Silinmesi başarılı olmadı (table)");
             }
 
@@ -221,11 +219,11 @@ const CustomTable = ({
         try {
             const response = await postAPI(api_route, {id, newData}, "PUT");
 
-            if(!response){
+            if (!response) {
                 throw new Error("Veri güncellemesi (table)");
             }
 
-            if(response.status !== "success"){
+            if (response.status !== "success") {
                 throw new Error("Veri Güncellemesi başarılı olmadı (table)");
             }
 
@@ -234,6 +232,30 @@ const CustomTable = ({
             setUpdateDataState({});
             setAddModalLang(null);
             toast.success(`Data Güncellendi Data`);
+            await getData()
+        } catch (error) {
+            toast.error(error.message);
+            console.log(error);
+        }
+    }
+
+    const handleAddData = async (newData) => {
+        try {
+            const response = await postAPI(api_route, {newData}, "POST");
+
+            if (!response) {
+                throw new Error("Veri Eklemesi (table)");
+            }
+
+            if (response.status !== "success") {
+                throw new Error("Veri Eklemesi başarılı olmadı (table)");
+            }
+
+            // Reset state variables
+            setAddModalLang(null)
+            setAddModalState({});
+            setOpenAddModal(false);
+            toast.success("Successfully added new data");
             await getData()
         } catch (error) {
             toast.error(error.message);
@@ -378,14 +400,15 @@ const CustomTable = ({
                         onSubmit={(e) => {
                             // form tetiklenir (submit) ise dataya modal'daki inputların tutulduğu state'i ve id: datanın uzunluğu + 1 ekle
                             e.preventDefault();
-                            const st = addModalState;
-                            setData((prevState) => [...prevState, {id: prevState.length + 1, ...st}]);
-                            // modal'ı kapat
-                            setAddModalLang(null)
-                            toast.success("Successfully added new data");
-                            // reset state's
-                            setAddModalState({});
-                            setOpenAddModal(false);
+
+                            const filtered = Object.keys(addModalState).filter(objKey =>
+                                objKey !== 'id').reduce((newObj, key) => {
+                                    newObj[key] = addModalState[key];
+                                    return newObj;
+                                }, {}
+                            );
+
+                            handleAddData(filtered)
                         }}
                     >
                         <div className="w-full flex items-start pr-8">
@@ -581,8 +604,7 @@ const CustomTable = ({
                                                 onSubmit={(e) => {
                                                     e.preventDefault();
                                                     const filtered = Object.keys(updateDataState).filter(objKey =>
-                                                        objKey !== 'id').reduce((newObj, key) =>
-                                                        {
+                                                        objKey !== 'id').reduce((newObj, key) => {
                                                             newObj[key] = updateDataState[key];
                                                             return newObj;
                                                         }, {}

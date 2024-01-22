@@ -1,4 +1,10 @@
-import {deleteDataAll, deleteDataByMany, getAllData, updateDataByMany} from '@/services/serviceOperations';
+import {
+    createNewData,
+    deleteDataAll,
+    deleteDataByMany,
+    getAllData,
+    updateDataByMany
+} from '@/services/serviceOperations';
 
 const handleDelete = async (req) => {
     let data = {}
@@ -65,6 +71,25 @@ const handler = async (req, res) => {
                     }
                 },
                 req.body.newData
+            );
+            if (!financialManagementSpecial || financialManagementSpecial.error) {
+                throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4';
+            }
+            return res.status(200).json({
+                status: 'success',
+                data: financialManagementSpecial,
+                message: financialManagementSpecial.message,
+            });
+        } else if (req.method === "DELETE") {
+            const result = await handleDelete(req)
+            return res.status(200).json(result)
+        } else if (req.method === "POST") {
+            const financialManagementSpecial = await createNewData(
+                'User',
+                {
+                    ...req.body.newData,
+                    role: "USER"
+                }
             );
             console.log(financialManagementSpecial)
             if (!financialManagementSpecial || financialManagementSpecial.error) {
