@@ -142,9 +142,9 @@ const CustomTable = ({
         }
     }
 
-    const deleteData = async (id) => {
+    const deleteOne = async (id) => {
         try {
-            const response = await postAPI(api_route, {id}, "DELETE");
+            const response = await postAPI(api_route, {id, type: "one"}, "DELETE");
 
             if(!response){
                 throw new Error("Veri Silinemedi (table)");
@@ -158,6 +158,56 @@ const CustomTable = ({
             setFilters({global: "", columns: []});
 
             toast.warning(`Deleted Data`);
+            getData().then(() => {
+                toast.success(`Data GÜncellendi`);
+            })
+        } catch (error) {
+            toast.error(error.message);
+            console.log(error);
+        }
+    }
+
+    const deleteSelected = async (ids) => {
+        try {
+            const response = await postAPI(api_route, {ids, type: "selected"}, "DELETE");
+
+            if(!response){
+                throw new Error("Veri Silinemedi (table)");
+            }
+
+            if(response.status !== "success"){
+                throw new Error("Veri Silinmesi başarılı olmadı (table)");
+            }
+
+            setSelection({})
+            setFilters({global: "", columns: []});
+
+            toast.warning("Deleted Selected Data");
+            getData().then(() => {
+                toast.success(`Data GÜncellendi`);
+            })
+        } catch (error) {
+            toast.error(error.message);
+            console.log(error);
+        }
+    }
+
+    const handleDeleteAll = async () => {
+        try {
+            const response = await postAPI(api_route, {type: "all"}, "DELETE");
+
+            if(!response){
+                throw new Error("Veri Silinemedi (table)");
+            }
+
+            if(response.status !== "success"){
+                throw new Error("Veri Silinmesi başarılı olmadı (table)");
+            }
+
+            setSelection({})
+            setFilters({global: "", columns: []});
+
+            toast.warning("Deleted All Data");
             getData().then(() => {
                 toast.success(`Data GÜncellendi`);
             })
@@ -272,13 +322,8 @@ const CustomTable = ({
                         </AlertDialogCancel>
                         <AlertDialogAction
                             onClick={() => {
-                                const filteredData = data.filter((item, index) => !selection[index] ?? true);
-
-                                setData(filteredData);
-                                setSelection({})
-                                setFilters({global: "", columns: []});
-
-                                toast.warning("Deleted Selected Data");
+                                const ids = Array.from(Object.keys(selection).filter(key => selection[key] === true));
+                                deleteSelected(ids)
                             }}
                         >
                             Continue
@@ -308,14 +353,7 @@ const CustomTable = ({
                         </AlertDialogCancel>
                         <AlertDialogAction
                             onClick={() => {
-                                // tüm veriler içerisinde mevcut global ve column filterlarını uyguluyoruz ve eğerki bu filterlardan geçemez ise true döndürüyoruz çünkü burada filterdan geçen veriler siliniyor yani bize geçemeyen veriler lazım
-                                const filteredData = data.filter((item) => !table.applyFilters(item));
-
-                                setData(filteredData);
-                                // reset filters
-                                setFilters({global: "", columns: []});
-
-                                toast.warning("Deleted All Data");
+                                handleDeleteAll()
                             }}
                         >
                             Continue
@@ -491,9 +529,9 @@ const CustomTable = ({
                                 <TableCell>
                                     {/* Veriye bağlı olmamaksızın her zaman ilk başta bir selectbox render et bu satırı seçebilmek için. */}
                                     <Checkbox
-                                        checked={selection[dt_idx] ?? false}
+                                        checked={selection[dt.id] ?? false}
                                         onCheckedChange={() => setSelection(prev => ({
-                                            ...prev, [dt_idx]: !prev[dt_idx] ?? true
+                                            ...prev, [dt.id]: !prev[dt.id] ?? true
                                         }))}
                                     />
                                 </TableCell>
@@ -518,7 +556,7 @@ const CustomTable = ({
                                                 </DropdownMenuLabel>
                                                 {actions && actions?.delete && (
                                                     <DropdownMenuItem
-                                                        onClick={() => deleteData(dt.id)}>
+                                                        onClick={() => deleteOne(dt.id)}>
                                                         Delete
                                                     </DropdownMenuItem>
                                                 )}
