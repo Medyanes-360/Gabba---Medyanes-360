@@ -346,3 +346,33 @@ model OfferOrderExtra {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Store {
+  id                    String  @id @default(auto()) @map("_id") @db.ObjectId
+  company_name          String
+  company_nameEnglish   String?
+  company_nameUkrainian String?
+  company_nameTurkish   String?
+
+  country          String
+  countryEnglish   String?
+  countryUkrainian String?
+  countryTurkish   String?
+
+  state          String
+  stateEnglish   String?
+  stateUkrainian String?
+  stateTurkish   String?
+
+  phone_number String
+
+  maximum_discount_rate String
+  maximum_bonus_rate    String
+
+  description          String
+  descriptionEnglish   String?
+  descriptionUkrainian String?
+  descriptionTurkish   String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
