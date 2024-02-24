@@ -1,6 +1,7 @@
 import '@/styles/globals.css';
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from '@/components/table/providers';
+import classNames from 'classnames';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -50,7 +51,7 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang='en'>
-      <body className={inter.className}>
+      <body className={classNames(inter.className, "bg-white")}>
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
