@@ -254,18 +254,22 @@ model OfferBasketExtra {
 }
 
 model User {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  companyName  String?
-  name         String
-  surname      String
-  phoneNumber  String
-  address      String?
-  mailAddress  String?  @unique
-  storeName    String?
-  storeAddress String?
-  role         String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  companyName    String?
+  name           String
+  surname        String
+  phoneNumber    String
+  address        String?
+  mailAddress    String?  @unique
+  storeName      String?
+  storeAddress   String?
+  maxTax         String?
+  role           String
+  salary         String
+  bonus          String
+  managerComment String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model OfferBasket {
@@ -401,7 +405,7 @@ model Company {
 }
 
 model Expense {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+  id                   String @id @default(auto()) @map("_id") @db.ObjectId
   store                String
   payment_company_info String
   date                 String
