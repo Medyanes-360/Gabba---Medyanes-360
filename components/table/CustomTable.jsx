@@ -59,7 +59,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { getAPI, postAPI } from "@/services/fetchAPI";
 
-const my_role = 'personal'
+const my_role = 'company_manager'
 
 const CustomTable = ({
   api_route,

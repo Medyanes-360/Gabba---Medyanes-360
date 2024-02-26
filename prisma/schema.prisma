@@ -256,18 +256,18 @@ model OfferBasketExtra {
 model User {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
   companyName    String?
-  name           String
-  surname        String
-  phoneNumber    String
+  name           String?
+  surname        String?
+  phoneNumber    String?
   address        String?
   mailAddress    String?  @unique
   storeName      String?
   storeAddress   String?
   maxTax         String?
-  role           String
-  salary         String
-  bonus          String
-  managerComment String
+  role           String?
+  salary         String?
+  bonus          String?
+  managerComment String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
