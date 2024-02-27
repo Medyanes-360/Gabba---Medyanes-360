@@ -473,3 +473,18 @@ model StockExtra {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Supplier {
+  id              String  @id @default(auto()) @map("_id") @db.ObjectId
+  yetkiliisim1    String?
+  yetkilitelefon1 String?
+  yetkiliemail1   String?
+  yetkiliisim2    String?
+  yetkilitelefon2 String?
+  yetkiliemail2   String?
+  firma           String?
+  adres           String?
+  vergino         String?
+  sirkettel       String?
+  sirketemail     String?
+}
