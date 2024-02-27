@@ -992,7 +992,7 @@ function ListProducts({
           </Formik>
         )
       }
-      <div className='w-full overflow-x-scroll lg:overflow-x-auto'>
+      <div className='w-full overflow-x-scroll bg-white lg:overflow-x-auto'>
         <table
           className={`${
             selectedImage && 'blur'
