@@ -475,16 +475,16 @@ model StockExtra {
 }
 
 model Supplier {
-  id               String  @id @default(auto()) @map("_id") @db.ObjectId
-  authorizedName1  String
-  authorizedPhone1 String
-  authorizedEmail1 String
-  authorizedName2  String?
-  authorizedPhone2 String?
-  authorizedEmail2 String?
-  company          String
-  address          String
-  taxNumber        Int
-  companyPhone     String
-  companyEmail     String
+  id              String  @id @default(auto()) @map("_id") @db.ObjectId
+  yetkiliisim1    String?
+  yetkilitelefon1 String?
+  yetkiliemail1   String?
+  yetkiliisim2    String?
+  yetkilitelefon2 String?
+  yetkiliemail2   String?
+  firma           String?
+  adres           String?
+  vergino         String?
+  sirkettel       String?
+  sirketemail     String?
 }
