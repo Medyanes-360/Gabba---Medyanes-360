@@ -51,7 +51,7 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang='en'>
-      <body className={classNames(inter.className)}>
+      <body className={classNames(inter.className, "bg-white")}>
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
