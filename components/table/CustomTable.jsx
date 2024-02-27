@@ -411,7 +411,7 @@ const CustomTable = ({
         {/* SET LANGUAGE END */}
 
         {/* Theme Toggle Butonu sistemde hali hazırda olan bir component. */}
-        {themeChanger && <ThemeToggle />}
+        {false && <ThemeToggle />}
 
         {/* DELETE SELECTED STAR */}
         {/* Burada bir modal ve bu modal'ın tetikleyici butonu var, buradaki modal emin misiniz tarzı bir soru soruyor. */}

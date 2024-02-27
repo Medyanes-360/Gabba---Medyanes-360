@@ -1,17 +1,15 @@
 'use client'
 
-import {ThemeProvider as NextThemeProvider} from 'next-themes'
-import {ReactNode} from "react";
+import { ThemeProvider as NextThemeProvider } from 'next-themes'
+import { ReactNode } from "react";
 import dynamic from "next/dynamic";
 
-const ToastProvider = dynamic(() => import('@/components/table/toast-provider'), {ssr: false})
+const ToastProvider = dynamic(() => import('@/components/table/toast-provider'), { ssr: false })
 
-export function ThemeProvider({children}) {
+export function ThemeProvider({ children }) {
     return (
-        <NextThemeProvider enableSystem attribute="class" storageKey="theme">
-            <ToastProvider>
-                {children}
-            </ToastProvider>
-        </NextThemeProvider>
+        <ToastProvider>
+            {children}
+        </ToastProvider>
     )
 }

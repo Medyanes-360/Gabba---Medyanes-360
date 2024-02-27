@@ -89,7 +89,7 @@ const Stock = () => {
       <div
         className={`${
           hiddenBasketBar ? 'hidden' : 'flex'
-        } flex-col md:flex-row p-2 lg:p-2 lg:px-10 w-full justify-between mb-4 items-center shadow-lg  bg-gray-100 gap-2 pr-4`}
+        } flex-col md:flex-row p-2 lg:p-2 lg:px-10 w-full justify-between mb-4 items-center shadow-lg bg-background gap-2 pr-4`}
       >
         {/* Filtreleme ve Teklifler Butonu */}
         <div className='flex justify-center item-center flex-col md:flex-row gap-2 px-4 my-2'>
