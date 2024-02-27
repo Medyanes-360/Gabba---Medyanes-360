@@ -416,3 +416,60 @@ model Expense {
   expense_amount       String
   description          String
 }
+
+model Stock {
+  id                  String  @id @default(auto()) @map("_id") @db.ObjectId
+  stock               Int
+  orderNote           String?
+  productId           String
+  productPrice        Float
+  productFeaturePrice Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StockColors {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  colourId  String
+  productId String
+  basketId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StockFabrics {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  fabricsId String
+  productId String
+  basketId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StockMetals {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  metalId   String
+  productId String
+  basketId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StockMeasurements {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  measurementId String
+  productId     String
+  basketId      String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model StockExtra {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  extraId   String
+  productId String
+  basketId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
