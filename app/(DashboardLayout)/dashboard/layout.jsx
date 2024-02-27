@@ -1,7 +1,6 @@
 'use client';
 import Navbar from '@/components/dashboard/Navbar';
 import Sidebar from '@/components/dashboard/Sidebar';
-import React, { useState } from 'react';
 
 const MainLayout = ({ children }) => {
   return (
