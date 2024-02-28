@@ -12,59 +12,53 @@ import { useMediaQuery } from '@/lib/table/useMediaQuery';
 
 const buttons = [
   {
-    title: 'Dashboard',
+    title: 'Panel',
     buttons: [
       {
         id: '1.1',
         icon: UserIcon,
-        label: 'Company',
+        label: 'Şirket',
         path: '/dashboard/company',
       },
       {
         id: '1.2',
         icon: UserIcon,
-        label: 'Store',
+        label: 'Mağaza',
         path: '/dashboard/store',
       },
       {
         id: '1.3',
-        label: 'Personal',
+        label: 'Çalışan',
         icon: UserIcon,
         path: '/dashboard/personal',
       },
       {
         id: '1.4',
-        label: 'Suplier',
+        label: 'Tedarikçi',
         icon: UserIcon,
         path: '/dashboard/suplier',
       },
       {
         id: '1.5',
-        label: 'Expense',
+        label: 'Gider',
         icon: UserIcon,
         path: '/dashboard/expense',
       },
     ],
   },
   {
-    title: 'Others',
+    title: 'Diğerler',
     buttons: [
       {
         id: '1.4',
-        label: 'Stock',
+        label: 'Stok',
         icon: UserIcon,
         childs: [
           {
             id: '1.4.1',
-            label: 'Stock',
+            label: 'Stok',
             icon: UserIcon,
             path: '/dashboard/stock',
-          },
-          {
-            id: '1.4.2',
-            label: 'Stock Control',
-            path: '/dashboard/stockcontrol',
-            icon: UserIcon,
           },
         ],
       },
