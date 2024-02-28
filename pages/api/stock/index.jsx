@@ -286,6 +286,7 @@ const handler = async (req, res) => {
             Ölçüler: dataMeasurement,
             Kumaşlar: dataFabric,
             Metaller: dataMetal,
+            CreatedDate: Stock.createdAt,
           };
 
           // Toplu veriler dizisine ekle
