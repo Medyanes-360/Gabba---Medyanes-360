@@ -257,19 +257,19 @@ model User {
   id          String  @id @default(auto()) @map("_id") @db.ObjectId
   companyName String?
 
-  name          String
+  name          String?
   nameEnglish   String?
   nameUkrainian String?
   nameTurkish   String?
 
-  surname          String
+  surname          String?
   surnameEnglish   String?
   surnameUkrainian String?
   surnameTurkish   String?
 
-  phoneNumber String
+  phoneNumber String?
 
-  address          String
+  address          String?
   addressEnglish   String?
   addressUkrainian String?
   addressTurkish   String?
@@ -279,12 +279,12 @@ model User {
   storeName    String?
   storeAddress String?
 
-  maxTax String
+  maxTax String?
   role   String?
-  salary String
-  bonus  String
+  salary String?
+  bonus  String?
 
-  managerComment          String
+  managerComment          String?
   managerCommentEnglish   String?
   managerCommentUkrainian String?
   managerCommentTurkish   String?
