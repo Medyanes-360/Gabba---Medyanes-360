@@ -756,11 +756,11 @@ const CustomTable = ({
                   <TableCell>
                     {/* Veriye bağlı olmamaksızın her zaman ilk başta bir selectbox render et bu satırı seçebilmek için. */}
                     <Checkbox
-                      checked={selection[dt_idx] ?? false}
+                      checked={selection[dt.id] ?? false}
                       onCheckedChange={() =>
                         setSelection((prev) => ({
                           ...prev,
-                          [dt_idx]: !prev[dt_idx],
+                          [dt.id]: !prev[dt.id],
                         }))
                       }
                     />
