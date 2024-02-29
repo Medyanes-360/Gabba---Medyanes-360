@@ -84,6 +84,56 @@ const Modal = ({
     }
   }
 
+  function addOfferedFeatures(selectedItem, category, prop) {
+    // Eski verilere doğrudan erişerek güncelleme işlemi yap
+    prop.setFieldValue(`selectedOfferFeatures.${category}`, {
+      ...prop.values.selectedOfferFeatures[category],
+      [selectedItem.id]: selectedItem,
+    });
+
+    // Feature değeri yoksa fonksiyondan çık.
+    if (!selectedItem.value) {
+      return;
+    }
+    // Feature değerini güncelliyoruz.
+    prop.setFieldValue(
+      'selectedOfferProductFeaturePrice',
+      parseInt(
+        prop.values.selectedOfferProductFeaturePrice +
+          parseInt(selectedItem.value)
+      )
+    );
+  }
+
+  function deleteOfferedFeatures(selectedItem, category, prop) {
+    // Önceki kategori verilerinin bir kopyasını al
+    const updatedCategoryData = {
+      ...prop.values.selectedOfferFeatures[category],
+    };
+
+    // Belirli bir öğeyi kategoriden sil
+    delete updatedCategoryData[selectedItem.id];
+
+    // Güncellenmiş kategori verilerini setFieldValue ile atama
+    prop.setFieldValue(
+      `selectedOfferFeatures.${category}`,
+      updatedCategoryData
+    );
+
+    if (!selectedItem.value) {
+      return;
+    }
+
+    // Feature değerini güncelliyoruz.
+    prop.setFieldValue(
+      'selectedOfferProductFeaturePrice',
+      parseInt(
+        prop.values.selectedOfferProductFeaturePrice -
+          parseInt(selectedItem.value)
+      )
+    );
+  }
+
   useEffect(() => {
     getAllFeatureValues();
   }, []);
@@ -105,11 +155,31 @@ const Modal = ({
       <Formik
         initialValues={{
           selectedOfferFeatures: {
-            Renkler: [],
-            Kumaşlar: [],
-            Metaller: [],
-            Ölçüler: [],
-            Extra: [],
+            Renkler: modalData.Renkler.reduce((acc, renk) => {
+              // Renkler verisini dönüştürerek, her bir rengin id'sini anahtar olarak kullanıp rengi objeye yerleştirelim
+              acc[renk.id] = renk;
+              return acc;
+            }, {}),
+            Kumaşlar: modalData.Kumaşlar.reduce((acc, kumaslar) => {
+              // Renkler verisini dönüştürerek, her bir rengin id'sini anahtar olarak kullanıp rengi objeye yerleştirelim
+              acc[kumaslar.id] = kumaslar;
+              return acc;
+            }, {}),
+            Metaller: modalData.Metaller.reduce((acc, metaller) => {
+              // Renkler verisini dönüştürerek, her bir rengin id'sini anahtar olarak kullanıp rengi objeye yerleştirelim
+              acc[metaller.id] = metaller;
+              return acc;
+            }, {}),
+            Ölçüler: modalData.Ölçüler.reduce((acc, olculer) => {
+              // Renkler verisini dönüştürerek, her bir rengin id'sini anahtar olarak kullanıp rengi objeye yerleştirelim
+              acc[olculer.id] = olculer;
+              return acc;
+            }, {}),
+            Extralar: modalData.Extralar.reduce((acc, extra) => {
+              // Renkler verisini dönüştürerek, her bir rengin id'sini anahtar olarak kullanıp rengi objeye yerleştirelim
+              acc[extra.id] = extra;
+              return acc;
+            }, {}),
           },
           stock: modalData.Stock,
           orderNote: '',
@@ -168,8 +238,8 @@ const Modal = ({
                           Son Güncel Fiyatı:{' '}
                         </span>
                         <span className='bg-green-600 p-1 rounded text-white'>
-                          {(modalData.ProductPrice +
-                            modalData.ProductFeaturePrice) *
+                          {(props.values.selectedOfferProductPrice +
+                            props.values.selectedOfferProductFeaturePrice) *
                             props.values.stock}
                         </span>
                       </p>
@@ -325,9 +395,9 @@ const Modal = ({
                               <td className='text-center py-2 border-r'>
                                 <button
                                   onClick={() =>
-                                    modalData.Renkler.filter(
-                                      (feature) => feature.id === item.id
-                                    ).length > 0
+                                    props.values.selectedOfferFeatures.Renkler[
+                                      item.id
+                                    ]
                                       ? deleteOfferedFeatures(
                                           item,
                                           'Renkler',
@@ -341,18 +411,17 @@ const Modal = ({
                                   }
                                   type='button'
                                   className={`${
-                                    modalData.Renkler.filter(
-                                      (feature) => feature.id === item.id
-                                    ).length > 0
+                                    props.values.selectedOfferFeatures.Renkler[
+                                      item.id
+                                    ]
                                       ? 'bg-red-500'
                                       : 'bg-blue-500'
                                   } rounded hover:cursor-pointer hover:scale-110 transition-all inline-block text-white font-bold text-md shadow`}
                                 >
                                   <div className='p-2 flex flex-row justify-center items-center gap-2 whitespace-nowrap'>
                                     <span className='block'>
-                                      {modalData.Renkler.filter(
-                                        (feature) => feature.id === item.id
-                                      ).length > 0
+                                      {props.values.selectedOfferFeatures
+                                        .Renkler[item.id]
                                         ? 'Özelliği Kaldır'
                                         : 'Özelliği Ekle'}
                                     </span>
@@ -405,9 +474,9 @@ const Modal = ({
                               <td className='text-center py-2 border-r'>
                                 <button
                                   onClick={() =>
-                                    modalData.Kumaşlar.filter(
-                                      (feature) => feature.id === item.id
-                                    ).length > 0
+                                    props.values.selectedOfferFeatures.Kumaşlar[
+                                      item.id
+                                    ]
                                       ? deleteOfferedFeatures(
                                           item,
                                           'Kumaşlar',
@@ -421,18 +490,17 @@ const Modal = ({
                                   }
                                   type='button'
                                   className={`${
-                                    modalData.Kumaşlar.filter(
-                                      (feature) => feature.id === item.id
-                                    ).length > 0
+                                    props.values.selectedOfferFeatures.Kumaşlar[
+                                      item.id
+                                    ]
                                       ? 'bg-red-500'
                                       : 'bg-blue-500'
                                   } rounded hover:cursor-pointer hover:scale-110 transition-all inline-block text-white font-bold text-md shadow`}
                                 >
                                   <div className='p-2 flex flex-row justify-center items-center gap-2 whitespace-nowrap'>
                                     <span className='hidden lg:block'>
-                                      {modalData.Kumaşlar.filter(
-                                        (feature) => feature.id === item.id
-                                      ).length > 0
+                                      {props.values.selectedOfferFeatures
+                                        .Kumaşlar[item.id]
                                         ? 'Özelliği Kaldır'
                                         : 'Özelliği Ekle'}
                                     </span>
@@ -497,9 +565,9 @@ const Modal = ({
                               <td className='text-center py-2 border-r'>
                                 <button
                                   onClick={() =>
-                                    modalData.Metaller.filter(
-                                      (feature) => feature.id === item.id
-                                    ).length > 0
+                                    props.values.selectedOfferFeatures.Metaller[
+                                      item.id
+                                    ]
                                       ? deleteOfferedFeatures(
                                           item,
                                           'Metaller',
@@ -513,18 +581,17 @@ const Modal = ({
                                   }
                                   type='button'
                                   className={`${
-                                    modalData.Metaller.filter(
-                                      (feature) => feature.id === item.id
-                                    ).length > 0
+                                    props.values.selectedOfferFeatures.Metaller[
+                                      item.id
+                                    ]
                                       ? 'bg-red-500'
                                       : 'bg-blue-500'
                                   } rounded hover:cursor-pointer hover:scale-110 transition-all inline-block text-white font-bold text-md shadow`}
                                 >
                                   <div className='p-2 flex flex-row justify-center items-center gap-2 whitespace-nowrap'>
                                     <span className='hidden lg:block'>
-                                      {modalData.Metaller.filter(
-                                        (feature) => feature.id === item.id
-                                      ).length > 0
+                                      {props.values.selectedOfferFeatures
+                                        .Metaller[item.id]
                                         ? 'Özelliği Kaldır'
                                         : 'Özelliği Ekle'}
                                     </span>
@@ -586,9 +653,9 @@ const Modal = ({
                               <td className='text-center py-2 border-r'>
                                 <button
                                   onClick={() =>
-                                    modalData.Ölçüler.filter(
-                                      (feature) => feature.id === item.id
-                                    ).length > 0
+                                    props.values.selectedOfferFeatures.Ölçüler[
+                                      item.id
+                                    ]
                                       ? deleteOfferedFeatures(
                                           item,
                                           'Ölçüler',
@@ -602,18 +669,17 @@ const Modal = ({
                                   }
                                   type='button'
                                   className={`${
-                                    modalData.Ölçüler.filter(
-                                      (feature) => feature.id === item.id
-                                    ).length > 0
+                                    props.values.selectedOfferFeatures.Ölçüler[
+                                      item.id
+                                    ]
                                       ? 'bg-red-500'
                                       : 'bg-blue-500'
                                   } rounded hover:cursor-pointer hover:scale-110 transition-all inline-block text-white font-bold text-md shadow`}
                                 >
                                   <div className='p-2 flex flex-row justify-center items-center gap-2 whitespace-nowrap'>
                                     <span className='hidden lg:block'>
-                                      {modalData.Ölçüler.filter(
-                                        (feature) => feature.id === item.id
-                                      ).length > 0
+                                      {props.values.selectedOfferFeatures
+                                        .Ölçüler[item.id]
                                         ? 'Özelliği Kaldır'
                                         : 'Özelliği Ekle'}
                                     </span>
@@ -665,9 +731,9 @@ const Modal = ({
                               <td className='text-center py-2 border-r'>
                                 <button
                                   onClick={() =>
-                                    modalData.Extralar.filter(
-                                      (feature) => feature.id === item.id
-                                    ).length > 0
+                                    props.values.selectedOfferFeatures.Extralar[
+                                      item.id
+                                    ]
                                       ? deleteOfferedFeatures(
                                           item,
                                           'Extra',
@@ -677,18 +743,17 @@ const Modal = ({
                                   }
                                   type='button'
                                   className={`${
-                                    modalData.Extralar.filter(
-                                      (feature) => feature.id === item.id
-                                    ).length > 0
+                                    props.values.selectedOfferFeatures.Extralar[
+                                      item.id
+                                    ]
                                       ? 'bg-red-500'
                                       : 'bg-blue-500'
                                   } rounded hover:cursor-pointer hover:scale-110 transition-all inline-block text-white font-bold text-md shadow`}
                                 >
                                   <div className='p-2 flex flex-row justify-center items-center gap-2 whitespace-nowrap'>
                                     <span className='hidden lg:block'>
-                                      {modalData.Extralar.filter(
-                                        (feature) => feature.id === item.id
-                                      ).length > 0
+                                      {props.values.selectedOfferFeatures
+                                        .Extralar[item.id]
                                         ? 'Özelliği Kaldır'
                                         : 'Özelliği Ekle'}
                                     </span>
