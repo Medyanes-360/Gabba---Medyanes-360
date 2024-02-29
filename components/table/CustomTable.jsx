@@ -230,6 +230,8 @@ const CustomTable = ({
         "DELETE"
       );
 
+      console.log(ids)
+
       if (!response) {
         throw new Error("Veri Silinemedi (table)");
       }
@@ -250,6 +252,10 @@ const CustomTable = ({
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    console.log(selection)
+  }, [selection])
 
   const handleDeleteAll = async () => {
     try {
@@ -750,11 +756,11 @@ const CustomTable = ({
                   <TableCell>
                     {/* Veriye bağlı olmamaksızın her zaman ilk başta bir selectbox render et bu satırı seçebilmek için. */}
                     <Checkbox
-                      checked={selection[dt.id] ?? false}
+                      checked={selection[dt_idx] ?? false}
                       onCheckedChange={() =>
                         setSelection((prev) => ({
                           ...prev,
-                          [dt.id]: !prev[dt.id] ?? true,
+                          [dt_idx]: !prev[dt_idx],
                         }))
                       }
                     />
