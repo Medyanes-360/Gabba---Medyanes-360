@@ -109,7 +109,7 @@ const StepByStep = () => {
       </div>
 
       {/* Seçilen adımın bileşeni */}
-      {<Current.Component />}
+      {<Current.Component lang={"tr"} id={id}/>}
     </div >
   )
 }
