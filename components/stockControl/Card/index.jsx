@@ -5,16 +5,34 @@ import { GoTrash } from 'react-icons/go';
 import { LiaEdit } from 'react-icons/lia';
 import { postAPI } from '@/services/fetchAPI';
 import { BiCalendarCheck } from 'react-icons/bi';
+import { IoPricetagsOutline } from 'react-icons/io5';
+import { FaBoxes } from 'react-icons/fa';
 
 const StockControlCard = ({
   stocks,
+  setStocks,
   popup,
   setPopup,
   productFeatures,
   setModalData,
   setSelectedFeatures,
 }) => {
-  console.log(stocks);
+  const role = 'Admin';
+
+  const deleteBasketItem = async (itemId) => {
+    const response = await postAPI('/stockControl', {
+      processType: 'delete',
+      id: itemId,
+    });
+
+    if (!response || response.status !== 'success') {
+      throw new Error('Veri silinemedi');
+    } else {
+      const newStockData = stocks.filter((item) => item.id !== itemId);
+      setStocks(newStockData);
+      console.log(response.message);
+    }
+  };
 
   return (
     <div className={popup ? 'hidden' : 'block'}>
@@ -46,67 +64,76 @@ const StockControlCard = ({
             )}
             {/* Stock ürün adı, ürünü kaldır, ürünü düzenle */}
 
-            <div className='flex items-center mx-2 gap-3 justify-between'>
-              <p className='text-center font-semibold uppercase break-all '>
+            <div
+              className={`flex flex-col lg:flex-row items-center mx-2 gap-3 ${
+                role === 'Admin' ? 'justify-between' : 'justify-center'
+              }`}
+            >
+              <p className='text-center text-sm lg:text-lg  font-semibold uppercase break-all'>
                 {stock.Product.productName}
               </p>
-              <div className='flex gap-2'>
-                <button
-                  onClick={() => {
-                    setPopup(true);
-                    setModalData(stock);
-                    setSelectedFeatures(
-                      productFeatures.filter(
-                        (productFeature) =>
-                          productFeature.productId === stock.Product.id
-                      )
-                    );
-                  }}
-                  title='Düzenle'
-                  type='button'
-                  className='font-semibold text-white border border-green-500 rounded-full p-1 bg-green-500
+              {/* Role göre düzenle ve silme kısmına erişebileceği yer burası */}
+              {role == 'Admin' && (
+                <div className='flex gap-2'>
+                  <button
+                    onClick={() => {
+                      setPopup(true);
+                      setModalData(stock);
+                      setSelectedFeatures(
+                        productFeatures.filter(
+                          (productFeature) =>
+                            productFeature.productId === stock.Product.id
+                        )
+                      );
+                    }}
+                    title='Düzenle'
+                    type='button'
+                    className='font-semibold text-white border border-green-500 rounded-full p-1 bg-green-500
           hover:bg-green-800 transition duration-300 ease-in-out hover:border-green-800'
-                >
-                  <LiaEdit size={20} />
-                </button>
-                <button
-                  title='Sil'
-                  type='button'
-                  className='font-semibold text-white border border-red-500 rounded-full p-1 bg-red-500
+                  >
+                    <LiaEdit size={20} />
+                  </button>
+                  <button
+                    onClick={() => deleteBasketItem(stock.id)}
+                    title='Sil'
+                    type='button'
+                    className='font-semibold text-white border border-red-500 rounded-full p-1 bg-red-500
           hover:bg-red-800 transition duration-300 ease-in-out hover:border-red-800'
-                >
-                  <GoTrash size={18} />
-                </button>
-              </div>
-            </div>
-            {/* Stock ürün fiyatı, stok adedi */}
-            <div className='flex gap-2 items-center justify-between px-2'>
-              <div className='flex gap-2  items-center'>
-                <button
-                  type='button'
-                  className='w-8 h-8 bg-blue-500 rounded-full text-white'
-                >
-                  +
-                </button>
-
-                <p>{stock.Stock}</p>
-                <button
-                  type='button'
-                  className='w-8 h-8 bg-blue-500 rounded-full text-white'
-                >
-                  -
-                </button>
-              </div>
-              <p className='mr-4 font-semibold text-red-600'>
-                Fiyat:{' '}
-                {(stock.ProductPrice + stock.ProductFeaturePrice) * stock.Stock}
-              </p>
+                  >
+                    <GoTrash size={18} />
+                  </button>
+                </div>
+              )}
             </div>
             {/* Mağaza İsmi, Eklenme Tarihi */}
             <div className='flex flex-col'>
-              <p className='mr-4 font-semibold px-2'>Mağaza İsmi: </p>
-              <div className='flex items-center gap-1 justify-center bg-gray-100 w-full p-1'>
-                <BiCalendarCheck size={20} className='text-muted-foreground' />
+              <div className='flex gap-1 items-center bg-gray-100 w-full p-1 border-2 pl-4'>
+                <FaBoxes
+                  size={20}
+                  className='text-muted-foreground'
+                  title='Stok'
+                />
+                <p className='font-semibold text-muted-foreground'>
+                  {stock.Stock}
+                </p>
+              </div>
+              <div className='flex gap-1 items-center bg-gray-100 w-full p-1 border-2 pl-4'>
+                <IoPricetagsOutline
+                  size={20}
+                  className='text-muted-foreground'
+                  title='Fiyat'
+                />
+                <p className='font-semibold text-muted-foreground'>
+                  {(stock.ProductPrice + stock.ProductFeaturePrice) *
+                    stock.Stock}
+                </p>
+              </div>
+              <div className='flex gap-1 items-center bg-gray-100 w-full p-1 pl-4'>
+                <BiCalendarCheck
+                  size={20}
+                  className='text-muted-foreground'
+                  title='Eklenme Tarihi'
+                />
                 <p className='font-semibold text-muted-foreground'>
                   {formatDate(stock.CreatedDate)}
                 </p>
