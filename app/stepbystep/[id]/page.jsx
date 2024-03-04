@@ -1,5 +1,7 @@
 'use client'
+import FirstStep from '@/components/stepbystep/FirstStep'
 import { getAPI } from '@/services/fetchAPI'
+import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
@@ -29,8 +31,7 @@ const StepByStep = () => {
       state: "continue",
       title: "Adım 1",
       // Adım bileşenleri
-      Component: () => <div className="flex-1 bg-green-500">
-      </div>
+      Component: FirstStep,
     },
     {
       id: 0,
@@ -81,6 +82,8 @@ const StepByStep = () => {
     getAllOrderData();
   }, []);
 
+  const Current = steps[currentStep]
+
   return (
     <div className='h-screen w-full flex'>
       {/* Adımları içeren yan panel */}
@@ -96,11 +99,18 @@ const StepByStep = () => {
             </div>
           )
         })}
+
+        <Link
+          href={`/document?id=${id}&lang=tr`}
+          // Adım durumuna göre stili ayarlayan ve gereksinimler sağlanmadığında tıklanabilirliği kapatıp opaklık ekleyen sınıf birleştirmesi
+          className={twMerge("p-3 bg-black font-semibold rounded hover:opacity-75 text-white transition-all duration-200 cursor-pointer")}>
+          Print Document
+        </Link>
       </div>
 
       {/* Seçilen adımın bileşeni */}
-      {steps[currentStep].Component()}
-    </div>
+      {<Current.Component />}
+    </div >
   )
 }
 
