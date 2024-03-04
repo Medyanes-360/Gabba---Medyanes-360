@@ -1,9 +1,13 @@
 'use client'
-import React, { useState } from 'react'
+import { getAPI } from '@/services/fetchAPI'
+import { useParams } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 
 // Adım adım bir formu temsil eden bileşen
 const StepByStep = () => {
+  const { id } = useParams()
+
   // Veri durumu
   const [data, setData] = useState({
     "user": {
@@ -26,9 +30,6 @@ const StepByStep = () => {
       title: "Adım 1",
       // Adım bileşenleri
       Component: () => <div className="flex-1 bg-green-500">
-        <button onClick={() => setData((prev) => ({ ...prev, user: { ...prev.user, username: "test username" } }))}>
-          Set Username
-        </button>
       </div>
     },
     {
@@ -42,9 +43,6 @@ const StepByStep = () => {
       title: "Adım 2",
       // Adım bileşenleri
       Component: () => <div className="flex-1 bg-red-500">
-        <button onClick={() => setData((prev) => ({ ...prev, order: { ...prev.order, orderId: "test order id" } }))}>
-          Set Username
-        </button>
       </div>
     },
     {
@@ -60,6 +58,7 @@ const StepByStep = () => {
       Component: () => <div className="flex-1 bg-orange-500" />
     }
   ])
+  const [orderData, setOrderData] = useState();
 
   // Duruma göre renk döndüren fonksiyon
   const getColor = (state) => {
@@ -71,6 +70,16 @@ const StepByStep = () => {
       return "bg-green-500"
     }
   }
+
+  const getAllOrderData = async () => {
+    const response = await getAPI('/createOrder/order');
+    const filtered = response.data?.filter((fl) => fl.orderCode === id)[0]
+    setOrderData(filtered);
+  };
+
+  useEffect(() => {
+    getAllOrderData();
+  }, []);
 
   return (
     <div className='h-screen w-full flex'>

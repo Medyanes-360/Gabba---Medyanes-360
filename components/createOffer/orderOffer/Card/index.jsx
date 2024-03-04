@@ -1,5 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 const Card = ({
   orderData,
   setOrderData,
@@ -55,7 +57,7 @@ const Card = ({
                     return (
                       total +
                       (order.productPrice + order.productFeaturePrice) *
-                        order.stock
+                      order.stock
                     );
                   }, 0)}
                 </li>
@@ -66,8 +68,8 @@ const Card = ({
                   </span>
                 </li>
               </ul>
-              <div className='flex mt-4 gap-2'>
-                <Image
+              <div className='flex my-4 gap-2'>
+                {/* <Image
                   onClick={() => {
                     setSelectedOrder({ data: item, lang: 'en' });
                   }}
@@ -96,7 +98,13 @@ const Card = ({
                   width={100}
                   height={100}
                   alt='Invoice icon'
-                />
+                /> */}
+                
+                <Button>
+                  <Link href={`/stepbystep/${item.orderCode}`}>
+                    Go Panel
+                  </Link>
+                </Button>
               </div>
             </div>
           </div>
