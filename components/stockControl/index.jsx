@@ -50,6 +50,7 @@ const StockControl = () => {
       ) : (
         <StockControlCard
           stocks={stocks}
+          setStocks={setStocks}
           popup={popup}
           setPopup={setPopup}
           productFeatures={productFeatures}
