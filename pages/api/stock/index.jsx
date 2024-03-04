@@ -45,7 +45,7 @@ const handler = async (req, res) => {
         await data.selectedOfferFeatures.Renkler.map((item) => {
           item.colourId = item.id;
           item.productId = data.selectedOfferProduct;
-          item.basketId = responseCreateStock.id;
+          item.stockId = responseCreateStock.id;
           delete item.id;
         });
 
@@ -67,7 +67,7 @@ const handler = async (req, res) => {
         data.selectedOfferFeatures.Kumaşlar.map((item) => {
           item.fabricsId = item.id;
           item.productId = data.selectedOfferProduct;
-          item.basketId = responseCreateStock.id;
+          item.stockId = responseCreateStock.id;
           delete item.id;
         });
         const responseCreateStockFabric = await createNewDataMany(
@@ -88,7 +88,7 @@ const handler = async (req, res) => {
         data.selectedOfferFeatures.Ölçüler.map((item) => {
           item.measurementId = item.id;
           item.productId = data.selectedOfferProduct;
-          item.basketId = responseCreateStock.id;
+          item.stockId = responseCreateStock.id;
           delete item.id;
         });
 
@@ -113,7 +113,7 @@ const handler = async (req, res) => {
         data.selectedOfferFeatures.Metaller.map((item) => {
           item.metalId = item.id;
           item.productId = data.selectedOfferProduct;
-          item.basketId = responseCreateStock.id;
+          item.stockId = responseCreateStock.id;
           delete item.id;
         });
 
@@ -135,7 +135,7 @@ const handler = async (req, res) => {
         data.selectedOfferFeatures.Extra.map((item) => {
           item.extraId = item.id;
           item.productId = data.selectedOfferProduct;
-          item.basketId = responseCreateStock.id;
+          item.stockId = responseCreateStock.id;
           delete item.id;
         });
 
@@ -197,26 +197,26 @@ const handler = async (req, res) => {
 
           // StockColors içinde Stocks ID'sine göre eşleşen renkleri seçme
           const matchingColors = await StockColors.filter(
-            (color) => color.basketId === StockId
+            (color) => color.stockId === StockId
           );
 
           // StockExtra içinde Stocks ID'sine göre eşleşen ekstraları seçme
           const matchingExtras = await StockExtra.filter(
-            (extra) => extra.basketId === StockId
+            (extra) => extra.stockId === StockId
           );
 
           // StockFabrics içinde Stocks ID'sine göre eşleşen kumaşları seçme
           const matchingFabrics = await StockFabrics.filter(
-            (fabric) => fabric.basketId === StockId
+            (fabric) => fabric.stockId === StockId
           );
 
           const matchingMeasurements = await StockMeasurements.filter(
-            (measurement) => measurement.basketId === StockId
+            (measurement) => measurement.stockId === StockId
           );
 
           // StockMetals içinde Stocks ID'sine göre eşleşen metalleri seçme
           const matchingMetals = await StockMetals.filter(
-            (metal) => metal.basketId === StockId
+            (metal) => metal.stockId === StockId
           );
 
           // Her bir renk için API çağrısını yaparak Renkler dizisine eklemek
