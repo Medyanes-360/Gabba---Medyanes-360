@@ -30,7 +30,6 @@ const OrderOffer = ({
         <PrintOrder
           data={selectedOrder.data}
           lang={selectedOrder.lang}
-          setSelectedOrder={setSelectedOrder}
         />
       ) : (
         <Card
