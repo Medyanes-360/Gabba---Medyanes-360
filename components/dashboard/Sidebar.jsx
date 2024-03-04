@@ -47,7 +47,7 @@ const buttons = [
     ],
   },
   {
-    title: 'Diğerler',
+    title: 'Diğerleri',
     buttons: [
       {
         id: '1.4',
@@ -59,6 +59,12 @@ const buttons = [
             label: 'Stok',
             icon: UserIcon,
             path: '/dashboard/stock',
+          },
+          {
+            id: '1.4.2',
+            label: 'Stok Kontrol',
+            icon: UserIcon,
+            path: '/dashboard/stock-control',
           },
         ],
       },
