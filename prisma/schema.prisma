@@ -504,7 +504,7 @@ model StockColors {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   colourId  String
   productId String
-  basketId  String
+  stockId   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -513,7 +513,7 @@ model StockFabrics {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   fabricsId String
   productId String
-  basketId  String
+  stockId   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -522,7 +522,7 @@ model StockMetals {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   metalId   String
   productId String
-  basketId  String
+  stockId   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -531,7 +531,7 @@ model StockMeasurements {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   measurementId String
   productId     String
-  basketId      String
+  stockId       String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -540,7 +540,7 @@ model StockExtra {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   extraId   String
   productId String
-  basketId  String
+  stockId   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
