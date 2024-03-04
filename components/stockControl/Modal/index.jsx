@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { IoCloseOutline } from 'react-icons/io5';
 import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik';
 import Image from 'next/image';
-import { getAPI } from '@/services/fetchAPI';
+import { getAPI, postAPI } from '@/services/fetchAPI';
 
 const Modal = ({
   popup,
@@ -19,7 +19,6 @@ const Modal = ({
   const [test, setTest] = useState([]);
 
   const uniqueKeys = ['Renkler', 'Kumaşlar', 'Metaller', 'Ölçüler', 'Extra'];
-  console.log(modalData);
 
   async function getAllFeatureValues() {
     const responseMeasurements = getAPI('/createProduct/measurements');
@@ -84,6 +83,8 @@ const Modal = ({
     }
   }
 
+  // Formik verilerine seçilen ek özelliği ekler.
+  // Örnek: Renkler kategorisine "A" ürünü ve bu ürünün ek değerini ekle.
   function addOfferedFeatures(selectedItem, category, prop) {
     // Eski verilere doğrudan erişerek güncelleme işlemi yap
     prop.setFieldValue(`selectedOfferFeatures.${category}`, {
@@ -105,6 +106,7 @@ const Modal = ({
     );
   }
 
+  // Formik verilerine seçilen ek özelliği kaldırır.
   function deleteOfferedFeatures(selectedItem, category, prop) {
     // Önceki kategori verilerinin bir kopyasını al
     const updatedCategoryData = {
@@ -134,10 +136,30 @@ const Modal = ({
     );
   }
 
+  // Stok değerini değiştirmek için kullanılan
+  const handleChangeStock = async (itemId, stock) => {
+    console.log(stock);
+    if (stock < 1) {
+      return toast.error('Stok değeri 1 den küçük olamaz!');
+    }
+    setBasketData((prevBasketData) => {
+      const newBasketData = [...prevBasketData];
+      const itemIndex = newBasketData.findIndex((item) => item.id === itemId);
+      newBasketData[itemIndex].Stock = stock;
+      return newBasketData;
+    });
+    const response = await postAPI('/createOffer/basket', {
+      processType: 'update',
+      id: itemId,
+      stock,
+    });
+  };
+
   useEffect(() => {
     getAllFeatureValues();
   }, []);
 
+  // Tablodaki başlıkları oluşturmak için kullanılan bir fonksiyondur.
   const selectedProductTableHeader = (tableHeads) => {
     return tableHeads.map((header, index) => (
       <th
@@ -182,13 +204,17 @@ const Modal = ({
             }, {}),
           },
           stock: modalData.Stock,
-          orderNote: '',
-          selectedOfferProduct: modalData.id,
+          stockId: modalData.id,
+          orderNote: modalData.OrderNote,
+          selectedOfferProduct: modalData.Product.id,
           selectedOfferProductPrice: modalData.ProductPrice,
           selectedOfferProductFeaturePrice: modalData.ProductFeaturePrice,
         }}
         onSubmit={async (values, { resetForm }) => {
-          console.log(values);
+          const response = await postAPI('/stockControl', {
+            data: values,
+          });
+          console.log(response);
         }}
       >
         {(props) => (
@@ -275,6 +301,7 @@ const Modal = ({
                   <textarea
                     name='orderNote'
                     onChange={props.handleChange}
+                    value={props.values.orderNote}
                     className={`border border-gray-300 rounded-md p-2 m-2 w-full h-[43px]`}
                     placeholder='Ürün için özel açıklama ekleyiniz...'
                   />
