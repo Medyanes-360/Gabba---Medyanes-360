@@ -1,16 +1,9 @@
 'use client'
-<<<<<<< Updated upstream:app/stepbystep/[id]/page.jsx
-import FirstStep from '@/components/stepbystep/FirstStep'
-import { getAPI } from '@/services/fetchAPI'
-import Link from 'next/link'
-import { useParams } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 
 // Adım adım bir formu temsil eden bileşen
 const StepByStep = () => {
-  const { id } = useParams()
-
   // Veri durumu
   const [data, setData] = useState({
     "user": {
@@ -32,7 +25,11 @@ const StepByStep = () => {
       state: "continue",
       title: "Adım 1",
       // Adım bileşenleri
-      Component: FirstStep,
+      Component: () => <div className="flex-1 bg-green-500">
+        <button onClick={() => setData((prev) => ({ ...prev, user: { ...prev.user, username: "test username" } }))}>
+          Set Username
+        </button>
+      </div>
     },
     {
       id: 0,
@@ -45,6 +42,9 @@ const StepByStep = () => {
       title: "Adım 2",
       // Adım bileşenleri
       Component: () => <div className="flex-1 bg-red-500">
+        <button onClick={() => setData((prev) => ({ ...prev, order: { ...prev.order, orderId: "test order id" } }))}>
+          Set Username
+        </button>
       </div>
     },
     {
@@ -60,7 +60,6 @@ const StepByStep = () => {
       Component: () => <div className="flex-1 bg-orange-500" />
     }
   ])
-  const [orderData, setOrderData] = useState();
 
   // Duruma göre renk döndüren fonksiyon
   const getColor = (state) => {
@@ -72,18 +71,6 @@ const StepByStep = () => {
       return "bg-green-500"
     }
   }
-
-  const getAllOrderData = async () => {
-    const response = await getAPI('/createOrder/order');
-    const filtered = response.data?.filter((fl) => fl.orderCode === id)[0]
-    setOrderData(filtered);
-  };
-
-  useEffect(() => {
-    getAllOrderData();
-  }, []);
-
-  const Current = steps[currentStep]
 
   return (
     <div className='h-screen w-full flex'>
@@ -100,27 +87,12 @@ const StepByStep = () => {
             </div>
           )
         })}
-
-        <Link
-          href={`/document?id=${id}&lang=tr`}
-          // Adım durumuna göre stili ayarlayan ve gereksinimler sağlanmadığında tıklanabilirliği kapatıp opaklık ekleyen sınıf birleştirmesi
-          className={twMerge("p-3 bg-black font-semibold rounded hover:opacity-75 text-white transition-all duration-200 cursor-pointer")}>
-          Print Document
-        </Link>
       </div>
 
       {/* Seçilen adımın bileşeni */}
-      {<Current.Component lang={"tr"} id={id}/>}
-    </div >
+      {steps[currentStep].Component()}
+    </div>
   )
-=======
-
-import StepByStep from "@/containers/stepbystep/page"
-
-// Adım adım bir formu temsil eden bileşen
-const Page = () => {
-  return <StepByStep />
->>>>>>> Stashed changes:app/stepbystep/page.jsx
 }
 
-export default Page
+export default StepByStep
