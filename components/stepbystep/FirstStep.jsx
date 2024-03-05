@@ -11,7 +11,7 @@ const FirstStep = ({ id, lang }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await postAPI('/mail', { email: email, message: `go to the document (TR): ${`http://localhost:3000/document?id=${id}&lang=tr`}` })
+            await postAPI('/mail', { email: email, url: `http://localhost:3000/document?id=${id}&lang=tr` })
         } catch (error) {
             console.error('Error sending mail:', error);
         }
