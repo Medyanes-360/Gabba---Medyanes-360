@@ -5,7 +5,7 @@ import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { postAPI } from '@/services/fetchAPI';
 
-const FirstStep = ({ id, lang }) => {
+const SendDocument = ({ id, lang }) => {
     const [email, setEmail] = useState('');
 
     const handleSubmit = async (e) => {
@@ -18,7 +18,8 @@ const FirstStep = ({ id, lang }) => {
     };
 
     return (
-        <form className='flex flex-col mx-auto my-auto' onSubmit={handleSubmit}>
+        <div className="h-full w-full flex items-center justify-center">
+        <form className='flex h-fit flex-col w-full max-w-md' onSubmit={handleSubmit}>
             <div className="flex flex-col gap-2 mb-4">
                 <Label>
                     Email:
@@ -32,7 +33,8 @@ const FirstStep = ({ id, lang }) => {
             </div>
             <Button type="submit">Send Mail</Button>
         </form>
+        </div>
     );
 };
 
-export default FirstStep;
+export default SendDocument;

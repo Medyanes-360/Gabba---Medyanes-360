@@ -10,69 +10,7 @@ import UserIcon from '@/assets/icons/UserIcon';
 import BurgerIcon from '@/assets/icons/BurgerIcon';
 import { useMediaQuery } from '@/lib/table/useMediaQuery';
 
-const buttons = [
-  {
-    title: 'Panel',
-    buttons: [
-      {
-        id: '1.1',
-        icon: UserIcon,
-        label: 'Şirket',
-        path: '/dashboard/company',
-      },
-      {
-        id: '1.2',
-        icon: UserIcon,
-        label: 'Mağaza',
-        path: '/dashboard/store',
-      },
-      {
-        id: '1.3',
-        label: 'Çalışan',
-        icon: UserIcon,
-        path: '/dashboard/personal',
-      },
-      {
-        id: '1.4',
-        label: 'Tedarikçi',
-        icon: UserIcon,
-        path: '/dashboard/suplier',
-      },
-      {
-        id: '1.5',
-        label: 'Gider',
-        icon: UserIcon,
-        path: '/dashboard/expense',
-      },
-    ],
-  },
-  {
-    title: 'Diğerleri',
-    buttons: [
-      {
-        id: '1.4',
-        label: 'Stok',
-        icon: UserIcon,
-        childs: [
-          {
-            id: '1.4.1',
-            label: 'Stok',
-            icon: UserIcon,
-            path: '/dashboard/stock',
-          },
-          {
-            id: '1.4.2',
-            label: 'Stok Kontrol',
-            icon: UserIcon,
-            path: '/dashboard/stock-control',
-          },
-        ],
-      },
-    ],
-  },
-];
-
-const Sidebar = ({ isOpen, setIsOpen }) => {
+const Sidebar = ({ buttons }) => {
   const pathname = usePathname();
   const isMobile = useMediaQuery(768);
   const isResizingRef = useRef(false);
