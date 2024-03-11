@@ -372,10 +372,10 @@ function ListProducts({
             {(props) => (
               <Form
                 onSubmit={props.handleSubmit}
-                className='w-full absolute bg-black bg-opacity-90 z-50 min-h-screen'
+                className='w-full bg-black bg-opacity-90 z-50 min-h-screen flex justify-center'
               >
-                <div className='relative w-full h-full flex flex-col justify-center items-center gap-2'>
-                  <div className='relative bg-white w-[1000px] rounded p-4'>
+                <div className='max-w-[800px] relative w-full h-full flex flex-col justify-center items-center gap-2'>
+                  <div className='relative bg-white max-w-[1000px] rounded p-4'>
                     <div
                       className='absolute -right-4 -top-5 bg-red-600 rounded-full hover:cursor-pointer hover:scale-110 transition-all'
                       onClick={() => {
@@ -992,7 +992,11 @@ function ListProducts({
           </Formik>
         )
       }
-      <div className='w-full overflow-x-scroll lg:overflow-x-auto'>
+      <div
+        className={`${
+          selectedProduct ? 'hidden' : 'block'
+        } w-full overflow-x-scroll lg:overflow-x-auto`}
+      >
         <table
           className={`${
             selectedImage && 'blur'
