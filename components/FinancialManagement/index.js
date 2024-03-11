@@ -65,9 +65,7 @@ const FinancialManagementComponent = () => {
       const response = await getAPI('/financialManagement');
       // İşlem sırasına göre düzeltiyoruz. Veritabanında sırasız bir şekilde tutuluyor.
       response.data.sort((a, b) => a.orderValue - b.orderValue);
-      const responseSpecial = await getAPI(
-        '/financialManagementSpecial'
-      );
+      const responseSpecial = await getAPI('/financialManagementSpecial');
       setFinancialManagementsSpecial(responseSpecial.data);
       if (!response || !responseSpecial) {
         throw new Error('Veri çekilemedi 2');
@@ -95,8 +93,6 @@ const FinancialManagementComponent = () => {
           }
         });
       });
-
-      console.log(response.data);
 
       setIsloading(false);
 

@@ -47,8 +47,6 @@ const handler = async (req, res) => {
         productFeaturePrice: parseFloat(data.selectedOfferProductFeaturePrice),
       };
 
-      console.log('basketData', basketData);
-
       const responseCreateBasket = await createNewData(
         'OfferBasket',
         basketData

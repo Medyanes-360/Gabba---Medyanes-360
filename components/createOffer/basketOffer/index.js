@@ -135,7 +135,6 @@ const BasketOffer = ({
     } // else {
     //   console.log('Belirtilen kategori bulunamadı.');
     // }
-    console.log(props.values.selectedOfferFeatures);
   };
 
   const deleteOfferedFeatures = (item, category, props) => {
@@ -156,7 +155,6 @@ const BasketOffer = ({
       });
     }
   };
-  console.log(selectedBasketData);
   return (
     <>
       {selectedBasketData && selectedBasketData.length > 0 && (

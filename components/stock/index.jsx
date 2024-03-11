@@ -15,11 +15,7 @@ const Stock = () => {
   const [products, setProducts] = useState([]);
   const [productFeatures, setProductFeatures] = useState([]);
   const [showBasketOffer, setShowBasketOffer] = useState(false);
-  const [isCustomerAndPersonel, setIsCustomerAndPersonel] = useState(false);
   const [allFeatureValues, setAllFeatureValues] = useState([]);
-
-  // Yazdırma ekranına gönderilecek prop
-  const [selectedOrder, setSelectedOrder] = useState([]);
 
   // Sepetteki ürünleri tuttuğumuz state.
   const [basketData, setBasketData] = useState([]);
@@ -63,12 +59,17 @@ const Stock = () => {
     setBasketData(dataResult.data);
   }
 
+  async function getStoreData() {
+    const response = getAPI('/store');
+    const [dataResult] = await Promise.all([response]);
+    console.log(dataResult);
+  }
+
   useEffect(() => {
     getData();
     getAllBasketData();
+    getStoreData();
   }, []);
-
-  console.log('selectedOrder', selectedOrder);
 
   return (
     <>

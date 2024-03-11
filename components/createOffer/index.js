@@ -74,8 +74,6 @@ const CreateOfferComponent = () => {
     getAllBasketData();
   }, []);
 
-  console.log('selectedOrder', selectedOrder);
-
   return (
     <>
       {isloading && <LoadingScreen isloading={isloading} />}

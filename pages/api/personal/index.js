@@ -79,7 +79,6 @@ const handler = async (req, res) => {
       const financialManagementSpecial = await createNewData('User', {
         ...req.body.newData,
       });
-      console.log(financialManagementSpecial);
       if (!financialManagementSpecial || financialManagementSpecial.error) {
         throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4';
       }

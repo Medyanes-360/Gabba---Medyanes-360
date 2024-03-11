@@ -30,7 +30,6 @@ const StockControlCard = ({
     } else {
       const newStockData = stocks.filter((item) => item.id !== itemId);
       setStocks(newStockData);
-      console.log(response.message);
     }
   };
 

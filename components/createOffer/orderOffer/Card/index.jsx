@@ -8,7 +8,6 @@ const Card = ({
   setSelectedOrder,
   setShowOrderOffer,
 }) => {
-  console.log(orderData);
   return (
     <div className='grid xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-3'>
       {orderData &&
@@ -57,7 +56,7 @@ const Card = ({
                     return (
                       total +
                       (order.productPrice + order.productFeaturePrice) *
-                      order.stock
+                        order.stock
                     );
                   }, 0)}
                 </li>
@@ -99,11 +98,9 @@ const Card = ({
                   height={100}
                   alt='Invoice icon'
                 /> */}
-                
+
                 <Button>
-                  <Link href={`/stepbystep/${item.orderCode}`}>
-                    Go Panel
-                  </Link>
+                  <Link href={`/stepbystep/${item.orderCode}`}>Go Panel</Link>
                 </Button>
               </div>
             </div>

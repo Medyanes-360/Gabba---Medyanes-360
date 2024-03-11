@@ -22,8 +22,6 @@ const ListBasket = ({
   setUniqueKeys,
   setSelectedBasketFeatures,
 }) => {
-  console.log('basketData', basketData);
-
   return (
     <Formik
       //validationSchema={FinancialManagementValidationSchema}
@@ -63,7 +61,6 @@ const ListBasket = ({
           setIsloading(false);
           toast.error(response.error);
         } else {
-          console.log(response);
           setIsloading(false);
           toast.success(response.message);
           resetForm();

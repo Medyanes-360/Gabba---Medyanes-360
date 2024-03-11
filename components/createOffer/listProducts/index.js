@@ -266,7 +266,6 @@ function ListProducts({
     } // else {
     //   console.log('Belirtilen kategori bulunamadı.');
     // }
-    console.log(props.values.selectedOfferFeatures);
   };
 
   const deleteOfferedFeatures = (item, category, props) => {

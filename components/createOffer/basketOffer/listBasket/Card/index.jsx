@@ -32,7 +32,6 @@ const BasketCard = ({
   };
 
   const handleChangeStock = async (itemId, stock) => {
-    console.log(stock);
     if (stock < 1) {
       return toast.error('Stok değeri 1 den küçük olamaz!');
     }
