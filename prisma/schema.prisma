@@ -489,10 +489,12 @@ model Expense {
 }
 
 model Stock {
-  id                  String  @id @default(auto()) @map("_id") @db.ObjectId
-  stock               Int
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  stock Int
+
   orderNote           String?
   productId           String
+  storeId             String
   productPrice        Float
   productFeaturePrice Float
 

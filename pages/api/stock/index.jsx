@@ -25,6 +25,7 @@ const handler = async (req, res) => {
 
       const stockData = {
         stock: data.stock,
+        storeId: data.store,
         orderNote: data.orderNote,
         productId: data.selectedOfferProduct,
         productPrice: parseFloat(data.selectedOfferProductPrice),

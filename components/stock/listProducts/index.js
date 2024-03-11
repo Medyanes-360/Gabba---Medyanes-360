@@ -17,7 +17,9 @@ function ListProducts({
   setHiddenBasketBar,
   setAllFeatureValues,
   allFeatureValues,
+  stores,
 }) {
+  console.log(stores);
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedFeatures, setSelectedFeatures] = useState(null);
@@ -325,6 +327,7 @@ function ListProducts({
                 Extra: [],
               },
               stock: 1,
+              store: '',
               orderNote: '',
               selectedOfferProduct: selectedProduct.id,
               selectedOfferProductPrice: selectedProduct.productPrice,
@@ -348,6 +351,13 @@ function ListProducts({
                 return toast.error('Lütfen en az bir özellik seçiniz.');
               }
               values.selectedOfferProductFeaturePrice = productFeaturePrice;
+
+              console.log(values);
+
+              if (values.store == 'none' || values.store == '') {
+                setIsloading(false);
+                return toast.error('Lütfen mağazayı seçiniz!');
+              }
 
               const response = await postAPI('/stock', {
                 data: values,
@@ -465,7 +475,34 @@ function ListProducts({
                         className={`border border-gray-300 rounded-md p-2 m-2 w-full h-[43px]`}
                         placeholder='Ürün için özel açıklama ekleyiniz...'
                       />
+                    </div>
+                    <div className='flex gap-4 m-4 items-center'>
                       <div className='flex items-center'>
+                        <label
+                          htmlFor='store'
+                          className='font-semibold uppercase text-lg mr-2'
+                        >
+                          Mağaza:{' '}
+                        </label>
+                        <select
+                          name='store'
+                          value={props.values.store}
+                          id='store'
+                          onChange={props.handleChange}
+                          className='border border-gray-300 rounded-md w-full p-2 h-[43px]'
+                        >
+                          <option value='none'>
+                            ~ Lütfen bir mağaza seçiniz ~
+                          </option>
+                          {stores &&
+                            stores.map((store) => (
+                              <option key={store.id} value={store.id}>
+                                {store.company_name}
+                              </option>
+                            ))}
+                        </select>
+                      </div>
+                      <div className='flex items-center justify-end'>
                         <label className='font-semibold uppercase text-lg mr-2'>
                           Adet:
                         </label>

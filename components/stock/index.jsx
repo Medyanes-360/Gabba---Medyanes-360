@@ -9,6 +9,7 @@ import { BiFilterAlt } from 'react-icons/bi';
 import { FaFileInvoice } from 'react-icons/fa';
 
 const Stock = () => {
+  const [stores, setStores] = useState([]);
   const [showOrderOffer, setShowOrderOffer] = useState(false);
   const [hiddenBasketBar, setHiddenBasketBar] = useState(false);
   const [isloading, setIsloading] = useState(false);
@@ -62,7 +63,7 @@ const Stock = () => {
   async function getStoreData() {
     const response = getAPI('/store');
     const [dataResult] = await Promise.all([response]);
-    console.log(dataResult);
+    setStores(dataResult.data);
   }
 
   useEffect(() => {
@@ -122,6 +123,7 @@ const Stock = () => {
         setHiddenBasketBar={setHiddenBasketBar}
         setAllFeatureValues={setAllFeatureValues}
         allFeatureValues={allFeatureValues}
+        stores={stores}
       />
     </>
   );
