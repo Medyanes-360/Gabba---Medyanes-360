@@ -220,7 +220,7 @@ const Modal = ({
         {(props) => (
           <Form onSubmit={props.handleSubmit}>
             <div className='relative w-full h-full flex flex-col justify-center items-center gap-2'>
-              <div className='relative bg-white w-[1000px] rounded p-4'>
+              <div className='relative bg-white max-w-[800px] rounded p-4'>
                 <div
                   className='absolute -right-4 -top-5 bg-red-600 rounded-full hover:cursor-pointer hover:scale-110 transition-all'
                   onClick={() => {
