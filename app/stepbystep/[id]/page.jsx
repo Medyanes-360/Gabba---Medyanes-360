@@ -1,5 +1,4 @@
 'use client'
-<<<<<<< Updated upstream:app/stepbystep/[id]/page.jsx
 import FirstStep from '@/components/stepbystep/FirstStep'
 import { getAPI } from '@/services/fetchAPI'
 import Link from 'next/link'
