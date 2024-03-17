@@ -21,33 +21,23 @@ const handler = async (req, res) => {
         }
 
         const deleteColor = deleteDataByMany('StockColors', {
-          stockId: {
-            equals: id,
-          },
+          stockId: id,
         });
 
         const deleteExtra = deleteDataByMany('StockExtra', {
-          id: {
-            equals: id,
-          },
+          stockId: id,
         });
 
         const deleteFabrics = deleteDataByMany('StockFabrics', {
-          id: {
-            equals: id,
-          },
+          stockId: id,
         });
 
         const deleteMeasurements = deleteDataByMany('StockMeasurements', {
-          id: {
-            equals: id,
-          },
+          stockId: id,
         });
 
         const deleteMetals = deleteDataByMany('StockMetals', {
-          id: {
-            equals: id,
-          },
+          stockId: id,
         });
 
         const [
@@ -72,6 +62,7 @@ const handler = async (req, res) => {
 
       const stockData = {
         stock: data.stock,
+        storeId: data.storeId,
         orderNote: data.orderNote,
         productPrice: data.selectedOfferProductPrice,
         productFeaturePrice: data.selectedOfferProductFeaturePrice,
@@ -92,25 +83,25 @@ const handler = async (req, res) => {
       });
 
       const deleteExtra = deleteDataByMany('StockExtra', {
-        id: {
+        stockId: {
           equals: data.stockId,
         },
       });
 
       const deleteFabrics = deleteDataByMany('StockFabrics', {
-        id: {
+        stockId: {
           equals: data.stockId,
         },
       });
 
       const deleteMeasurements = deleteDataByMany('StockMeasurements', {
-        id: {
+        stockId: {
           equals: data.stockId,
         },
       });
 
       const deleteMetals = deleteDataByMany('StockMetals', {
-        id: {
+        stockId: {
           equals: data.stockId,
         },
       });
@@ -263,6 +254,7 @@ const handler = async (req, res) => {
 
       return res.status(200).json({
         status: 'success',
+        message: 'Ürünler başarıyla güncellendi!',
       });
     }
   } catch (error) {
