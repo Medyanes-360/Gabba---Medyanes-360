@@ -157,6 +157,7 @@ const handler = async (req, res) => {
 
     if (req.method === 'GET') {
       const Stocks = await getAllData('Stock');
+      const Stores = await getAllData('Store');
       const StockColors = await getAllData('StockColors');
       const StockFabrics = await getAllData('StockFabrics');
       const StockMeasurements = await getAllData('StockMeasurements');
@@ -195,6 +196,10 @@ const handler = async (req, res) => {
       await Promise.all(
         Stocks.map(async (Stock) => {
           const StockId = Stock.id;
+
+          const matchingStore = await Stores.filter(
+            (store) => store.id === Stock.storeId
+          );
 
           // StockColors içinde Stocks ID'sine göre eşleşen renkleri seçme
           const matchingColors = await StockColors.filter(
@@ -275,6 +280,8 @@ const handler = async (req, res) => {
             })
           );
 
+          const storeId = matchingStore.map((item) => item.id);
+
           const combinedItem = {
             id: Stock.id,
             Product: productData.data,
@@ -288,6 +295,7 @@ const handler = async (req, res) => {
             Kumaşlar: dataFabric,
             Metaller: dataMetal,
             CreatedDate: Stock.createdAt,
+            StoreId: storeId,
           };
 
           // Toplu veriler dizisine ekle
