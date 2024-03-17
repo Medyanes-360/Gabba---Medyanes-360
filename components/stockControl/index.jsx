@@ -16,8 +16,14 @@ const StockControl = () => {
 
   const [allFeatureValues, setAllFeatureValues] = useState([]);
 
-  async function getStockData() {
+  async function getStockData(update) {
     setIsLoading(true);
+    if (update) {
+      const response = getAPI('/stock');
+      const [responseStocks] = await Promise.all([response]);
+      setIsLoading(false);
+      return setStocks(responseStocks.data);
+    }
 
     const response1 = getAPI('/createProduct/createProduct');
     const response2 = getAPI('/stock');
@@ -47,6 +53,9 @@ const StockControl = () => {
           setAllFeatureValues={setAllFeatureValues}
           selectedFeatures={selectedFeatures}
           stores={stores}
+          isLoading={isLoading}
+          setIsLoading={setIsLoading}
+          getStockData={getStockData}
         />
       )}
 
