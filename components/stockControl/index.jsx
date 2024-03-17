@@ -3,11 +3,12 @@ import React, { useState, useEffect } from 'react';
 import StockControlCard from './Card';
 import Modal from './Modal';
 import { getAPI } from '@/services/fetchAPI';
+import { useLoadingContext } from '@/app/(DashboardLayout)/layout';
 
 const StockControl = () => {
+  const { isLoading, setIsLoading } = useLoadingContext();
   const [stocks, setStocks] = useState([]);
   const [productFeatures, setProductFeatures] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [popup, setPopup] = useState(false);
   const [modalData, setModalData] = useState([]);
   const [selectedFeatures, setSelectedFeatures] = useState(null);
@@ -15,6 +16,8 @@ const StockControl = () => {
   const [allFeatureValues, setAllFeatureValues] = useState([]);
 
   async function getStockData() {
+    setIsLoading(true);
+
     const response1 = getAPI('/createProduct/createProduct');
     const response2 = getAPI('/stock');
 
@@ -45,19 +48,17 @@ const StockControl = () => {
         />
       )}
 
-      {isLoading ? (
-        'Yükleniyor...'
-      ) : (
-        <StockControlCard
-          stocks={stocks}
-          setStocks={setStocks}
-          popup={popup}
-          setPopup={setPopup}
-          productFeatures={productFeatures}
-          setModalData={setModalData}
-          setSelectedFeatures={setSelectedFeatures}
-        />
-      )}
+      <StockControlCard
+        stocks={stocks}
+        setStocks={setStocks}
+        popup={popup}
+        setPopup={setPopup}
+        productFeatures={productFeatures}
+        setModalData={setModalData}
+        setSelectedFeatures={setSelectedFeatures}
+        isLoading={isLoading}
+        setIsLoading={setIsLoading}
+      />
     </>
   );
 };
