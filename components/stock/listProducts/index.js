@@ -352,8 +352,6 @@ function ListProducts({
               }
               values.selectedOfferProductFeaturePrice = productFeaturePrice;
 
-              console.log(values);
-
               if (values.store == 'none' || values.store == '') {
                 setIsloading(false);
                 return toast.error('Lütfen mağazayı seçiniz!');
