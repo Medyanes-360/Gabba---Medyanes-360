@@ -1,23 +1,25 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { IoCloseOutline } from 'react-icons/io5';
-import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik';
+import { Formik, Form } from 'formik';
 import Image from 'next/image';
 import { getAPI, postAPI } from '@/services/fetchAPI';
+import { toast } from 'react-toastify';
 
 const Modal = ({
   popup,
   setPopup,
   modalData,
-  setModalData,
   productFeatures,
   allFeatureValues,
   setAllFeatureValues,
   selectedFeatures,
+  stores,
+  setIsLoading,
+  getStockData,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [test, setTest] = useState([]);
-
   const uniqueKeys = ['Renkler', 'Kumaşlar', 'Metaller', 'Ölçüler', 'Extra'];
 
   async function getAllFeatureValues() {
@@ -136,25 +138,6 @@ const Modal = ({
     );
   }
 
-  // Stok değerini değiştirmek için kullanılan
-  const handleChangeStock = async (itemId, stock) => {
-    console.log(stock);
-    if (stock < 1) {
-      return toast.error('Stok değeri 1 den küçük olamaz!');
-    }
-    setBasketData((prevBasketData) => {
-      const newBasketData = [...prevBasketData];
-      const itemIndex = newBasketData.findIndex((item) => item.id === itemId);
-      newBasketData[itemIndex].Stock = stock;
-      return newBasketData;
-    });
-    const response = await postAPI('/createOffer/basket', {
-      processType: 'update',
-      id: itemId,
-      stock,
-    });
-  };
-
   useEffect(() => {
     getAllFeatureValues();
   }, []);
@@ -206,15 +189,53 @@ const Modal = ({
           stock: modalData.Stock,
           stockId: modalData.id,
           orderNote: modalData.OrderNote,
+          storeId: modalData.StoreId[0],
           selectedOfferProduct: modalData.Product.id,
           selectedOfferProductPrice: modalData.ProductPrice,
           selectedOfferProductFeaturePrice: modalData.ProductFeaturePrice,
         }}
         onSubmit={async (values, { resetForm }) => {
+          setIsLoading(true);
+
+          // Stok adedini 0'dan büyük olmasını kontrol ediyoruz.
+          if (values.stock <= 0) {
+            setIsLoading(false);
+            return toast.error('Lütfen geçerli bir adet giriniz.');
+          }
+
+          // Ürünlerin ek özelliklerinden bir tane seçme zorunluluğu vardır. Bunu kontrol ediyoruz.
+          if (
+            values.selectedOfferFeatures.Renkler.length === 0 &&
+            values.selectedOfferFeatures.Kumaşlar.length === 0 &&
+            values.selectedOfferFeatures.Metaller.length === 0 &&
+            values.selectedOfferFeatures.Ölçüler.length === 0 &&
+            values.selectedOfferFeatures.Extra.length === 0
+          ) {
+            setIsLoading(false);
+            return toast.error('Lütfen en az bir özellik seçiniz.');
+          }
+
+          // Mağaza seçip seçmediğini kontrol ediyoruz.
+          if (values.storeId == 'none' || values.storeId == '') {
+            setIsLoading(false);
+            return toast.error('Lütfen mağazayı seçiniz!');
+          }
+
+          // API'ye istek atıyoruz
           const response = await postAPI('/stockControl', {
             data: values,
           });
-          console.log(response);
+
+          if (response.status == 'error') {
+            setIsLoading(false);
+            return toast.error(response.message);
+          }
+
+          setIsLoading(false);
+          setPopup(false);
+          toast.success(response.message);
+          // Veriler güncellendiği için fonksiyona update işlemi olduğunu belirtmek için true değeri gönderiyoruz.
+          getStockData(true);
         }}
       >
         {(props) => (
@@ -300,12 +321,39 @@ const Modal = ({
                 <div className='flex gap-4 justify-end m-4 items-center'>
                   <textarea
                     name='orderNote'
-                    onChange={props.handleChange}
                     value={props.values.orderNote}
+                    onChange={props.handleChange}
                     className={`border border-gray-300 rounded-md p-2 m-2 w-full h-[43px]`}
                     placeholder='Ürün için özel açıklama ekleyiniz...'
                   />
+                </div>
+                <div className='flex gap-4 m-4 items-center'>
                   <div className='flex items-center'>
+                    <label
+                      htmlFor='store'
+                      className='font-semibold uppercase text-lg mr-2'
+                    >
+                      Mağaza:{' '}
+                    </label>
+                    <select
+                      name='storeId'
+                      value={props.values.storeId}
+                      id='storeId'
+                      onChange={props.handleChange}
+                      className='border border-gray-300 rounded-md w-full p-2 h-[43px]'
+                    >
+                      <option value='none'>
+                        ~ Lütfen bir mağaza seçiniz ~
+                      </option>
+                      {stores &&
+                        stores.map((store) => (
+                          <option key={store.id} value={store.id}>
+                            {store.company_name}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                  <div className='flex items-center justify-end'>
                     <label className='font-semibold uppercase text-lg mr-2'>
                       Adet:
                     </label>
@@ -325,6 +373,7 @@ const Modal = ({
                     Stok Güncelle
                   </button>
                 </div>
+
                 {/* Ürün için eklenen özellikler buradadır. */}
                 <div>
                   <h2 className='font-semibold text-2xl mb-6 text-center bg-blue-200 p-2 rounded'>
