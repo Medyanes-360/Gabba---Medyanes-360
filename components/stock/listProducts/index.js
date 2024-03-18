@@ -2,19 +2,14 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { getAPI, postAPI } from '@/services/fetchAPI';
-import 'react-toastify/dist/ReactToastify.css';
 import { IoCloseOutline } from 'react-icons/io5';
-import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik';
+import { Formik, Form } from 'formik';
 
 function ListProducts({
   toast,
-  isloading,
   setIsloading,
-  getData,
-  getAllBasketData,
   products,
   productFeatures,
-  setHiddenBasketBar,
   setAllFeatureValues,
   allFeatureValues,
   stores,
@@ -204,7 +199,6 @@ function ListProducts({
                   <button
                     type='button'
                     onClick={async () => {
-                      setHiddenBasketBar(true);
                       setSelectedProduct(product);
                       setSelectedFeatures(
                         productFeatures.filter(
@@ -368,12 +362,10 @@ function ListProducts({
                 setProductFeaturePrice(0);
                 // veriyi çek ve state'e at
                 setIsloading(false);
-                setHiddenBasketBar(false);
                 toast.success('Tüm Veriler Başarıyla Eklendi!');
                 setSelectedProduct(null);
                 setSelectedFeatures(null);
                 setSelectedCategory(null);
-                getAllBasketData();
               }
             }}
           >
@@ -390,7 +382,6 @@ function ListProducts({
                         setSelectedProduct(null);
                         setSelectedFeatures(null);
                         setSelectedCategory(null);
-                        setHiddenBasketBar(false);
                         setProductFeaturePrice(0);
                         props.resetForm();
                       }}
