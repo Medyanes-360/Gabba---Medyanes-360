@@ -83,7 +83,7 @@ const StockControlCard = ({
                       role === 'Admin' ? 'justify-between' : 'justify-center'
                     }`}
                   >
-                    <p className='text-center text-sm lg:text-lg  font-semibold uppercase break-all'>
+                    <p className='text-center text-sm font-semibold uppercase break-all'>
                       {stock.Product.productName}
                     </p>
                     {/* Role göre düzenle ve silme kısmına erişebileceği yer burası */}
