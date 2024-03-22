@@ -1,5 +1,5 @@
 'use client';
-import { getAPI } from '@/services/fetchAPI';
+import { getAPI, postAPI } from '@/services/fetchAPI';
 import React, { useState, useEffect } from 'react';
 import ListBasket from './listBasket';
 import { IoCloseOutline } from 'react-icons/io5';
@@ -11,9 +11,9 @@ const BasketOffer = ({
   isloading,
   setIsloading,
   productFeatures,
+  getData,
   basketData,
   setBasketData,
-  getAllBasketData,
   setShowOrderOffer,
   setShowBasketOffer,
   setIsCustomerAndPersonel,
@@ -104,78 +104,144 @@ const BasketOffer = ({
     ));
   };
 
-  const addOfferedFeatures = (item, category, props) => {
-    if (props.values.selectedOfferFeatures[category]) {
-      // Verilen kategorideki objelerin id'lerini kontrol et
-      const id = item.id;
-      const categoryArray = props.values.selectedOfferFeatures[category];
+  // Formik verilerine seçilen ek özelliği ekler.
+  // Örnek: Renkler kategorisine "A" ürünü ve bu ürünün ek değerini ekle.
+  function addOfferedFeatures(selectedItem, category, prop) {
+    // Eski verilere doğrudan erişerek güncelleme işlemi yap
+    prop.setFieldValue(`selectedOfferFeatures.${category}`, {
+      ...prop.values.selectedOfferFeatures[category],
+      [selectedItem.id]: selectedItem,
+    });
 
-      const isDuplicate = categoryArray.some(function (item) {
-        return item.id === id;
-      });
-
-      if (item.targetValue === 'plus' || item.targetValue === 'minus') {
-        setProductFeaturePrice(
-          parseInt(productFeaturePrice) + parseInt(item.value)
-        );
-      }
-
-      // Eğer obje daha önce- eklenmediyse, kategoriye ekleyin
-      if (!isDuplicate) {
-        categoryArray.push({
-          id: item.id,
-        });
-        props.setFieldValue('selectedOfferFeatures', {
-          ...props.values.selectedOfferFeatures,
-          [category]: categoryArray,
-        });
-      } //else {
-      //   console.log("Bu ID'ye sahip obje zaten var.");
-      // }
-    } // else {
-    //   console.log('Belirtilen kategori bulunamadı.');
-    // }
-  };
-
-  const deleteOfferedFeatures = (item, category, props) => {
-    const id = item.id;
-    item.targetValue === 'plus' || item.targetValue === 'minus'
-      ? setProductFeaturePrice(
-          parseInt(productFeaturePrice) - parseInt(item.value)
-        )
-      : null;
-    // Objeyi kategoriden kaldırmak için bir işlev
-    if (props.values.selectedOfferFeatures[category]) {
-      const deletedOfferFeatures = props.values.selectedOfferFeatures[
-        category
-      ].filter((item) => item.id !== id);
-      props.setFieldValue('selectedOfferFeatures', {
-        ...props.values.selectedOfferFeatures,
-        [category]: deletedOfferFeatures,
-      });
+    // Feature değeri yoksa fonksiyondan çık.
+    if (!selectedItem.value) {
+      return;
     }
-  };
+    // Feature değerini güncelliyoruz.
+    prop.setFieldValue(
+      'selectedOfferProductFeaturePrice',
+      parseInt(
+        prop.values.selectedOfferProductFeaturePrice +
+          parseInt(selectedItem.value)
+      )
+    );
+  }
+
+  // Formik verilerine seçilen ek özelliği kaldırır.
+  function deleteOfferedFeatures(selectedItem, category, prop) {
+    // Önceki kategori verilerinin bir kopyasını al
+    const updatedCategoryData = {
+      ...prop.values.selectedOfferFeatures[category],
+    };
+
+    // Belirli bir öğeyi kategoriden sil
+    delete updatedCategoryData[selectedItem.id];
+
+    // Güncellenmiş kategori verilerini setFieldValue ile atama
+    prop.setFieldValue(
+      `selectedOfferFeatures.${category}`,
+      updatedCategoryData
+    );
+
+    if (!selectedItem.value) {
+      return;
+    }
+
+    // Feature değerini güncelliyoruz.
+    prop.setFieldValue(
+      'selectedOfferProductFeaturePrice',
+      parseInt(
+        prop.values.selectedOfferProductFeaturePrice -
+          parseInt(selectedItem.value)
+      )
+    );
+  }
+
   return (
     <>
       {selectedBasketData && selectedBasketData.length > 0 && (
         <Formik
           initialValues={{
             selectedOfferFeatures: {
-              Renkler: [],
-              Kumaşlar: [],
-              Metaller: [],
-              Ölçüler: [],
-              Extra: [],
+              Renkler: selectedBasketData[0].Renkler.reduce((acc, renk) => {
+                // Renkler verisini dönüştürerek, her bir rengin id'sini anahtar olarak kullanıp rengi objeye yerleştirelim
+                acc[renk.id] = renk;
+                return acc;
+              }, {}),
+              Kumaşlar: selectedBasketData[0].Kumaşlar.reduce(
+                (acc, kumaslar) => {
+                  // Renkler verisini dönüştürerek, her bir rengin id'sini anahtar olarak kullanıp rengi objeye yerleştirelim
+                  acc[kumaslar.id] = kumaslar;
+                  return acc;
+                },
+                {}
+              ),
+              Metaller: selectedBasketData[0].Metaller.reduce(
+                (acc, metaller) => {
+                  // Renkler verisini dönüştürerek, her bir rengin id'sini anahtar olarak kullanıp rengi objeye yerleştirelim
+                  acc[metaller.id] = metaller;
+                  return acc;
+                },
+                {}
+              ),
+              Ölçüler: selectedBasketData[0].Ölçüler.reduce((acc, olculer) => {
+                // Renkler verisini dönüştürerek, her bir rengin id'sini anahtar olarak kullanıp rengi objeye yerleştirelim
+                acc[olculer.id] = olculer;
+                return acc;
+              }, {}),
+              Extralar: selectedBasketData[0].Extralar.reduce((acc, extra) => {
+                // Renkler verisini dönüştürerek, her bir rengin id'sini anahtar olarak kullanıp rengi objeye yerleştirelim
+                acc[extra.id] = extra;
+                return acc;
+              }, {}),
             },
             stock: selectedBasketData[0].Stock,
-            orderNote: selectedBasketData[0].orderNote,
+            basketId: selectedBasketData[0].id,
+            orderNote: selectedBasketData[0].OrderNote,
             selectedOfferProduct: selectedBasketData[0].Product.id,
             selectedOfferProductPrice: selectedBasketData[0].ProductPrice,
             selectedOfferProductFeaturePrice:
-              selectedBasketData[0].productFeaturePrice,
+              selectedBasketData[0].ProductFeaturePrice,
           }}
           onSubmit={async (values, { resetForm }) => {
-            console.log(values);
+            console.log(selectedBasketData[0]);
+            setIsloading(true);
+
+            // Stok adedini 0'dan büyük olmasını kontrol ediyoruz.
+            if (values.stock <= 0) {
+              setIsloading(false);
+              return toast.error('Lütfen geçerli bir adet giriniz.');
+            }
+
+            // Ürünlerin ek özelliklerinden bir tane seçme zorunluluğu vardır. Bunu kontrol ediyoruz.
+            if (
+              values.selectedOfferFeatures.Renkler.length === 0 &&
+              values.selectedOfferFeatures.Kumaşlar.length === 0 &&
+              values.selectedOfferFeatures.Metaller.length === 0 &&
+              values.selectedOfferFeatures.Ölçüler.length === 0 &&
+              values.selectedOfferFeatures.Extra.length === 0
+            ) {
+              setIsloading(false);
+              return toast.error('Lütfen en az bir özellik seçiniz.');
+            }
+
+            // API'ye istek atıyoruz
+            const response = await postAPI('/createOffer/basket/', {
+              data: values,
+              processType: 'updateBasket',
+            });
+
+            if (response.status == 'error') {
+              setIsloading(false);
+              return toast.error(response.message);
+            }
+
+            toast.success(response.message);
+            getData('onlyBasket');
+            setIsloading(false);
+            setHiddenBasketBar(false);
+            setIsSelectedBasket(false);
+            setSelectedBasketData([]);
           }}
         >
           {(props) => (
@@ -228,8 +294,8 @@ const BasketOffer = ({
                             Son Güncel Fiyatı:{' '}
                           </span>
                           <span className='bg-green-600 p-1 rounded text-white'>
-                            {(selectedBasketData[0].ProductPrice +
-                              productFeaturePrice) *
+                            {(props.values.selectedOfferProductPrice +
+                              props.values.selectedOfferProductFeaturePrice) *
                               props.values.stock}
                           </span>
                         </p>
@@ -394,9 +460,8 @@ const BasketOffer = ({
                                   <td className='text-center py-2 border-r'>
                                     <button
                                       onClick={() =>
-                                        props.values.selectedOfferFeatures.Renkler.filter(
-                                          (feature) => feature.id === item.id
-                                        ).length > 0
+                                        props.values.selectedOfferFeatures
+                                          .Renkler[item.id]
                                           ? deleteOfferedFeatures(
                                               item,
                                               'Renkler',
@@ -410,18 +475,16 @@ const BasketOffer = ({
                                       }
                                       type='button'
                                       className={`${
-                                        props.values.selectedOfferFeatures.Renkler.filter(
-                                          (feature) => feature.id === item.id
-                                        ).length > 0
+                                        props.values.selectedOfferFeatures
+                                          .Renkler[item.id]
                                           ? 'bg-red-500'
                                           : 'bg-blue-500'
                                       } rounded hover:cursor-pointer hover:scale-110 transition-all inline-block text-white font-bold text-md shadow`}
                                     >
                                       <div className='p-2 flex flex-row justify-center items-center gap-2 whitespace-nowrap'>
                                         <span className='block'>
-                                          {props.values.selectedOfferFeatures.Renkler.filter(
-                                            (feature) => feature.id === item.id
-                                          ).length > 0
+                                          {props.values.selectedOfferFeatures
+                                            .Renkler[item.id]
                                             ? 'Özelliği Kaldır'
                                             : 'Özelliği Ekle'}
                                         </span>
@@ -477,9 +540,8 @@ const BasketOffer = ({
                                   <td className='text-center py-2 border-r'>
                                     <button
                                       onClick={() =>
-                                        props.values.selectedOfferFeatures.Kumaşlar.filter(
-                                          (feature) => feature.id === item.id
-                                        ).length > 0
+                                        props.values.selectedOfferFeatures
+                                          .Kumaşlar[item.id]
                                           ? deleteOfferedFeatures(
                                               item,
                                               'Kumaşlar',
@@ -493,18 +555,16 @@ const BasketOffer = ({
                                       }
                                       type='button'
                                       className={`${
-                                        props.values.selectedOfferFeatures.Kumaşlar.filter(
-                                          (feature) => feature.id === item.id
-                                        ).length > 0
+                                        props.values.selectedOfferFeatures
+                                          .Kumaşlar[item.id]
                                           ? 'bg-red-500'
                                           : 'bg-blue-500'
                                       } rounded hover:cursor-pointer hover:scale-110 transition-all inline-block text-white font-bold text-md shadow`}
                                     >
                                       <div className='p-2 flex flex-row justify-center items-center gap-2 whitespace-nowrap'>
-                                        <span className='hidden lg:block'>
-                                          {props.values.selectedOfferFeatures.Kumaşlar.filter(
-                                            (feature) => feature.id === item.id
-                                          ).length > 0
+                                        <span className='block'>
+                                          {props.values.selectedOfferFeatures
+                                            .Kumaşlar[item.id]
                                             ? 'Özelliği Kaldır'
                                             : 'Özelliği Ekle'}
                                         </span>
@@ -572,9 +632,8 @@ const BasketOffer = ({
                                   <td className='text-center py-2 border-r'>
                                     <button
                                       onClick={() =>
-                                        props.values.selectedOfferFeatures.Metaller.filter(
-                                          (feature) => feature.id === item.id
-                                        ).length > 0
+                                        props.values.selectedOfferFeatures
+                                          .Metaller[item.id]
                                           ? deleteOfferedFeatures(
                                               item,
                                               'Metaller',
@@ -588,18 +647,16 @@ const BasketOffer = ({
                                       }
                                       type='button'
                                       className={`${
-                                        props.values.selectedOfferFeatures.Metaller.filter(
-                                          (feature) => feature.id === item.id
-                                        ).length > 0
+                                        props.values.selectedOfferFeatures
+                                          .Metaller[item.id]
                                           ? 'bg-red-500'
                                           : 'bg-blue-500'
                                       } rounded hover:cursor-pointer hover:scale-110 transition-all inline-block text-white font-bold text-md shadow`}
                                     >
                                       <div className='p-2 flex flex-row justify-center items-center gap-2 whitespace-nowrap'>
-                                        <span className='hidden lg:block'>
-                                          {props.values.selectedOfferFeatures.Metaller.filter(
-                                            (feature) => feature.id === item.id
-                                          ).length > 0
+                                        <span className='block'>
+                                          {props.values.selectedOfferFeatures
+                                            .Metaller[item.id]
                                             ? 'Özelliği Kaldır'
                                             : 'Özelliği Ekle'}
                                         </span>
@@ -664,9 +721,8 @@ const BasketOffer = ({
                                   <td className='text-center py-2 border-r'>
                                     <button
                                       onClick={() =>
-                                        props.values.selectedOfferFeatures.Ölçüler.filter(
-                                          (feature) => feature.id === item.id
-                                        ).length > 0
+                                        props.values.selectedOfferFeatures
+                                          .Ölçüler[item.id]
                                           ? deleteOfferedFeatures(
                                               item,
                                               'Ölçüler',
@@ -680,18 +736,16 @@ const BasketOffer = ({
                                       }
                                       type='button'
                                       className={`${
-                                        props.values.selectedOfferFeatures.Ölçüler.filter(
-                                          (feature) => feature.id === item.id
-                                        ).length > 0
+                                        props.values.selectedOfferFeatures
+                                          .Ölçüler[item.id]
                                           ? 'bg-red-500'
                                           : 'bg-blue-500'
                                       } rounded hover:cursor-pointer hover:scale-110 transition-all inline-block text-white font-bold text-md shadow`}
                                     >
                                       <div className='p-2 flex flex-row justify-center items-center gap-2 whitespace-nowrap'>
-                                        <span className='hidden lg:block'>
-                                          {props.values.selectedOfferFeatures.Ölçüler.filter(
-                                            (feature) => feature.id === item.id
-                                          ).length > 0
+                                        <span className='block'>
+                                          {props.values.selectedOfferFeatures
+                                            .Ölçüler[item.id]
                                             ? 'Özelliği Kaldır'
                                             : 'Özelliği Ekle'}
                                         </span>
@@ -745,34 +799,31 @@ const BasketOffer = ({
                                   <td className='text-center py-2 border-r'>
                                     <button
                                       onClick={() =>
-                                        props.values.selectedOfferFeatures.Extra.filter(
-                                          (feature) => feature.id === item.id
-                                        ).length > 0
+                                        props.values.selectedOfferFeatures
+                                          .Extralar[item.id]
                                           ? deleteOfferedFeatures(
                                               item,
-                                              'Extra',
+                                              'Extralar',
                                               props
                                             )
                                           : addOfferedFeatures(
                                               item,
-                                              'Extra',
+                                              'Extralar',
                                               props
                                             )
                                       }
                                       type='button'
                                       className={`${
-                                        props.values.selectedOfferFeatures.Extra.filter(
-                                          (feature) => feature.id === item.id
-                                        ).length > 0
+                                        props.values.selectedOfferFeatures
+                                          .Extralar[item.id]
                                           ? 'bg-red-500'
                                           : 'bg-blue-500'
                                       } rounded hover:cursor-pointer hover:scale-110 transition-all inline-block text-white font-bold text-md shadow`}
                                     >
                                       <div className='p-2 flex flex-row justify-center items-center gap-2 whitespace-nowrap'>
-                                        <span className='hidden lg:block'>
-                                          {props.values.selectedOfferFeatures.Extra.filter(
-                                            (feature) => feature.id === item.id
-                                          ).length > 0
+                                        <span className='block'>
+                                          {props.values.selectedOfferFeatures
+                                            .Extralar[item.id]
                                             ? 'Özelliği Kaldır'
                                             : 'Özelliği Ekle'}
                                         </span>
@@ -822,7 +873,7 @@ const BasketOffer = ({
         toast={toast}
         basketData={basketData}
         setBasketData={setBasketData}
-        getAllBasketData={getAllBasketData}
+        getData={getData}
         productFeatures={productFeatures}
         isloading={isloading}
         setIsloading={setIsloading}

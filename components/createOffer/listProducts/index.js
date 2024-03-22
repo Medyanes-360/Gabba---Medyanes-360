@@ -11,7 +11,6 @@ function ListProducts({
   isloading,
   setIsloading,
   getData,
-  getAllBasketData,
   products,
   productFeatures,
   setHiddenBasketBar,
@@ -364,7 +363,7 @@ function ListProducts({
                 setSelectedProduct(null);
                 setSelectedFeatures(null);
                 setSelectedCategory(null);
-                getAllBasketData();
+                getData('onlyBasket');
               }
             }}
           >

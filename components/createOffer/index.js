@@ -11,7 +11,6 @@ import { BiFilterAlt } from 'react-icons/bi';
 import { FaFileInvoice } from 'react-icons/fa';
 import { BsCart3 } from 'react-icons/bs';
 import { IoChevronForwardOutline } from 'react-icons/io5';
-import { IoIosSave } from 'react-icons/io';
 import { IoChevronBackOutline } from 'react-icons/io5';
 
 const CreateOfferComponent = () => {
@@ -30,48 +29,54 @@ const CreateOfferComponent = () => {
   // Sepetteki ürünleri tuttuğumuz state.
   const [basketData, setBasketData] = useState([]);
   // Sepetteki ürünlerin stok değerlerini tuttuğumuz state.
-  const getData = async () => {
+  const getData = async (condition) => {
     try {
       setIsloading(true);
-      const response = await getAPI('/createProduct/createProduct');
-      if (!response) {
+      if (condition === 'onlyBasket') {
+        const response = getAPI('/createOffer/basket');
+        const [dataResult] = await Promise.all([response]);
+        setIsloading(false);
+        return setBasketData(dataResult.data);
+      }
+
+      const response1 = getAPI('/createProduct/createProduct');
+      const response2 = getAPI('/createOffer/basket');
+      const [createProductResult, basketResult] = await Promise.all([
+        response1,
+        response2,
+      ]);
+
+      if (!createProductResult) {
         throw new Error('Veri çekilemedi 2');
       }
 
-      if (response.status !== 'success') {
+      if (createProductResult.status !== 'success') {
         throw new Error('Veri çekilemedi');
       }
 
       // response.data.createProducts içerisindeki değerleri gez ve "productName" değerlerine göre küçükten büyüğe doğru sırala.
-      await response.data.createProducts.sort((a, b) =>
+      await createProductResult.data.createProducts.sort((a, b) =>
         a.productName.localeCompare(b.productName)
       );
       await Promise.all(
-        await response.data.createProducts.map(async (item) => {
+        await createProductResult.data.createProducts.map(async (item) => {
           const { result } = await FinancialManagementCalculate(
             item.productPrice
           );
           item.productPrice = result[result.length - 1];
         })
       );
-      setProducts(response.data.createProducts);
-      setProductFeatures(response.data.productFeatures);
+      setProducts(createProductResult.data.createProducts);
+      setProductFeatures(createProductResult.data.productFeatures);
+      setBasketData(basketResult.data);
       setIsloading(false);
     } catch (error) {
       toast.error(error.message);
     }
   };
 
-  async function getAllBasketData() {
-    const response = getAPI('/createOffer/basket');
-    const [dataResult] = await Promise.all([response]);
-    setIsloading(false);
-    setBasketData(dataResult.data);
-  }
-
   useEffect(() => {
     getData();
-    getAllBasketData();
   }, []);
 
   return (
@@ -227,12 +232,12 @@ const CreateOfferComponent = () => {
       {showBasketOffer && (
         <BasketOffer
           toast={toast}
+          getData={getData}
           basketData={basketData}
           setBasketData={setBasketData}
           isloading={isloading}
           setIsloading={setIsloading}
           productFeatures={productFeatures}
-          getAllBasketData={getAllBasketData}
           setShowOrderOffer={setShowOrderOffer}
           setShowBasketOffer={setShowBasketOffer}
           setIsCustomerAndPersonel={setIsCustomerAndPersonel}
@@ -245,7 +250,6 @@ const CreateOfferComponent = () => {
       {!showBasketOffer && !showOrderOffer && (
         <ListProducts
           getData={getData}
-          getAllBasketData={getAllBasketData}
           toast={toast}
           isloading={isloading}
           setIsloading={setIsloading}
