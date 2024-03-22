@@ -579,32 +579,32 @@ const CustomTable = ({
                         >
                           {column?.type === `enum` ? (
                             <>
-                            <Label className="text-left w-full capitalize">
-                                {column?.dt_name?.replaceAll("_", " ")}
+                              <Label className="text-left w-full capitalize">
+                                {column?.header}
                               </Label>
-                              
-                            <Select onValueChange={(newval) => {
-                                setAddModalState((prevState) => ({
-                                    ...prevState,
-                                    [columnKey]: newval,
-                                  }))
-                            }}>
-                              <SelectTrigger>
-                                <SelectValue placeholder='Select a personal role'/>
-                              </SelectTrigger>
 
-                              <SelectContent>
-                                <SelectGroup>
+                              <Select onValueChange={(newval) => {
+                                setAddModalState((prevState) => ({
+                                  ...prevState,
+                                  [columnKey]: newval,
+                                }))
+                              }}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder='Select a personal role' />
+                                </SelectTrigger>
+
+                                <SelectContent>
+                                  <SelectGroup>
                                     <SelectLabel>Roles</SelectLabel>
                                     {column?.list?.filter((x) => x.roles.includes(my_role))?.map((item) => <SelectItem value={item.role}>{item.title}</SelectItem>)}
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select>
+                                  </SelectGroup>
+                                </SelectContent>
+                              </Select>
                             </>
                           ) : (
                             <>
                               <Label className="text-left w-full capitalize">
-                                {column?.dt_name?.replaceAll("_", " ")}
+                                {column?.header}
                               </Label>
                               <Input
                                 onChange={(event) =>
@@ -621,7 +621,7 @@ const CustomTable = ({
                                   (addModalLang
                                     ? addModalLang?.code + " "
                                     : "") +
-                                  column?.dt_name?.replaceAll("_", " ")
+                                  column?.header
                                 }
                               />
                             </>
@@ -896,7 +896,7 @@ const CustomTable = ({
                                     key={col_index + columnKey}
                                   >
                                     <Label className="text-left w-full capitalize">
-                                      {column?.dt_name?.replaceAll("_", " ")}
+                                      {column?.header}
                                     </Label>
                                     <Input
                                       onChange={(event) =>
@@ -912,7 +912,7 @@ const CustomTable = ({
                                         (addModalLang
                                           ? addModalLang?.code + " "
                                           : "") +
-                                        column?.dt_name?.replaceAll("_", " ")
+                                        column?.header
                                       }
                                     />
                                   </div>
