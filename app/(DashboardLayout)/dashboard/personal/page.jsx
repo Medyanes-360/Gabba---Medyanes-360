@@ -1,3 +1,4 @@
+'use client'
 import React from 'react'
 import { personelColumn } from "@/lib/table/table";
 import { langs } from "@/lib/table/data";
