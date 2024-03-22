@@ -59,8 +59,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { getAPI, postAPI } from "@/services/fetchAPI";
 
-const my_role = 'company_manager'
-
 const CustomTable = ({
   api_route,
   columns,
@@ -72,7 +70,6 @@ const CustomTable = ({
   searchTable = true,
   changeVisible = true,
   setLanguage = true,
-  themeChanger = true,
   selectedDelete = true,
   deleteAll = true,
   addData = true,
@@ -81,6 +78,8 @@ const CustomTable = ({
     update: true,
   },
 }) => {
+  // next-auth kurulunca güncellenecek
+  const role = "company_manager"
   {
     /* Stateler */
   }
@@ -596,7 +595,7 @@ const CustomTable = ({
                                 <SelectContent>
                                   <SelectGroup>
                                     <SelectLabel>Roles</SelectLabel>
-                                    {column?.list?.filter((x) => x.roles.includes(my_role))?.map((item) => <SelectItem value={item.role}>{item.title}</SelectItem>)}
+                                    {column?.list?.filter((x) => x.roles.includes(role))?.map((item) => <SelectItem value={item.role}>{item.title}</SelectItem>)}
                                   </SelectGroup>
                                 </SelectContent>
                               </Select>
