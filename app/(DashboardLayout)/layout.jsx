@@ -1,9 +1,10 @@
 'use client';
-import React, { useState, createContext, useContext } from 'react';
+import React, { useState, createContext, useContext, useEffect } from 'react';
 import Sidebar from '@/components/dashboard/Sidebar';
 import { useParams } from 'next/navigation';
 import UserIcon from '@/assets/icons/UserIcon';
 import LoadingScreen from '@/components/other/dashboardLoading';
+import { signIn, useSession } from 'next-auth/react'
 
 const LoadingContext = createContext();
 
@@ -75,19 +76,27 @@ const MainLayout = ({ children }) => {
     },
   ];
 
+  const { data } = useSession()
+
   return (
     <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
-      <div className='flex h-screen w-full overflow-hidden bg-background pb-4 relative'>
-        <LoadingScreen isloading={isLoading} />
-        <Sidebar buttons={buttons} />
-        <div className='flex flex-1 w-full flex-col h-full px-4 overflow-hidden gap-2'>
-          {/* <Navbar /> */}
-
-          <div className='flex flex-1 h-full overflow-auto bg-background rounded-lg'>
-            <div className='py-6 w-full pl-6 md:pl-0'>{children}</div>
+      {!data ? (
+        <>
+          <button className='py-3 px-4 rounded-md bg-slate-800 text-red-600' onClick={() => signIn()}>
+            Log in
+          </button>
+        </>
+      ) : (
+        <div className='flex h-screen w-full overflow-hidden bg-background pb-4 relative'>
+          <LoadingScreen isloading={isLoading} />
+          <Sidebar buttons={buttons} />
+          <div className='flex flex-1 w-full flex-col h-full px-4 overflow-hidden gap-2'>
+            <div className='flex flex-1 h-full overflow-auto bg-background rounded-lg'>
+              <div className='py-6 w-full pl-6 md:pl-0'>{children}</div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </LoadingContext.Provider>
   );
 };

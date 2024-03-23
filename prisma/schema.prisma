@@ -267,7 +267,7 @@ model User {
   surnameUkrainian String?
   surnameTurkish   String?
 
-  phoneNumber String?
+  phoneNumber String @unique
 
   address          String?
   addressEnglish   String?

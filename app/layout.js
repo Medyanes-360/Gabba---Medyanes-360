@@ -2,6 +2,8 @@ import '@/styles/globals.css';
 import { Inter } from 'next/font/google';
 import classNames from 'classnames';
 import dynamic from 'next/dynamic';
+import AuthProvider from '@/components/AuthProvider';
+
 const ToastProvider = dynamic(() => import('@/components/table/toast-provider'), { ssr: false })
 
 const inter = Inter({ subsets: ['latin'] });
@@ -11,7 +13,7 @@ export const metadata = {
   description: 'Gabba Home Design',
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children, session }) {
   const links = [
     { url: '/', text: 'Ana Sayfa' },
     {
@@ -53,7 +55,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang='en'>
       <body className={classNames(inter.className, "bg-white")}>
-        <ToastProvider>{children}</ToastProvider>
+        <AuthProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </AuthProvider>
       </body>
     </html>
   );
