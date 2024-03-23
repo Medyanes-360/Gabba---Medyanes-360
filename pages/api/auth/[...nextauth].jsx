@@ -30,6 +30,16 @@ const authOptions = {
             throw new Error('Kullanıcı bulunamadı.');
           }
 
+          // Kullanıcı bilgilerini döndürüyoruz.
+          console.log(findUser);
+          const user = {
+            name: findUser.name,
+            surname: findUser.surname,
+            email: findUser.email,
+            phone: findUser.phoneNumber,
+            role: findUser.role,
+          };
+
           return user;
         } catch (error) {
           throw new Error(error.message);

@@ -4,7 +4,7 @@ import Sidebar from '@/components/dashboard/Sidebar';
 import { useParams } from 'next/navigation';
 import UserIcon from '@/assets/icons/UserIcon';
 import LoadingScreen from '@/components/other/dashboardLoading';
-import { signIn, useSession } from 'next-auth/react'
+import { signIn, signOut, useSession } from 'next-auth/react';
 
 const LoadingContext = createContext();
 
@@ -76,13 +76,18 @@ const MainLayout = ({ children }) => {
     },
   ];
 
-  const { data } = useSession()
+  const { data } = useSession();
+
+  console.log(data);
 
   return (
     <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
       {!data ? (
         <>
-          <button className='py-3 px-4 rounded-md bg-slate-800 text-red-600' onClick={() => signIn()}>
+          <button
+            className='py-3 px-4 rounded-md bg-slate-800 text-red-600'
+            onClick={() => signIn()}
+          >
             Log in
           </button>
         </>
@@ -91,6 +96,13 @@ const MainLayout = ({ children }) => {
           <LoadingScreen isloading={isLoading} />
           <Sidebar buttons={buttons} />
           <div className='flex flex-1 w-full flex-col h-full px-4 overflow-hidden gap-2'>
+            <button
+              onClick={() => signOut()}
+              className='py-3 px-4 rounded-md bg-slate-800 text-white'
+              type='button'
+            >
+              Çıkış Yap
+            </button>
             <div className='flex flex-1 h-full overflow-auto bg-background rounded-lg'>
               <div className='py-6 w-full pl-6 md:pl-0'>{children}</div>
             </div>
