@@ -60,7 +60,9 @@ const authOptions = {
     strategy: 'jwt',
     maxAge: 1 * 24 * 60 * 60, // 1 days * 24 hours * 60 minutes * 60 seconds
   },
-
+  pages: {
+    signIn: '/sign-in',
+  },
   callbacks: {
     // jwt fonksiyonu ile kullanıcı giriş yaptıktan sonra giriş yapan kullanıcının bilgilerini token değişkenine atıyoruz.
     // bu bilgileri session fonksiyonunda kullanacağız.
