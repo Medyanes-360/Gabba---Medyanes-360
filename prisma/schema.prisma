@@ -276,8 +276,8 @@ model User {
 
   mailAddress String? @unique
 
-  storeName    String?
-  storeAddress String?
+  store   Store  @relation(fields: [storeId], references: [id])
+  storeId String @map("storeId") @db.ObjectId
 
   maxTax String?
   role   String?
@@ -403,6 +403,7 @@ model Store {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  User      User[]
 }
 
 model Company {
