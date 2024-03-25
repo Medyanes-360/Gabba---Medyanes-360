@@ -58,6 +58,7 @@ import { ArrowDownIcon, ArrowDownUp, ArrowUpIcon } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { getAPI, postAPI } from "@/services/fetchAPI";
+import { useSession } from "next-auth/react";
 
 const CustomTable = ({
   api_route,
@@ -79,7 +80,8 @@ const CustomTable = ({
   },
 }) => {
   // next-auth kurulunca güncellenecek
-  const role = "company_manager"
+  const { session } = useSession()
+  const role = session.user.role
   {
     /* Stateler */
   }

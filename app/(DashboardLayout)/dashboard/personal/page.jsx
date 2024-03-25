@@ -3,10 +3,12 @@ import React from 'react'
 import { personelColumn } from "@/lib/table/table";
 import { langs } from "@/lib/table/data";
 import CustomTable from '@/components/table/CustomTable';
+import { useSession } from 'next-auth/react';
 
 const Addperson = () => {
   // next-auth kurulunca güncellenecek
-  const role = "company_manager"
+  const { data } = useSession()
+  const role = data.user.role
   return (
     <div>
       <CustomTable

@@ -383,8 +383,7 @@ const handler = async (req, res) => {
               const data = await getAPI(
                 `/user?id=${order.customerId}`
               );
-              data.id = order.customerId;
-              return data;
+              return data.data;
             })
           );
 
@@ -393,8 +392,7 @@ const handler = async (req, res) => {
               const data = await getAPI(
                 `/user?id=${order.personelId}`
               );
-              data.id = order.personelId;
-              return data;
+              return data.data;
             })
           );
 
