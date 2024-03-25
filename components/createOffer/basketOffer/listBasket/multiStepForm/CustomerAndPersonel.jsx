@@ -15,9 +15,8 @@ const CustomerAndPersonel = ({ FormProps, ErrorMessage }) => {
         <IoIosSave size={22} className='text-white ml-2' />
       </button>
 
-      <div className='w-full lg:w-1/2 lg:grid-cols-2 p-3 grid grid-cols-1 my-4 gap-2'>
+      <div className='w-full lg:w-1/2 lg:grid-cols-2 p-3 my-4 gap-2'>
         <BasketAddCustomer FormProps={FormProps} ErrorMessage={ErrorMessage} />
-        <BasketAddPersonel FormProps={FormProps} ErrorMessage={ErrorMessage} />
       </div>
       <div className='w-1/2'>
         <textarea

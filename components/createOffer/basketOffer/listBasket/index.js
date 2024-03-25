@@ -5,6 +5,7 @@ import CustomerAndPersonel from '@/components/createOffer/basketOffer/listBasket
 import { IoChevronForwardOutline } from 'react-icons/io5';
 import { Formik, Form, ErrorMessage } from 'formik';
 import BasketCard from './Card';
+import { useSession } from 'next-auth/react';
 
 const ListBasket = ({
   toast,
@@ -22,6 +23,7 @@ const ListBasket = ({
   setUniqueKeys,
   setSelectedBasketFeatures,
 }) => {
+  const { data } = useSession()
   return (
     <Formik
       //validationSchema={FinancialManagementValidationSchema}
@@ -39,23 +41,25 @@ const ListBasket = ({
             mailAddress: '',
             role: 'customer',
           },
-        ],
-        Personel: [
-          {
-            name: '',
-            surname: '',
-            phoneNumber: '',
-            storeName: '',
-            storeAddress: '',
-            role: 'personel',
-          },
-        ],
+        ]
       }}
       onSubmit={async (values, { resetForm }) => {
         setIsloading(true);
         const response = await postAPI('/createOrder/order', {
           basketData,
-          values,
+          values: {
+            ...values,
+            Personel: [
+              {
+                name: data.user.name,
+                surname: data.user.surname,
+                phoneNumber: data.user.phone,
+                storeName: 'Store Nameeee',
+                storeAddress: 'Store Adressss',
+                role: data.user.role,
+              },
+            ],
+          },
         });
         if (response.status !== 'success' || response.status == 'error') {
           setIsloading(false);

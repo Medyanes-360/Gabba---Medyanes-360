@@ -1,8 +1,10 @@
+import prisma from '@/lib/prisma';
 import { getAPI, postAPI } from '@/services/fetchAPI';
 import {
   createNewData,
   createNewDataMany,
   getAllData,
+  getDataByUniqueMany,
 } from '@/services/serviceOperations';
 
 function generateOrderCode(customerName) {
@@ -64,21 +66,27 @@ const handler = async (req, res) => {
       const invalidDate = new Date(date);
       invalidDate.setDate(date.getDate() + 10);
 
-      const createdCustomer = createNewData('User', customer);
-      const createdPersonel = createNewData('User', personel);
-      const [createdCustomerResult, createdPersonelResult] = await Promise.all([
-        createdCustomer,
-        createdPersonel,
-      ]);
+      const createdCustomerResult = await prisma.user.findUnique({
+        where: {
+          phoneNumber: customer.phoneNumber
+        }
+      });;
 
-      if (!createdCustomerResult || createdCustomerResult.error) {
-        throw createdCustomerResult.error;
+      const createdPersonelResult = await prisma.user.findUnique({
+        where: {
+          phoneNumber: personel.phoneNumber
+        }
+      });
+
+      if (!createdCustomerResult || createdCustomerResult?.error) {
+        throw createdCustomerResult?.error;
       }
-      if (!createdPersonelResult || createdPersonelResult.error) {
-        throw createdPersonelResult.error;
+      if (!createdPersonelResult || createdPersonelResult?.error) {
+        throw createdPersonelResult?.error;
       }
 
       const orderCode = generateOrderCode(customer.name);
+
 
       await Promise.all(
         // MAP
@@ -102,8 +110,8 @@ const handler = async (req, res) => {
             orderData
           );
 
-          if (!responseCreateOrder || responseCreateOrder.error) {
-            throw responseCreateOrder.error;
+          if (!responseCreateOrder || responseCreateOrder?.error) {
+            throw responseCreateOrder?.error;
           }
 
           // Renkleri Order Tablosuna Ekle
@@ -122,8 +130,8 @@ const handler = async (req, res) => {
               'OfferOrderColors',
               colourData
             );
-            if (!createdColors || createdColors.error) {
-              throw createdColors.error;
+            if (!createdColors || createdColors?.error) {
+              throw createdColors?.error;
             }
           }
 
@@ -143,8 +151,8 @@ const handler = async (req, res) => {
               'OfferOrderMetals',
               metalData
             );
-            if (!createdMetals || createdMetals.error) {
-              throw createdMetals.error;
+            if (!createdMetals || createdMetals?.error) {
+              throw createdMetals?.error;
             }
           }
 
@@ -164,8 +172,8 @@ const handler = async (req, res) => {
               'OfferOrderMeasurements',
               measurementData
             );
-            if (!createdMeasurements || createdMeasurements.error) {
-              throw createdMeasurements.error;
+            if (!createdMeasurements || createdMeasurements?.error) {
+              throw createdMeasurements?.error;
             }
           }
 
@@ -185,8 +193,8 @@ const handler = async (req, res) => {
               'OfferOrderFabrics',
               fabricData
             );
-            if (!createdFabrics || createdFabrics.error) {
-              throw createdFabrics.error;
+            if (!createdFabrics || createdFabrics?.error) {
+              throw createdFabrics?.error;
             }
           }
 
@@ -206,8 +214,8 @@ const handler = async (req, res) => {
               'OfferOrderExtra',
               extraData
             );
-            if (!createdExtras || createdExtras.error) {
-              throw createdExtras.error;
+            if (!createdExtras || createdExtras?.error) {
+              throw createdExtras?.error;
             }
           }
 
@@ -216,8 +224,8 @@ const handler = async (req, res) => {
             processType: 'delete',
             id: item.id,
           });
-          if (!deletedBasket || deletedBasket.error) {
-            throw deletedBasket.error;
+          if (!deletedBasket || deletedBasket?.error) {
+            throw deletedBasket?.error;
           }
         })
         // MAP END
@@ -254,7 +262,7 @@ const handler = async (req, res) => {
         OfferOrderExtra,
       ]);
 
-      if (!OfferOrdersResult || OfferOrdersResult.error) {
+      if (!OfferOrdersResult || OfferOrdersResult?.error) {
         throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4';
       }
 
@@ -372,21 +380,21 @@ const handler = async (req, res) => {
 
           const Customer = await Promise.all(
             matchingOrder.map(async (order) => {
-              const customerData = await getAPI(
-                `/user?customerId=${order.customerId}`
+              const data = await getAPI(
+                `/user?id=${order.customerId}`
               );
-              customerData.customer.id = order.customerId;
-              return customerData.customer;
+              data.id = order.customerId;
+              return data;
             })
           );
 
           const Personel = await Promise.all(
             matchingOrder.map(async (order) => {
-              const personelData = await getAPI(
-                `/user?personelId=${order.personelId}`
+              const data = await getAPI(
+                `/user?id=${order.personelId}`
               );
-              personelData.personel.id = order.personelId;
-              return personelData.personel;
+              data.id = order.personelId;
+              return data;
             })
           );
 
