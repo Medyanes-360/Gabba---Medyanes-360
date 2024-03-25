@@ -80,8 +80,8 @@ const CustomTable = ({
   },
 }) => {
   // next-auth kurulunca güncellenecek
-  const { session } = useSession()
-  const role = session.user.role
+  const { data: session } = useSession()
+  const role = session?.user?.role
   {
     /* Stateler */
   }
