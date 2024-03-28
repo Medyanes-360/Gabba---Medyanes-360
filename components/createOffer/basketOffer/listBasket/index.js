@@ -23,7 +23,7 @@ const ListBasket = ({
   setUniqueKeys,
   setSelectedBasketFeatures,
 }) => {
-  const { data } = useSession()
+  const { data } = useSession();
   return (
     <Formik
       //validationSchema={FinancialManagementValidationSchema}
@@ -33,15 +33,14 @@ const ListBasket = ({
         productOrderStatus: 'Onay Bekliyor',
         Customer: [
           {
-            companyName: '',
+            company_name: '',
             name: '',
             surname: '',
             phoneNumber: '',
             address: '',
             mailAddress: '',
-            role: 'customer',
           },
-        ]
+        ],
       }}
       onSubmit={async (values, { resetForm }) => {
         setIsloading(true);
@@ -61,9 +60,10 @@ const ListBasket = ({
             ],
           },
         });
+
         if (response.status !== 'success' || response.status == 'error') {
           setIsloading(false);
-          toast.error(response.error);
+          toast.error(response.message);
         } else {
           setIsloading(false);
           toast.success(response.message);
