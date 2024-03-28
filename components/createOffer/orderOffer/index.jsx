@@ -27,16 +27,15 @@ const OrderOffer = ({
   return (
     <>
       {selectedOrder && selectedOrder.data ? (
-        <PrintOrder
-          data={selectedOrder.data}
-          lang={selectedOrder.lang}
-        />
+        <PrintOrder data={selectedOrder.data} lang={selectedOrder.lang} />
       ) : (
         <Card
           orderData={orderData}
           setOrderData={setOrderData}
           setSelectedOrder={setSelectedOrder}
           setShowOrderOffer={setShowOrderOffer}
+          setIsloading={setIsloading}
+          getAllOrderData={getAllOrderData}
         />
       )}
     </>
