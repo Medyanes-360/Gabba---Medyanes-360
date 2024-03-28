@@ -26,7 +26,7 @@ const OrderOffer = ({
 
   return (
     <>
-      {!orderData.length > 0 && (
+      {orderData && !orderData.length > 0 && (
         <h2 className='text-center text-red-500 font-semibold text-3xl mt-40'>
           Herhangi bir teklif bulunmamakta!
         </h2>
