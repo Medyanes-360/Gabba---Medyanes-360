@@ -4,7 +4,10 @@ import {
   createNewData,
   createNewDataMany,
   getAllData,
+  getDataByUnique,
   getDataByUniqueMany,
+  deleteDataByAny,
+  deleteDataByMany,
 } from '@/services/serviceOperations';
 
 function generateOrderCode(customerName) {
@@ -53,7 +56,85 @@ function generateOrderCode(customerName) {
 const handler = async (req, res) => {
   try {
     if (req.method === 'POST') {
-      const { basketData, values } = req.body;
+      const { basketData, values, processType, deletedOrderCode } = req.body;
+
+      // Teklifler sayfasından silme işlemi yapılırsa
+      if (processType === 'delete') {
+        const findOrderCode = await getDataByUniqueMany('OfferOrder', {
+          orderCode: deletedOrderCode,
+        });
+
+        if (!findOrderCode || findOrderCode.error) {
+          throw findOrderCode.error;
+        }
+        console.log(findOrderCode);
+
+        const result = await Promise.all(
+          findOrderCode.map(async (item) => {
+            const deletedOrder = deleteDataByAny('OfferOrder', {
+              id: item.id,
+            });
+
+            const deletedColors = deleteDataByMany('OfferOrderColors', {
+              orderCode: item.orderCode,
+            });
+
+            const deletedFabrics = deleteDataByMany('OfferOrderFabrics', {
+              orderCode: item.orderCode,
+            });
+
+            const deletedMeasurements = deleteDataByMany(
+              'OfferOrderMeasurements',
+              {
+                orderCode: item.orderCode,
+              }
+            );
+
+            const deletedMetals = deleteDataByMany('OfferOrderMetals', {
+              orderCode: item.orderCode,
+            });
+
+            const deletedExtras = deleteDataByMany('OfferOrderExtra', {
+              orderCode: item.orderCode,
+            });
+
+            const [
+              deletedOrderResult,
+              deletedColorsResult,
+              deletedFabricsResult,
+              deletedMeasurementsResult,
+              deletedMetalsResult,
+              deletedExtrasResult,
+            ] = await Promise.all([
+              deletedOrder,
+              deletedColors,
+              deletedFabrics,
+              deletedMeasurements,
+              deletedMetals,
+              deletedExtras,
+            ]);
+
+            return {
+              deletedOrderResult,
+              deletedColorsResult,
+              deletedFabricsResult,
+              deletedMeasurementsResult,
+              deletedMetalsResult,
+              deletedExtrasResult,
+            };
+          })
+        );
+
+        if (!result || result.some((r) => r.error)) {
+          throw result.find((r) => r.error).error;
+        }
+
+        return res.status(200).json({
+          status: 'success',
+          data: result,
+          message: 'Tekliften ürün başarıyla silindi.',
+        });
+      }
 
       const customer = values.Customer[0];
       const personel = values.Personel[0];
@@ -66,27 +147,57 @@ const handler = async (req, res) => {
       const invalidDate = new Date(date);
       invalidDate.setDate(date.getDate() + 10);
 
-      const createdCustomerResult = await prisma.user.findUnique({
-        where: {
-          phoneNumber: customer.phoneNumber
-        }
-      });;
+      const existingCustomerByPhoneNumber = await getDataByUnique('Customer', {
+        phoneNumber: customer.phoneNumber,
+      });
+
+      const existingCustomerByEmail = await getDataByUnique('Customer', {
+        mailAddress: customer.mailAddress,
+      });
+
+      if (
+        existingCustomerByPhoneNumber != null &&
+        existingCustomerByEmail != null
+      ) {
+        // Hem telefon numarası hem de e-posta adresi zaten veritabanında var,
+        // bu durumu kullanıcıya bir hata olarak döndür.
+        throw new Error('Bu telefon numarası ve e-posta adresi zaten mevcut.');
+      }
+
+      if (existingCustomerByPhoneNumber) {
+        // Sadece telefon numarası mevcut, e-posta adresi benzersiz.
+        throw new Error('Bu telefon numarası zaten mevcut.');
+      }
+
+      if (existingCustomerByEmail) {
+        // Sadece e-posta adresi mevcut, telefon numarası benzersiz.
+        throw new Error('Bu e-posta adresi zaten mevcut.');
+      }
+      let customerId = existingCustomerByEmail?.id;
+      if (
+        existingCustomerByPhoneNumber == null &&
+        existingCustomerByEmail == null
+      ) {
+        const createdData = await createNewData('Customer', customer);
+        customerId = createdData.id;
+      }
 
       const createdPersonelResult = await prisma.user.findUnique({
         where: {
-          phoneNumber: personel.phoneNumber
-        }
+          phoneNumber: personel.phoneNumber, // userId, kullanıcının ID'sini temsil eden bir değişken olmalıdır
+        },
+        select: {
+          id: true,
+        },
       });
 
-      if (!createdCustomerResult || createdCustomerResult?.error) {
-        throw createdCustomerResult?.error;
-      }
+      console.log(createdPersonelResult);
+
       if (!createdPersonelResult || createdPersonelResult?.error) {
         throw createdPersonelResult?.error;
       }
 
       const orderCode = generateOrderCode(customer.name);
-
 
       await Promise.all(
         // MAP
@@ -99,7 +210,7 @@ const handler = async (req, res) => {
             ordersStatus: ordersStatus,
             productOrderStatus: productOrderStatus,
             personelId: createdPersonelResult.id,
-            customerId: createdCustomerResult.id,
+            customerId: customerId,
             productPrice: item.ProductPrice,
             productFeaturePrice: item.ProductFeaturePrice,
             productId: item.Product.id,
@@ -380,18 +491,14 @@ const handler = async (req, res) => {
 
           const Customer = await Promise.all(
             matchingOrder.map(async (order) => {
-              const data = await getAPI(
-                `/user?id=${order.customerId}`
-              );
+              const data = await getAPI(`/user?id=${order.customerId}`);
               return data.data;
             })
           );
 
           const Personel = await Promise.all(
             matchingOrder.map(async (order) => {
-              const data = await getAPI(
-                `/user?id=${order.personelId}`
-              );
+              const data = await getAPI(`/user?id=${order.personelId}`);
               return data.data;
             })
           );
