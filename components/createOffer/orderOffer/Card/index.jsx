@@ -76,11 +76,11 @@ const Card = ({
                     )}
                   </li>
                   <li className='py-2'>
-                    Müşteri İsmi: {item.Personel[0]?.name}{' '}
-                    {item.Personel[0]?.surname}
+                    Müşteri İsmi: {item.Müşteri[0]?.name}{' '}
+                    {item.Müşteri[0]?.surname}
                   </li>
                   <li className='py-2'>
-                    Firma İsmi: {item.Müşteri[0]?.companyName}
+                    Firma İsmi: {item.Müşteri[0]?.company_name}
                   </li>
                   <li className='py-2'>Ürün Adedi: {item.Orders.length}</li>
                   <li className='py-2'>
