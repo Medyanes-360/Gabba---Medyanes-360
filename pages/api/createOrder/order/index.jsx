@@ -394,114 +394,87 @@ const handler = async (req, res) => {
 
       await Promise.all(
         uniqueOrderCodes.map(async (orderCode) => {
-          // Her bir sipariş kodu için renkleri seç
-          const matchingColors = OfferOrderColorsResult.filter(
-            (color) => color.orderCode === orderCode
-          );
+          const [
+            matchingColors,
+            matchingFabrics,
+            matchingMeasurements,
+            matchingMetals,
+            matchingExtras,
+            matchingOrder,
+          ] = await Promise.all([
+            OfferOrderColorsResult.filter(
+              (color) => color.orderCode === orderCode
+            ),
+            OfferOrderFabricsResult.filter(
+              (fabric) => fabric.orderCode === orderCode
+            ),
+            OfferOrderMeasurementsResult.filter(
+              (measurement) => measurement.orderCode === orderCode
+            ),
+            OfferOrderMetalsResult.filter(
+              (metal) => metal.orderCode === orderCode
+            ),
+            OfferOrderExtraResult.filter(
+              (extra) => extra.orderCode === orderCode
+            ),
+            OfferOrdersResult.filter((order) => order.orderCode === orderCode),
+          ]);
 
-          // Her bir sipariş kodu için kumaşları seç
-          const matchingFabrics = OfferOrderFabricsResult.filter(
-            (fabric) => fabric.orderCode === orderCode
-          );
-
-          // Her bir sipariş kodu için ölçüleri seç
-          const matchingMeasurements = OfferOrderMeasurementsResult.filter(
-            (measurement) => measurement.orderCode === orderCode
-          );
-
-          // Her bir sipariş kodu için metalleri seç
-          const matchingMetals = OfferOrderMetalsResult.filter(
-            (metal) => metal.orderCode === orderCode
-          );
-
-          // Her bir sipariş kodu için extraları seç
-          const matchingExtras = OfferOrderExtraResult.filter(
-            (extra) => extra.orderCode === orderCode
-          );
-
-          const matchingOrder = OfferOrdersResult.filter(
-            (order) => order.orderCode === orderCode
-          );
-
-          // Her bir renk için API çağrısını yaparak Renkler dizisine eklemek
-          const Colours = await Promise.all(
-            matchingColors.map(async (color) => {
-              const colourData = await getAPI(
-                `/createProduct/colors?colourId=${color.colourId}`
-              );
-              colourData.data.orderId = color.orderId;
-              return colourData.data;
-            })
-          );
-
-          // Her bir ölçü için API çağrısını yaparak Ölçüler dizisine eklemek
-          const Measurements = await Promise.all(
-            matchingMeasurements.map(async (measurement) => {
-              const measurementData = await getAPI(
-                `/createProduct/measurements?measurementId=${measurement.measurementId}`
-              );
-              measurementData.data.orderId = measurement.orderId;
-              return measurementData.data;
-            })
-          );
-
-          // Her bir metaller için API çağrısını yaparak Metaller dizisine eklemek
-          const Metals = await Promise.all(
-            matchingMetals.map(async (metal) => {
-              const metalData = await getAPI(
-                `/createProduct/metals?metalId=${metal.metalId}`
-              );
-              metalData.data.orderId = metal.orderId;
-              return metalData.data;
-            })
-          );
-
-          // Her bir kumaş için API çağrısını yaparak Kumaşlar dizisine eklemek
-          const Fabrics = await Promise.all(
-            matchingFabrics.map(async (fabric) => {
-              const fabricData = await getAPI(
-                `/createProduct/fabrics?fabricsId=${fabric.fabricsId}`
-              );
-              fabricData.data.orderId = fabric.orderId;
-              return fabricData.data;
-            })
-          );
-
-          // Her bir ekstra için API çağrısını yaparak Extralar dizisine eklemek
-          const Extras = await Promise.all(
-            matchingExtras.map(async (extra) => {
-              const extraData = await getAPI(
-                `/createProduct/createProduct?extraId=${extra.extraId}`
-              );
-              extraData.data.orderId = extra.orderId;
-              return extraData.data;
-            })
-          );
-
-          // Her bir ürün için API çağırısını yaparak Ürünler dizisine eklemek
-          const Products = await Promise.all(
-            matchingOrder.map(async (order) => {
-              const productData = await getAPI(
-                `/createProduct/createProduct?productId=${order.productId}`
-              );
-              productData.data.orderId = order.orderId;
-              return productData.data;
-            })
-          );
-
-          const Customer = await Promise.all(
-            matchingOrder.map(async (order) => {
-              const data = await getAPI(`/user?id=${order.customerId}`);
-              return data.data;
-            })
-          );
-
-          const Personel = await Promise.all(
-            matchingOrder.map(async (order) => {
-              const data = await getAPI(`/user?id=${order.personelId}`);
-              return data.data;
-            })
-          );
+          const [
+            Colours,
+            Fabrics,
+            Measurements,
+            Metals,
+            Extras,
+            Products,
+            Customer,
+            Personel,
+          ] = await Promise.all([
+            Promise.all(
+              matchingColors.map((color) =>
+                getDataByUnique('Colors', { id: color.orderId })
+              )
+            ),
+            Promise.all(
+              matchingFabrics.map((fabric) =>
+                getDataByUnique('Fabrics', { id: fabric.orderId })
+              )
+            ),
+            Promise.all(
+              matchingMeasurements.map((measurement) =>
+                getDataByUnique('Measurements', { id: measurement.orderId })
+              )
+            ),
+            Promise.all(
+              matchingMetals.map((metal) =>
+                getDataByUnique('Metals', { id: metal.orderId })
+              )
+            ),
+            Promise.all(
+              matchingExtras.map(async (extra) => {
+                const extraData = await getAPI(
+                  `/createProduct/createProduct?extraId=${extra.extraId}`
+                );
+                extraData.data.orderId = extra.orderId;
+                return extraData.data;
+              })
+            ),
+            Promise.all(
+              matchingOrder.map((order) =>
+                getDataByUnique('Products', { id: order.productId })
+              )
+            ),
+            Promise.all(
+              matchingOrder.map((order) =>
+                getDataByUnique('Customer', { id: order.customerId })
+              )
+            ),
+            Promise.all(
+              matchingOrder.map((order) =>
+                getAPI(`/user?id=${order.personelId}`)
+              )
+            ),
+          ]);
 
           combinetData.push({
             orderCode: orderCode,
