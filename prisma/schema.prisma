@@ -295,6 +295,16 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
+model Customer {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  surname      String
+  mailAddress  String @unique
+  address      String
+  company_name String
+  phoneNumber  String @unique
+}
+
 model OfferBasket {
   id                  String  @id @default(auto()) @map("_id") @db.ObjectId
   stock               Int
