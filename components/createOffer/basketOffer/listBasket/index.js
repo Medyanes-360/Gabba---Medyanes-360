@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { postAPI } from '@/services/fetchAPI';
-import CustomerAndPersonel from '@/components/createOffer/basketOffer/listBasket/multiStepForm/CustomerAndPersonel';
+import Customer from './Customer';
 import { IoChevronForwardOutline } from 'react-icons/io5';
 import { Formik, Form, ErrorMessage } from 'formik';
 import BasketCard from './Card';
@@ -79,7 +79,7 @@ const ListBasket = ({
         <Form onSubmit={FormProps.handleSubmit}>
           <div className='flex flex-col justify-center items-center'>
             {isCustomerAndPersonel ? (
-              <CustomerAndPersonel
+              <Customer
                 FormProps={FormProps}
                 ErrorMessage={ErrorMessage}
                 setIsCustomerAndPersonel={setIsCustomerAndPersonel}
