@@ -349,51 +349,38 @@ const handler = async (req, res) => {
     }
 
     if (req.method === 'GET') {
-      const OfferOrders = getAllData('OfferOrder');
+      try {
+        const [
+          OfferOrdersResult,
+          OfferOrderColorsResult,
+          OfferOrderFabricsResult,
+          OfferOrderMeasurementsResult,
+          OfferOrderMetalsResult,
+          OfferOrderExtraResult,
+        ] = await Promise.all([
+          getAllData('OfferOrder'),
+          getAllData('OfferOrderColors'),
+          getAllData('OfferOrderFabrics'),
+          getAllData('OfferOrderMeasurements'),
+          getAllData('OfferOrderMetals'),
+          getAllData('OfferOrderExtra'),
+        ]);
 
-      const OfferOrderColors = getAllData('OfferOrderColors');
-      const OfferOrderFabrics = getAllData('OfferOrderFabrics');
-      const OfferOrderMeasurements = getAllData('OfferOrderMeasurements');
-      const OfferOrderMetals = getAllData('OfferOrderMetals');
-      const OfferOrderExtra = getAllData('OfferOrderExtra');
-
-      const [
-        OfferOrdersResult,
-        OfferOrderColorsResult,
-        OfferOrderFabricsResult,
-        OfferOrderMeasurementsResult,
-        OfferOrderMetalsResult,
-        OfferOrderExtraResult,
-      ] = await Promise.all([
-        OfferOrders,
-        OfferOrderColors,
-        OfferOrderFabrics,
-        OfferOrderMeasurements,
-        OfferOrderMetals,
-        OfferOrderExtra,
-      ]);
-
-      if (!OfferOrdersResult || OfferOrdersResult?.error) {
-        throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4';
-      }
-
-      // Benzersiz orderCode'ları saklamak için bir dizi oluştur
-      const uniqueOrderCodes = [];
-
-      // Her bir siparişi kontrol et
-      OfferOrdersResult.forEach((order) => {
-        const orderCode = order.orderCode;
-
-        // Eğer orderCode daha önce eklenmemişse, diziye ekle
-        if (!uniqueOrderCodes.includes(orderCode)) {
-          uniqueOrderCodes.push(orderCode);
+        if (!OfferOrdersResult || OfferOrdersResult?.error) {
+          throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4';
         }
-      });
 
-      const combinetData = [];
+        // Benzersiz orderCode'ları direkt olarak veritabanından al
+        const uniqueOrderCodes = OfferOrdersResult.reduce((acc, order) => {
+          if (!acc.includes(order.orderCode)) {
+            acc.push(order.orderCode);
+          }
+          return acc;
+        }, []);
 
-      await Promise.all(
-        uniqueOrderCodes.map(async (orderCode) => {
+        const combinetData = [];
+
+        for (const orderCode of uniqueOrderCodes) {
           const [
             matchingColors,
             matchingFabrics,
@@ -488,14 +475,20 @@ const handler = async (req, res) => {
             Müşteri: Customer,
             Personel: Personel,
           });
-        })
-      );
+        }
 
-      return res.status(200).json({
-        status: 'success',
-        data: combinetData,
-        message: 'Siparişler başarıyla getirildi.',
-      });
+        return res.status(200).json({
+          status: 'success',
+          data: combinetData,
+          message: 'Siparişler başarıyla getirildi.',
+        });
+      } catch (error) {
+        console.error('Hata:', error);
+        return res.status(500).json({
+          status: 'error',
+          message: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+        });
+      }
     }
   } catch (error) {
     return res
