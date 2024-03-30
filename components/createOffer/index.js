@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import LoadingScreen from '@/components/other/loading';
 import ListProducts from './listProducts';
 import BasketOffer from './basketOffer';
@@ -82,18 +82,6 @@ const CreateOfferComponent = () => {
   return (
     <>
       {isloading && <LoadingScreen isloading={isloading} />}
-      <ToastContainer
-        position='top-right'
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme='dark'
-      />
 
       <div
         className={`${

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { postAPI, getAPI } from '@/services/fetchAPI';
 import LoadingScreen from '@/components/other/loading';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import ResizeImage from '@/functions/others/resizeImage';
 import Image from 'next/image';
 
@@ -200,22 +200,6 @@ const ListComponent = ({
 
   return (
     <>
-      {/* 
-        zaten parent componentinde mevcut olduğu için onu algılıyor ve onun çalışması yeterli oluyr
-        yoksa iki kere bildirim geliyor.
-        <ToastContainer
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="dark"
-        /> */}
-
       <div
         className={`
         w-full relative overflow-x-auto
