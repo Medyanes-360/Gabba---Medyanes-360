@@ -1,6 +1,6 @@
-import prisma from '@/lib/prisma';
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { getDataByUnique } from '@/services/serviceOperations';
 
 const authOptions = {
   providers: [
@@ -21,8 +21,8 @@ const authOptions = {
           }
 
           // email adresi veritabanında kayıtlı mı kontrol ediyoruz.
-          const findUser = await prisma.user.findUnique({
-            where: { phoneNumber: phoneNumber },
+          const findUser = await getDataByUnique('User', {
+            phoneNumber: phoneNumber,
           });
 
           // email adresi veritabanında kayıtlı değilse hata fırlatıyoruz.
@@ -31,7 +31,6 @@ const authOptions = {
           }
 
           // Kullanıcı bilgilerini döndürüyoruz.
-          console.log(findUser);
           const user = {
             name: findUser.name,
             surname: findUser.surname,
