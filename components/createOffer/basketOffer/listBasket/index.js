@@ -1,7 +1,8 @@
 'use client';
 import React, { useState } from 'react';
 import { postAPI } from '@/services/fetchAPI';
-import Customer from './Customer';
+// import Customer from './Customer';
+import Customer from '@/components/customer';
 import { IoChevronForwardOutline } from 'react-icons/io5';
 import { Formik, Form, ErrorMessage } from 'formik';
 import BasketCard from './Card';
