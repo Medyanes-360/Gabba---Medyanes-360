@@ -276,8 +276,8 @@ model User {
 
   mailAddress String? @unique
 
-  store   Store  @relation(fields: [storeId], references: [id])
-  storeId String @map("storeId") @db.ObjectId
+  store   Store?  @relation(fields: [storeId], references: [id])
+  storeId String? @map("storeId") @db.ObjectId
 
   maxTax String?
   role   String?
