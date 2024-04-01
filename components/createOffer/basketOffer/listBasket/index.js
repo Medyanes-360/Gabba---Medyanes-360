@@ -44,7 +44,7 @@ const ListBasket = ({
           orderNote: '',
           ordersStatus: 'Onay Bekliyor',
           productOrderStatus: 'Onay Bekliyor',
-          personelId: data.user.id,
+          personelId: data?.user?.id,
           customerId: '',
           customerName: '',
         }}
