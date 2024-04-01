@@ -1,11 +1,12 @@
 'use client';
 import React, { useState } from 'react';
 
-const FilterInput = ({ musteriler, setFilteredMusteriler }) => {
+const FilterInput = ({ customers, setFilteredMusteriler, setCurrentPage }) => {
   const [filterText, setFilterText] = useState('');
 
   const handleFilter = (filterText) => {
-    const filteredData = musteriler.filter((musteri) =>
+    setCurrentPage(1);
+    const filteredData = customers.filter((musteri) =>
       Object.values(musteri).some(
         (value) =>
           typeof value === 'string' &&
