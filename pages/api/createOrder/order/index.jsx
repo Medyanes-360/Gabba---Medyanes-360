@@ -136,8 +136,9 @@ const handler = async (req, res) => {
         });
       }
 
-      const customer = values.Customer[0];
-      const personel = values.Personel[0];
+      const customerId = values.customerId;
+      const customerName = values.customerName;
+      const personelId = values.personelId;
       const orderNote = values.orderNote;
       const ordersStatus = values.ordersStatus;
       const productOrderStatus = values.productOrderStatus;
@@ -147,57 +148,7 @@ const handler = async (req, res) => {
       const invalidDate = new Date(date);
       invalidDate.setDate(date.getDate() + 10);
 
-      const existingCustomerByPhoneNumber = await getDataByUnique('Customer', {
-        phoneNumber: customer.phoneNumber,
-      });
-
-      const existingCustomerByEmail = await getDataByUnique('Customer', {
-        mailAddress: customer.mailAddress,
-      });
-
-      if (
-        existingCustomerByPhoneNumber != null &&
-        existingCustomerByEmail != null
-      ) {
-        // Hem telefon numarası hem de e-posta adresi zaten veritabanında var,
-        // bu durumu kullanıcıya bir hata olarak döndür.
-        throw new Error('Bu telefon numarası ve e-posta adresi zaten mevcut.');
-      }
-
-      if (existingCustomerByPhoneNumber) {
-        // Sadece telefon numarası mevcut, e-posta adresi benzersiz.
-        throw new Error('Bu telefon numarası zaten mevcut.');
-      }
-
-      if (existingCustomerByEmail) {
-        // Sadece e-posta adresi mevcut, telefon numarası benzersiz.
-        throw new Error('Bu e-posta adresi zaten mevcut.');
-      }
-      let customerId = existingCustomerByEmail?.id;
-      if (
-        existingCustomerByPhoneNumber == null &&
-        existingCustomerByEmail == null
-      ) {
-        const createdData = await createNewData('Customer', customer);
-        customerId = createdData.id;
-      }
-
-      const createdPersonelResult = await prisma.user.findUnique({
-        where: {
-          phoneNumber: personel.phoneNumber, // userId, kullanıcının ID'sini temsil eden bir değişken olmalıdır
-        },
-        select: {
-          id: true,
-        },
-      });
-
-      console.log(createdPersonelResult);
-
-      if (!createdPersonelResult || createdPersonelResult?.error) {
-        throw createdPersonelResult?.error;
-      }
-
-      const orderCode = generateOrderCode(customer.name);
+      const orderCode = generateOrderCode(customerName);
 
       await Promise.all(
         // MAP
@@ -209,7 +160,7 @@ const handler = async (req, res) => {
             orderNote: orderNote,
             ordersStatus: ordersStatus,
             productOrderStatus: productOrderStatus,
-            personelId: createdPersonelResult.id,
+            personelId: personelId,
             customerId: customerId,
             productPrice: item.ProductPrice,
             productFeaturePrice: item.ProductFeaturePrice,
