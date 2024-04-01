@@ -1,19 +1,13 @@
 import React from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
 
-const Pagination = ({
-  currentPage,
-  musteriler,
-  pageSize,
-  setCurrentPage,
-  selectedMusteri,
-}) => {
+const Pagination = ({ currentPage, customers, pageSize, setCurrentPage }) => {
   // Dropdown'dan sayfa seçildiğinde çağrılacak fonksiyon
   const handleDropdownChange = (e) => {
     setCurrentPage(parseInt(e.target.value));
   };
   // Toplam sayfa sayısını hesapla
-  const totalPageCount = Math.ceil(musteriler.length / pageSize);
+  const totalPageCount = Math.ceil(customers.length / pageSize);
   const pageNumbers = Array.from({ length: totalPageCount }, (_, i) => i + 1);
   // Sayfa seçenekleri oluştur
   const pageOptions = pageNumbers.map((page) => (
@@ -22,7 +16,7 @@ const Pagination = ({
     </option>
   ));
   return (
-    <div className='mt-5 flex justify-between'>
+    <div className='mt-5 flex justify-end'>
       <div className='flex justify-start items-center gap-4'>
         <div className='relative inline-block rounded bg-gray-100'>
           <select
@@ -40,14 +34,6 @@ const Pagination = ({
           Sayfa: {currentPage} / {totalPageCount}
         </span>
       </div>
-      {selectedMusteri && (
-        <button
-          type='button'
-          className='bg-green-500 rounded text-white font-semibold p-3'
-        >
-          Sipariş Oluştur
-        </button>
-      )}
     </div>
   );
 };
