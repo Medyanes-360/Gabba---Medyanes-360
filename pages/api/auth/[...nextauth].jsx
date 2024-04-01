@@ -32,6 +32,7 @@ const authOptions = {
 
           // Kullanıcı bilgilerini döndürüyoruz.
           const user = {
+            id: findUser.id,
             name: findUser.name,
             surname: findUser.surname,
             email: findUser.email,
