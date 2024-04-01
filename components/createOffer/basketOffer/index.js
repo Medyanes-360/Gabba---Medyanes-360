@@ -21,6 +21,7 @@ const BasketOffer = ({
   setHiddenBasketBar,
   allFeatureValues,
   setAllFeatureValues,
+  customers,
 }) => {
   const [isSelectedBasket, setIsSelectedBasket] = useState(false);
   const [selectedBasketData, setSelectedBasketData] = useState([]);
@@ -885,6 +886,7 @@ const BasketOffer = ({
         setIsSelectedBasket={setIsSelectedBasket}
         setHiddenBasketBar={setHiddenBasketBar}
         setSelectedBasketFeatures={setSelectedBasketFeatures}
+        customers={customers}
       />
     </>
   );
