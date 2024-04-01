@@ -143,6 +143,10 @@ const handler = async (req, res) => {
       const ordersStatus = values.ordersStatus;
       const productOrderStatus = values.productOrderStatus;
 
+      if (personelId == undefined || personelId == null) {
+        throw new Error('Hesabınıza giriş yapmanız gerekiyor!');
+      }
+
       // 10 gün eklemek için yeni bir tarih oluştur
       const date = new Date();
       const invalidDate = new Date(date);
