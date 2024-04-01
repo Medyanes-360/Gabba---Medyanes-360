@@ -1,6 +1,12 @@
-import Navbar from "@/components/navbar";
+'use client';
+import React, { useState, createContext, useContext } from 'react';
+import Navbar from '@/components/navbar';
 
-export default function RootLayout({children}) {
+const LoadingContext = createContext();
+
+export default function RootLayout({ children }) {
+  // Context oluşturuluyor
+  const [isLoading, setIsLoading] = useState(false);
   const links = [
     { url: '/', text: 'Ana Sayfa' },
     {
@@ -39,10 +45,15 @@ export default function RootLayout({children}) {
     // Diğer linkleri burada da tanımlayabilirsiniz
   ];
 
-    return (
-        <>
-            <Navbar links={links}/>
-            {children}
-        </>
-    );
+  return (
+    <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
+      <Navbar links={links} />
+      {children}
+    </LoadingContext.Provider>
+  );
 }
+
+// Alt bileşenlerde LoadingContext'i kullanmak için bir custom hook oluşturuluyor
+export const useLoadingContext = () => {
+  return useContext(LoadingContext);
+};
