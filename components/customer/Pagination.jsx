@@ -11,10 +11,6 @@ import {
 import { cn } from '@/lib/table/utils';
 
 const Pagination = ({ currentPage, customers, pageSize, setCurrentPage }) => {
-  // Dropdown'dan sayfa seçildiğinde çağrılacak fonksiyon
-  const handleDropdownChange = (e) => {
-    setCurrentPage(parseInt(e));
-  };
   // Toplam sayfa sayısını hesapla
   const totalPageCount = Math.ceil(customers.length / pageSize);
   const pageNumbers = Array.from({ length: totalPageCount }, (_, i) => i + 1);
@@ -29,7 +25,7 @@ const Pagination = ({ currentPage, customers, pageSize, setCurrentPage }) => {
 
           {pageNumbers.map((num, index) => (
             <PaginationItem key={index}>
-              <PaginationLink isActive={num === currentPage} >{num}</PaginationLink>
+              <PaginationLink onClick={() => setCurrentPage(num)} isActive={num === currentPage} >{num}</PaginationLink>
             </PaginationItem>
           ))}
 
