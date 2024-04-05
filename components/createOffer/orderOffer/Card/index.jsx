@@ -2,12 +2,38 @@ import React from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { IoCloseOutline } from 'react-icons/io5';
+import { toast } from 'react-toastify';
+import { postAPI } from '@/services/fetchAPI';
+
 const Card = ({
   orderData,
   setOrderData,
   setSelectedOrder,
   setShowOrderOffer,
+  setIsloading,
+  getAllOrderData,
 }) => {
+  // Silme fonksiyonu buradadır.
+  const deleteOrder = async (orderCode) => {
+    setIsloading(true);
+    try {
+      const response = await postAPI('/createOrder/order', {
+        deletedOrderCode: orderCode,
+        processType: 'delete',
+      });
+      console.log(response);
+      if (response.status !== 'success') {
+        setIsloading(false);
+        throw new Error('Bir hata oluştu');
+      }
+
+      getAllOrderData();
+      return toast.success(response.message);
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
   return (
     <div className='grid xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-3'>
       {orderData &&
@@ -16,8 +42,14 @@ const Card = ({
           return (
             <div
               key={item.orderCode}
-              className='border rounded-lg shadow bg-gray-800 border-gray-700'
+              className='relative border rounded-lg shadow bg-gray-800 border-gray-700'
             >
+              <button
+                className='absolute -right-2 -top-2 z-20 bg-red-600 rounded-full hover:cursor-pointer hover:scale-110 transition-all'
+                onClick={() => deleteOrder(item.orderCode)}
+              >
+                <IoCloseOutline size={30} color='white' />
+              </button>
               <div className='flex flex-col items-center pt-4'>
                 <Image
                   className='w-24 h-24 mb-3 rounded-full shadow-lg'
@@ -44,11 +76,11 @@ const Card = ({
                     )}
                   </li>
                   <li className='py-2'>
-                    Müşteri İsmi: {item.Personel[0]?.name}{' '}
-                    {item.Personel[0]?.surname}
+                    Müşteri İsmi: {item.Müşteri[0]?.name}{' '}
+                    {item.Müşteri[0]?.surname}
                   </li>
                   <li className='py-2'>
-                    Firma İsmi: {item.Müşteri[0]?.companyName}
+                    Firma İsmi: {item.Müşteri[0]?.company_name}
                   </li>
                   <li className='py-2'>Ürün Adedi: {item.Orders.length}</li>
                   <li className='py-2'>
@@ -57,7 +89,7 @@ const Card = ({
                       return (
                         total +
                         (order.productPrice + order.productFeaturePrice) *
-                        order.stock
+                          order.stock
                       );
                     }, 0)}
                   </li>
@@ -106,7 +138,7 @@ const Card = ({
                 </div>
               </div>
             </div>
-          )
+          );
         })}
     </div>
   );

@@ -4,7 +4,10 @@ import {
   createNewData,
   createNewDataMany,
   getAllData,
+  getDataByUnique,
   getDataByUniqueMany,
+  deleteDataByAny,
+  deleteDataByMany,
 } from '@/services/serviceOperations';
 
 function generateOrderCode(customerName) {
@@ -53,40 +56,103 @@ function generateOrderCode(customerName) {
 const handler = async (req, res) => {
   try {
     if (req.method === 'POST') {
-      const { basketData, values } = req.body;
+      const { basketData, values, processType, deletedOrderCode } = req.body;
 
-      const customer = values.Customer[0];
-      const personel = values.Personel[0];
+      // Teklifler sayfasından silme işlemi yapılırsa
+      if (processType === 'delete') {
+        const findOrderCode = await getDataByUniqueMany('OfferOrder', {
+          orderCode: deletedOrderCode,
+        });
+
+        if (!findOrderCode || findOrderCode.error) {
+          throw findOrderCode.error;
+        }
+        console.log(findOrderCode);
+
+        const result = await Promise.all(
+          findOrderCode.map(async (item) => {
+            const deletedOrder = deleteDataByAny('OfferOrder', {
+              id: item.id,
+            });
+
+            const deletedColors = deleteDataByMany('OfferOrderColors', {
+              orderCode: item.orderCode,
+            });
+
+            const deletedFabrics = deleteDataByMany('OfferOrderFabrics', {
+              orderCode: item.orderCode,
+            });
+
+            const deletedMeasurements = deleteDataByMany(
+              'OfferOrderMeasurements',
+              {
+                orderCode: item.orderCode,
+              }
+            );
+
+            const deletedMetals = deleteDataByMany('OfferOrderMetals', {
+              orderCode: item.orderCode,
+            });
+
+            const deletedExtras = deleteDataByMany('OfferOrderExtra', {
+              orderCode: item.orderCode,
+            });
+
+            const [
+              deletedOrderResult,
+              deletedColorsResult,
+              deletedFabricsResult,
+              deletedMeasurementsResult,
+              deletedMetalsResult,
+              deletedExtrasResult,
+            ] = await Promise.all([
+              deletedOrder,
+              deletedColors,
+              deletedFabrics,
+              deletedMeasurements,
+              deletedMetals,
+              deletedExtras,
+            ]);
+
+            return {
+              deletedOrderResult,
+              deletedColorsResult,
+              deletedFabricsResult,
+              deletedMeasurementsResult,
+              deletedMetalsResult,
+              deletedExtrasResult,
+            };
+          })
+        );
+
+        if (!result || result.some((r) => r.error)) {
+          throw result.find((r) => r.error).error;
+        }
+
+        return res.status(200).json({
+          status: 'success',
+          data: result,
+          message: 'Tekliften ürün başarıyla silindi.',
+        });
+      }
+
+      const customerId = values.customerId;
+      const customerName = values.customerName;
+      const personelId = values.personelId;
       const orderNote = values.orderNote;
       const ordersStatus = values.ordersStatus;
       const productOrderStatus = values.productOrderStatus;
+
+      if (personelId == undefined || personelId == null) {
+        throw new Error('Hesabınıza giriş yapmanız gerekiyor!');
+      }
 
       // 10 gün eklemek için yeni bir tarih oluştur
       const date = new Date();
       const invalidDate = new Date(date);
       invalidDate.setDate(date.getDate() + 10);
 
-      const createdCustomerResult = await prisma.user.findUnique({
-        where: {
-          phoneNumber: customer.phoneNumber
-        }
-      });;
-
-      const createdPersonelResult = await prisma.user.findUnique({
-        where: {
-          phoneNumber: personel.phoneNumber
-        }
-      });
-
-      if (!createdCustomerResult || createdCustomerResult?.error) {
-        throw createdCustomerResult?.error;
-      }
-      if (!createdPersonelResult || createdPersonelResult?.error) {
-        throw createdPersonelResult?.error;
-      }
-
-      const orderCode = generateOrderCode(customer.name);
-
+      const orderCode = generateOrderCode(customerName);
 
       await Promise.all(
         // MAP
@@ -98,8 +164,8 @@ const handler = async (req, res) => {
             orderNote: orderNote,
             ordersStatus: ordersStatus,
             productOrderStatus: productOrderStatus,
-            personelId: createdPersonelResult.id,
-            customerId: createdCustomerResult.id,
+            personelId: personelId,
+            customerId: customerId,
             productPrice: item.ProductPrice,
             productFeaturePrice: item.ProductFeaturePrice,
             productId: item.Product.id,
@@ -238,163 +304,119 @@ const handler = async (req, res) => {
     }
 
     if (req.method === 'GET') {
-      const OfferOrders = getAllData('OfferOrder');
+      try {
+        const [
+          OfferOrdersResult,
+          OfferOrderColorsResult,
+          OfferOrderFabricsResult,
+          OfferOrderMeasurementsResult,
+          OfferOrderMetalsResult,
+          OfferOrderExtraResult,
+        ] = await Promise.all([
+          getAllData('OfferOrder'),
+          getAllData('OfferOrderColors'),
+          getAllData('OfferOrderFabrics'),
+          getAllData('OfferOrderMeasurements'),
+          getAllData('OfferOrderMetals'),
+          getAllData('OfferOrderExtra'),
+        ]);
 
-      const OfferOrderColors = getAllData('OfferOrderColors');
-      const OfferOrderFabrics = getAllData('OfferOrderFabrics');
-      const OfferOrderMeasurements = getAllData('OfferOrderMeasurements');
-      const OfferOrderMetals = getAllData('OfferOrderMetals');
-      const OfferOrderExtra = getAllData('OfferOrderExtra');
-
-      const [
-        OfferOrdersResult,
-        OfferOrderColorsResult,
-        OfferOrderFabricsResult,
-        OfferOrderMeasurementsResult,
-        OfferOrderMetalsResult,
-        OfferOrderExtraResult,
-      ] = await Promise.all([
-        OfferOrders,
-        OfferOrderColors,
-        OfferOrderFabrics,
-        OfferOrderMeasurements,
-        OfferOrderMetals,
-        OfferOrderExtra,
-      ]);
-
-      if (!OfferOrdersResult || OfferOrdersResult?.error) {
-        throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4';
-      }
-
-      // Benzersiz orderCode'ları saklamak için bir dizi oluştur
-      const uniqueOrderCodes = [];
-
-      // Her bir siparişi kontrol et
-      OfferOrdersResult.forEach((order) => {
-        const orderCode = order.orderCode;
-
-        // Eğer orderCode daha önce eklenmemişse, diziye ekle
-        if (!uniqueOrderCodes.includes(orderCode)) {
-          uniqueOrderCodes.push(orderCode);
+        if (!OfferOrdersResult || OfferOrdersResult?.error) {
+          throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4';
         }
-      });
 
-      const combinetData = [];
+        // Benzersiz orderCode'ları direkt olarak veritabanından al
+        const uniqueOrderCodes = OfferOrdersResult.reduce((acc, order) => {
+          if (!acc.includes(order.orderCode)) {
+            acc.push(order.orderCode);
+          }
+          return acc;
+        }, []);
 
-      await Promise.all(
-        uniqueOrderCodes.map(async (orderCode) => {
-          // Her bir sipariş kodu için renkleri seç
-          const matchingColors = OfferOrderColorsResult.filter(
-            (color) => color.orderCode === orderCode
-          );
+        const combinetData = [];
 
-          // Her bir sipariş kodu için kumaşları seç
-          const matchingFabrics = OfferOrderFabricsResult.filter(
-            (fabric) => fabric.orderCode === orderCode
-          );
+        for (const orderCode of uniqueOrderCodes) {
+          const [
+            matchingColors,
+            matchingFabrics,
+            matchingMeasurements,
+            matchingMetals,
+            matchingExtras,
+            matchingOrder,
+          ] = await Promise.all([
+            OfferOrderColorsResult.filter(
+              (color) => color.orderCode === orderCode
+            ),
+            OfferOrderFabricsResult.filter(
+              (fabric) => fabric.orderCode === orderCode
+            ),
+            OfferOrderMeasurementsResult.filter(
+              (measurement) => measurement.orderCode === orderCode
+            ),
+            OfferOrderMetalsResult.filter(
+              (metal) => metal.orderCode === orderCode
+            ),
+            OfferOrderExtraResult.filter(
+              (extra) => extra.orderCode === orderCode
+            ),
+            OfferOrdersResult.filter((order) => order.orderCode === orderCode),
+          ]);
 
-          // Her bir sipariş kodu için ölçüleri seç
-          const matchingMeasurements = OfferOrderMeasurementsResult.filter(
-            (measurement) => measurement.orderCode === orderCode
-          );
-
-          // Her bir sipariş kodu için metalleri seç
-          const matchingMetals = OfferOrderMetalsResult.filter(
-            (metal) => metal.orderCode === orderCode
-          );
-
-          // Her bir sipariş kodu için extraları seç
-          const matchingExtras = OfferOrderExtraResult.filter(
-            (extra) => extra.orderCode === orderCode
-          );
-
-          const matchingOrder = OfferOrdersResult.filter(
-            (order) => order.orderCode === orderCode
-          );
-
-          // Her bir renk için API çağrısını yaparak Renkler dizisine eklemek
-          const Colours = await Promise.all(
-            matchingColors.map(async (color) => {
-              const colourData = await getAPI(
-                `/createProduct/colors?colourId=${color.colourId}`
-              );
-              colourData.data.orderId = color.orderId;
-              return colourData.data;
-            })
-          );
-
-          // Her bir ölçü için API çağrısını yaparak Ölçüler dizisine eklemek
-          const Measurements = await Promise.all(
-            matchingMeasurements.map(async (measurement) => {
-              const measurementData = await getAPI(
-                `/createProduct/measurements?measurementId=${measurement.measurementId}`
-              );
-              measurementData.data.orderId = measurement.orderId;
-              return measurementData.data;
-            })
-          );
-
-          // Her bir metaller için API çağrısını yaparak Metaller dizisine eklemek
-          const Metals = await Promise.all(
-            matchingMetals.map(async (metal) => {
-              const metalData = await getAPI(
-                `/createProduct/metals?metalId=${metal.metalId}`
-              );
-              metalData.data.orderId = metal.orderId;
-              return metalData.data;
-            })
-          );
-
-          // Her bir kumaş için API çağrısını yaparak Kumaşlar dizisine eklemek
-          const Fabrics = await Promise.all(
-            matchingFabrics.map(async (fabric) => {
-              const fabricData = await getAPI(
-                `/createProduct/fabrics?fabricsId=${fabric.fabricsId}`
-              );
-              fabricData.data.orderId = fabric.orderId;
-              return fabricData.data;
-            })
-          );
-
-          // Her bir ekstra için API çağrısını yaparak Extralar dizisine eklemek
-          const Extras = await Promise.all(
-            matchingExtras.map(async (extra) => {
-              const extraData = await getAPI(
-                `/createProduct/createProduct?extraId=${extra.extraId}`
-              );
-              extraData.data.orderId = extra.orderId;
-              return extraData.data;
-            })
-          );
-
-          // Her bir ürün için API çağırısını yaparak Ürünler dizisine eklemek
-          const Products = await Promise.all(
-            matchingOrder.map(async (order) => {
-              const productData = await getAPI(
-                `/createProduct/createProduct?productId=${order.productId}`
-              );
-              productData.data.orderId = order.orderId;
-              return productData.data;
-            })
-          );
-
-          const Customer = await Promise.all(
-            matchingOrder.map(async (order) => {
-              const data = await getAPI(
-                `/user?id=${order.customerId}`
-              );
-              return data.data;
-            })
-          );
-
-          const Personel = await Promise.all(
-            matchingOrder.map(async (order) => {
-              const data = await getAPI(
-                `/user?id=${order.personelId}`
-              );
-              return data.data;
-            })
-          );
+          const [
+            Colours,
+            Fabrics,
+            Measurements,
+            Metals,
+            Extras,
+            Products,
+            Customer,
+            Personel,
+          ] = await Promise.all([
+            Promise.all(
+              matchingColors.map((color) =>
+                getDataByUnique('Colors', { id: color.orderId })
+              )
+            ),
+            Promise.all(
+              matchingFabrics.map((fabric) =>
+                getDataByUnique('Fabrics', { id: fabric.orderId })
+              )
+            ),
+            Promise.all(
+              matchingMeasurements.map((measurement) =>
+                getDataByUnique('Measurements', { id: measurement.orderId })
+              )
+            ),
+            Promise.all(
+              matchingMetals.map((metal) =>
+                getDataByUnique('Metals', { id: metal.orderId })
+              )
+            ),
+            Promise.all(
+              matchingExtras.map(async (extra) => {
+                const extraData = await getAPI(
+                  `/createProduct/createProduct?extraId=${extra.extraId}`
+                );
+                extraData.data.orderId = extra.orderId;
+                return extraData.data;
+              })
+            ),
+            Promise.all(
+              matchingOrder.map((order) =>
+                getDataByUnique('Products', { id: order.productId })
+              )
+            ),
+            Promise.all(
+              matchingOrder.map((order) =>
+                getDataByUnique('Customer', { id: order.customerId })
+              )
+            ),
+            Promise.all(
+              matchingOrder.map((order) =>
+                getAPI(`/user?id=${order.personelId}`)
+              )
+            ),
+          ]);
 
           combinetData.push({
             orderCode: orderCode,
@@ -408,14 +430,20 @@ const handler = async (req, res) => {
             Müşteri: Customer,
             Personel: Personel,
           });
-        })
-      );
+        }
 
-      return res.status(200).json({
-        status: 'success',
-        data: combinetData,
-        message: 'Siparişler başarıyla getirildi.',
-      });
+        return res.status(200).json({
+          status: 'success',
+          data: combinetData,
+          message: 'Siparişler başarıyla getirildi.',
+        });
+      } catch (error) {
+        console.error('Hata:', error);
+        return res.status(500).json({
+          status: 'error',
+          message: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+        });
+      }
     }
   } catch (error) {
     return res

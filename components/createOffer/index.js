@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import LoadingScreen from '@/components/other/loading';
 import ListProducts from './listProducts';
 import BasketOffer from './basketOffer';
@@ -22,6 +22,8 @@ const CreateOfferComponent = () => {
   const [showBasketOffer, setShowBasketOffer] = useState(false);
   const [isCustomerAndPersonel, setIsCustomerAndPersonel] = useState(false);
   const [allFeatureValues, setAllFeatureValues] = useState([]);
+  // Müşteriler bilgisi
+  const [customers, setCustomers] = useState([]);
 
   // Yazdırma ekranına gönderilecek prop
   const [selectedOrder, setSelectedOrder] = useState([]);
@@ -39,12 +41,17 @@ const CreateOfferComponent = () => {
         return setBasketData(dataResult.data);
       }
 
+      if (condition === 'onlyCustomer') {
+        const response = await getAPI('/customer');
+        setCustomers(response.data);
+        return setIsloading(false);
+      }
+
       const response1 = getAPI('/createProduct/createProduct');
       const response2 = getAPI('/createOffer/basket');
-      const [createProductResult, basketResult] = await Promise.all([
-        response1,
-        response2,
-      ]);
+      const response3 = getAPI('/customer');
+      const [createProductResult, basketResult, customerResult] =
+        await Promise.all([response1, response2, response3]);
 
       if (!createProductResult) {
         throw new Error('Veri çekilemedi 2');
@@ -69,6 +76,7 @@ const CreateOfferComponent = () => {
       setProducts(createProductResult.data.createProducts);
       setProductFeatures(createProductResult.data.productFeatures);
       setBasketData(basketResult.data);
+      setCustomers(customerResult.data);
       setIsloading(false);
     } catch (error) {
       toast.error(error.message);
@@ -82,18 +90,6 @@ const CreateOfferComponent = () => {
   return (
     <>
       {isloading && <LoadingScreen isloading={isloading} />}
-      <ToastContainer
-        position='top-right'
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme='dark'
-      />
 
       <div
         className={`${
@@ -171,7 +167,7 @@ const CreateOfferComponent = () => {
               Toplam Ürün: {basketData.length}
             </p>
             <div className='flex justify-center item-center flex-row lg:flex-row gap-2 px-4 my-2'>
-              {!isCustomerAndPersonel && (
+              {!isCustomerAndPersonel && basketData.length > 0 && (
                 <button
                   onClick={() => setIsCustomerAndPersonel(true)}
                   type='button'
@@ -245,6 +241,7 @@ const CreateOfferComponent = () => {
           setHiddenBasketBar={setHiddenBasketBar}
           setAllFeatureValues={setAllFeatureValues}
           allFeatureValues={allFeatureValues}
+          customers={customers}
         />
       )}
       {!showBasketOffer && !showOrderOffer && (
