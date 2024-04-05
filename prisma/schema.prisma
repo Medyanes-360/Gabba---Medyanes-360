@@ -276,7 +276,7 @@ model User {
 
   mailAddress String? @unique
 
-  store   Store  @relation(fields: [storeId], references: [id])
+  store   Store? @relation(fields: [storeId], references: [id])
   storeId String @map("storeId") @db.ObjectId
 
   maxTax String?
@@ -376,6 +376,11 @@ model OfferOrderExtra {
 
 model Store {
   id                    String  @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  nameEnglish   String?
+  nameUkrainian String?
+  nameTurkish   String?
+  
   company_name          String
   company_nameEnglish   String?
   company_nameUkrainian String?
