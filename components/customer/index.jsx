@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '../ui/label';
 
 const MusteriTablosu = ({
   currentPage,
@@ -104,6 +105,14 @@ const Customer = ({ setAddCustomerPopup, customers, FormProps }) => {
     customers &&
     customers.length > 0 && (
       <div className='m-5'>
+        <div className='flex flex-col gap-2 mb-12'>
+          <Label className="text-xl font-semibold">
+            Müşteri Tanımlama Paneli
+          </Label>
+          <Label className="text-gray-700 font-medium">
+            Bu sayfada siparişi hangi müşteriniz için oluşturduğunuzu belirleyiniz
+          </Label>
+        </div>
         <div className='flex flex-col gap-2 md:flex-row md:gap-0 md:justify-between'>
           <FilterInput
             customers={customers}
