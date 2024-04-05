@@ -14,7 +14,6 @@ const ListBasket = ({
   setIsloading,
   setBasketData,
   basketData,
-  getData,
   productFeatures,
   setShowOrderOffer,
   setShowBasketOffer,
@@ -23,21 +22,12 @@ const ListBasket = ({
   setSelectedBasketData,
   setIsSelectedBasket,
   setHiddenBasketBar,
-  setUniqueKeys,
   setSelectedBasketFeatures,
   customers,
 }) => {
   const { data } = useSession();
-  console.log('sessionData: ', data);
-  const [addCustomerPopup, setAddCustomerPopup] = useState(false);
   return (
     <>
-      {addCustomerPopup && (
-        <CustomerRegistration
-          setAddCustomerPopup={setAddCustomerPopup}
-          getData={getData}
-        />
-      )}
       <Formik
         //validationSchema={FinancialManagementValidationSchema}
         initialValues={{
@@ -77,7 +67,6 @@ const ListBasket = ({
               {isCustomerAndPersonel ? (
                 <Customer
                   FormProps={FormProps}
-                  setAddCustomerPopup={setAddCustomerPopup}
                   customers={customers}
                 />
               ) : (

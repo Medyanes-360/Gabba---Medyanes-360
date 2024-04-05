@@ -7,6 +7,21 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '../ui/label';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Form, Formik } from 'formik';
+import { postAPI } from '@/services/fetchAPI';
+import { BiPlus } from 'react-icons/bi';
+import { useLoadingContext } from '@/app/(HomeLayout)/layout';
 
 const MusteriTablosu = ({
   currentPage,
@@ -93,6 +108,7 @@ const MusteriTablosu = ({
 
 const Customer = ({ setAddCustomerPopup, customers, FormProps }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const { isLoading, setIsLoading } = useLoadingContext();
   const [selectedMusteri, setSelectedMusteri] = useState(null);
   const [filteredMusteriler, setFilteredMusteriler] = useState(customers); // Filtrelenmiş müşteri verilerini saklamak için state
   const pageSize = 5;
@@ -113,19 +129,123 @@ const Customer = ({ setAddCustomerPopup, customers, FormProps }) => {
             Bu sayfada siparişi hangi müşteriniz için oluşturduğunuzu belirleyiniz
           </Label>
         </div>
-        <div className='flex flex-col gap-2 md:flex-row md:gap-0 md:justify-between'>
+        <div className='flex flex-col gap-2 md:flex-row md:gap-0 md:justify-between items-center'>
           <FilterInput
             customers={customers}
             setFilteredMusteriler={setFilteredMusteriler}
             setCurrentPage={setCurrentPage}
           />
-          <Button
-            type='button'
-            className='text-white rounded font-semibold transition-all duration-300'
-            onClick={() => setAddCustomerPopup(true)}
-          >
-            Müşteri Kaydı Ekle
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              {/*
+              <Button
+                type='button'
+                className='text-white rounded font-semibold transition-all duration-300'
+              >
+                Yeni Müşteri
+              </Button>
+              */}
+
+              <Button
+                title="Yeni müşteri kayıt et."
+                type='button'
+                className='text-white w-10 h-10 flex items-center justify-center p-0 rounded-full font-semibold transition-all duration-300'
+              >
+                <BiPlus size={24} />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Müşteri Kaydı Ekle</DialogTitle>
+                <DialogDescription>
+                  Yeni bir müşteri kaydı eklemek için lütfen aşağıdaki bilgileri doldurunuz.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+
+                <Formik
+                  initialValues={{
+                    name: '',
+                    surname: '',
+                    mailAddress: '',
+                    address: '',
+                    company_name: '',
+                    phoneNumber: '',
+                  }}
+                  onSubmit={async (values, { resetForm }) => {
+                    setIsLoading(true);
+                    const response = await postAPI('/customer', values).then(
+                      (res) => {
+                        if (res.status == 'error') {
+                          setIsLoading(false);
+                          return toast.error(res.message);
+                        }
+                        if (res.status == 'success') {
+                          setIsLoading(false);
+                          getData('onlyCustomer');
+                          resetForm();
+                          setAddCustomerPopup(false);
+                          return toast.success(res.message);
+                        }
+                      }
+                    );
+                    return response;
+                  }}
+                >
+                  {(props) => (
+                    <Form onSubmit={props.handleSubmit}>
+                      <div className='flex flex-col gap-2.5'>
+                        <Input
+                          type='text'
+                          name='company_name'
+                          onChange={props.handleChange}
+                          placeholder='Firma İsmi'
+                        />
+                        <Input
+                          type='text'
+                          name='name'
+                          onChange={props.handleChange}
+                          placeholder='Ad'
+                        />
+                        <Input
+                          type='text'
+                          name='surname'
+                          onChange={props.handleChange}
+                          placeholder='Soyad'
+                        />
+                        <Input
+                          type='text'
+                          name='address'
+                          onChange={props.handleChange}
+                          placeholder='Adres'
+                        />
+                        <Input
+                          type='text'
+                          name='mailAddress'
+                          onChange={props.handleChange}
+                          placeholder='Mail Adresi'
+                        />
+                        <Input
+                          type='text'
+                          name='phoneNumber'
+                          onChange={props.handleChange}
+                          placeholder='Telefon Numarası'
+                        />
+                        <DialogClose>
+                          <Button
+                            type='submit'
+                            className='mt-2'
+                          >
+                            Yeni Müşteri Ekle
+                          </Button>
+                        </DialogClose>
+                      </div>
+                    </Form>
+                  )}
+                </Formik>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
         <MusteriTablosu
           currentPage={currentPage}
@@ -140,7 +260,7 @@ const Customer = ({ setAddCustomerPopup, customers, FormProps }) => {
         />
         {/* Sayfalama kontrolleri */}
         <Pagination
-          customers={customers}
+          customers={filteredMusteriler}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
           pageSize={pageSize}
