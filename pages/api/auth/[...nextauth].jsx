@@ -40,7 +40,7 @@ const authOptions = {
             role: findUser.role,
           };
 
-          return user;
+          return findUser;
         } catch (error) {
           throw new Error(error.message);
         }
