@@ -2,6 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import Pagination from './Pagination';
 import FilterInput from './FilterInput';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 
 const MusteriTablosu = ({
   currentPage,
@@ -26,69 +30,63 @@ const MusteriTablosu = ({
   );
 
   return (
-    <div className='overflow-x-auto w-[600px] lg:w-full'>
-      <table className='w-full mt-4 border-collapse'>
-        <thead>
-          <tr>
-            <th className='border p-3 bg-gray-100'>Seçim</th>
-            <th className='border p-3 bg-gray-100'>Firma İsmi</th>
-            <th className='border p-3 bg-gray-100'>Müşterinin Adı</th>
-            <th className='border p-3 bg-gray-100'>Müşterinin Soyadı</th>
-            <th className='border p-3 bg-gray-100'>Müşterinin Adresi</th>
-            <th className='border p-3 bg-gray-100'>Müşterinin Mail Adresi</th>
-            <th className='border p-3 bg-gray-100'>
-              Müşterinin Telefon Numarası
-            </th>
-          </tr>
-        </thead>
-        <tbody className='text-center'>
+    <div className='overflow-x-auto w-[600px] lg:w-full rounded border border-border mt-8'>
+      <Table className='border-collapse w-full'>
+        <TableHeader>
+          <TableHead className="border border-border">Seçim</TableHead>
+          <TableHead className="border border-border">Firma İsmi</TableHead>
+          <TableHead className="border border-border">Müşterinin Adı</TableHead>
+          <TableHead className="border border-border">Müşterinin Soyadı</TableHead>
+          <TableHead className="border border-border">Müşterinin Adresi</TableHead>
+          <TableHead className="border border-border">Müşterinin Mail Adresi</TableHead>
+          <TableHead className="border border-border">
+            Müşterinin Telefon Numarası
+          </TableHead>
+        </TableHeader>
+        <TableBody className='text-center'>
           {selectedMusteri && (
-            <tr>
-              <td className='border p-3 bg-green-600 text-white'></td>
-              <td className='border p-3 bg-green-600 text-white font-semibold'>
+            <TableRow>
+              <TableCell className='border p-3 bg-green-600 text-white'></TableCell>
+              <TableCell className='border p-3 bg-green-600 text-white font-semibold'>
                 {selectedMusteri.company_name}
-              </td>
-              <td className='border p-3 bg-green-600 text-white font-semibold'>
+              </TableCell>
+              <TableCell className='border p-3 bg-green-600 text-white font-semibold'>
                 {selectedMusteri.name}
-              </td>
-              <td className='border p-3 bg-green-600 text-white font-semibold'>
+              </TableCell>
+              <TableCell className='border p-3 bg-green-600 text-white font-semibold'>
                 {selectedMusteri.surname}
-              </td>
-              <td className='border p-3 bg-green-600 text-white font-semibold'>
+              </TableCell>
+              <TableCell className='border p-3 bg-green-600 text-white font-semibold'>
                 {selectedMusteri.address}
-              </td>
-              <td className='border p-3 bg-green-600 text-white font-semibold'>
+              </TableCell>
+              <TableCell className='border p-3 bg-green-600 text-white font-semibold'>
                 {selectedMusteri.mailAddress}
-              </td>
-              <td className='border p-3 bg-green-600 text-white font-semibold'>
+              </TableCell>
+              <TableCell className='border p-3 bg-green-600 text-white font-semibold'>
                 {selectedMusteri.phoneNumber}
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           )}
           {currentMusteriler.map((musteri, index) => (
-            <tr key={index}>
-              <td className='border p-3'>
-                <input
-                  className='w-5 h-5 cursor-pointer'
-                  name='secim'
-                  type='checkbox'
-                  checked={
-                    selectedMusteri ? selectedMusteri.id === musteri.id : false
-                  }
-                  onChange={() => handleMusteriSecimi(musteri, FormProps)}
+            <TableRow key={index}>
+              <TableCell className='border border-border'>
+                <Checkbox
+                  className="w-5 h-5"
+                  checked={selectedMusteri ? selectedMusteri.id === musteri.id : false}
+                  onCheckedChange={() => handleMusteriSecimi(musteri, FormProps)}
                 />
-              </td>
-              <td className='border p-3'>{musteri.company_name}</td>
-              <td className='border p-3'>{musteri.name}</td>
-              <td className='border p-3'>{musteri.surname}</td>
-              <td className='border p-3'>{musteri.address}</td>
-              <td className='border p-3'>{musteri.mailAddress}</td>
-              <td className='border p-3'>{musteri.phoneNumber}</td>
-            </tr>
+              </TableCell>
+              <TableCell className='border border-border'>{musteri.company_name}</TableCell>
+              <TableCell className='border border-border'>{musteri.name}</TableCell>
+              <TableCell className='border border-border'>{musteri.surname}</TableCell>
+              <TableCell className='border border-border'>{musteri.address}</TableCell>
+              <TableCell className='border border-border'>{musteri.mailAddress}</TableCell>
+              <TableCell className='border border-border'>{musteri.phoneNumber}</TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </TableBody>
+      </Table>
+    </div >
   );
 };
 
@@ -112,13 +110,13 @@ const Customer = ({ setAddCustomerPopup, customers, FormProps }) => {
             setFilteredMusteriler={setFilteredMusteriler}
             setCurrentPage={setCurrentPage}
           />
-          <button
+          <Button
             type='button'
-            className='bg-purple-500 text-white rounded font-semibold p-3 hover:scale-105 transition-all duration-300'
+            className='text-white rounded font-semibold transition-all duration-300'
             onClick={() => setAddCustomerPopup(true)}
           >
             Müşteri Kaydı Ekle
-          </button>
+          </Button>
         </div>
         <MusteriTablosu
           currentPage={currentPage}
@@ -139,10 +137,10 @@ const Customer = ({ setAddCustomerPopup, customers, FormProps }) => {
           pageSize={pageSize}
         />
         <div className='flex justify-between mt-4 gap-6'>
-          <textarea
+          <Textarea
             name='orderNote'
             onChange={FormProps.handleChange}
-            className='w-3/4 h-[50px] border p-3 rounded hover:scale-105 transition-all duration-300'
+            className='w-full h-[100px] resize-none border rounded'
             placeholder='Ürün için genel açıklama notu ekleyin...'
           />
           {selectedMusteri && (

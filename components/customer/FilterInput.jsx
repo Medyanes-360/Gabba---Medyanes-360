@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import { Input } from "@/components/ui/input"
 
 const FilterInput = ({ customers, setFilteredMusteriler, setCurrentPage }) => {
   const [filterText, setFilterText] = useState('');
@@ -17,8 +18,8 @@ const FilterInput = ({ customers, setFilteredMusteriler, setCurrentPage }) => {
   };
 
   return (
-    <input
-      className='w-[250px] border p-3 rounded hover:scale-105 transition-all duration-300'
+    <Input
+      className='w-[250px] border rounded'
       type='text'
       placeholder='Tabloyu filtrele...'
       value={filterText}

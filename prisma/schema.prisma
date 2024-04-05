@@ -276,8 +276,8 @@ model User {
 
   mailAddress String? @unique
 
-  store   Store? @relation(fields: [storeId], references: [id])
-  storeId String @map("storeId") @db.ObjectId
+  store   Store?  @relation(fields: [storeId], references: [id])
+  storeId String? @map("storeId") @db.ObjectId
 
   maxTax String?
   role   String?
@@ -293,6 +293,16 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Customer {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  surname      String
+  mailAddress  String @unique
+  address      String
+  company_name String
+  phoneNumber  String @unique
 }
 
 model OfferBasket {
@@ -376,11 +386,6 @@ model OfferOrderExtra {
 
 model Store {
   id                    String  @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
-  nameEnglish   String?
-  nameUkrainian String?
-  nameTurkish   String?
-  
   company_name          String
   company_nameEnglish   String?
   company_nameUkrainian String?
