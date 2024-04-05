@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { GoTrash } from 'react-icons/go';
 import { postAPI } from '@/services/fetchAPI';
 import { LiaEdit } from 'react-icons/lia';
+import { BiMinus, BiPlus } from 'react-icons/bi';
 
 const BasketCard = ({
   productFeatures,
@@ -95,7 +96,7 @@ const BasketCard = ({
       ))}
       {/* Sepet ürün adı */}
       <div className='flex items-center justify-between'>
-        <p className='text-lg font-semibold text-gray-800 uppercase break-all'>
+        <p className='font-bold text-gray-900 capitalize break-all'>
           {item.Product.productName}
         </p>
       </div>
@@ -104,21 +105,21 @@ const BasketCard = ({
         <div className='flex gap-2 items-center'>
           <button
             type='button'
-            className='w-8 h-8 text-white bg-blue-500 rounded-full hover:bg-blue-600 focus:outline-none focus:bg-blue-600 transition duration-300'
+            className='w-6 h-6 flex items-center justify-center text-white bg-blue-500 rounded-full hover:bg-blue-600 focus:outline-none focus:bg-blue-600 transition duration-300'
             onClick={() => handleChangeStock(item.id, item.Stock - 1)}
           >
-            -
+            <BiMinus size={16}/>
           </button>
-          <p className='text-gray-700'>{item.Stock}</p>
+          <p className='text-gray-700 font-semibold'>{item.Stock}</p>
           <button
             type='button'
-            className='w-8 h-8 text-white bg-blue-500 rounded-full hover:bg-blue-600 focus:outline-none focus:bg-blue-600 transition duration-300'
+            className='w-6 h-6 flex items-center justify-center text-white bg-blue-500 rounded-full hover:bg-blue-600 focus:outline-none focus:bg-blue-600 transition duration-300'
             onClick={() => handleChangeStock(item.id, item.Stock + 1)}
           >
-            +
+            <BiPlus size={16}/>
           </button>
         </div>
-        <p className='text-lg font-semibold text-red-600'>
+        <p className='text-sm font-medium text-red-600'>
           Fiyat: {parseInt(item.ProductPrice + item.ProductFeaturePrice) * item.Stock}
         </p>
       </div>
