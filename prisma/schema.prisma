@@ -385,7 +385,12 @@ model OfferOrderExtra {
 }
 
 model Store {
-  id                    String  @id @default(auto()) @map("_id") @db.ObjectId
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  nameEnglish   String?
+  nameUkrainian String?
+  nameTurkish   String?
+
   company_name          String
   company_nameEnglish   String?
   company_nameUkrainian String?

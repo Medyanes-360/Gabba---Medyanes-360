@@ -1,3 +1,4 @@
+import prisma from '@/lib/prisma';
 import {
   createNewData,
   deleteDataAll,
@@ -42,7 +43,12 @@ const handleDelete = async (req) => {
 const handler = async (req, res) => {
   try {
     if (req.method === 'GET') {
-      const financialManagementSpecial = await getAllData('User');
+      const financialManagementSpecial = await prisma["User"].findMany({
+        where: {},
+        include: {
+          store: true
+        }
+      });
       if (!financialManagementSpecial || financialManagementSpecial.error) {
         throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4';
       }
@@ -64,6 +70,7 @@ const handler = async (req, res) => {
         },
         req.body.newData
       );
+      
       if (!financialManagementSpecial || financialManagementSpecial.error) {
         throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4';
       }
@@ -72,13 +79,13 @@ const handler = async (req, res) => {
         data: financialManagementSpecial,
         message: financialManagementSpecial.message,
       });
-    } else if (req.method === 'DELETE') {
-      const result = await handleDelete(req);
-      return res.status(200).json(result);
     } else if (req.method === 'POST') {
       const financialManagementSpecial = await createNewData('User', {
         ...req.body.newData,
       });
+
+      console.log(financialManagementSpecial)
+
       if (!financialManagementSpecial || financialManagementSpecial.error) {
         throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4';
       }

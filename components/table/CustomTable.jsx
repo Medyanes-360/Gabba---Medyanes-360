@@ -110,6 +110,11 @@ const CustomTable = ({
   {
     /* [key]: "asc" | "desc, bu type'da bir veri alır keyi tabloda arar ve bulunan başlığı valuesundaki değere göre sıralar (asc veya desc) olarak. */
   }
+  {
+    /* Engine prisma ise prismadan gelen verileri {tablo ismi : veri} formatında depolayacak state */
+  }
+  const [engineDatas, setEngineDatas] = useState();
+
   const [lang, setLang] = useState(
     langs.filter(
       (x) => x.code.toLowerCase() === defaultLang.toLowerCase()
@@ -255,8 +260,16 @@ const CustomTable = ({
   };
 
   useEffect(() => {
-    console.log(selection)
-  }, [selection])
+    columns.map(async (column) => {
+      if (column?.engine === "prisma") {
+        const responseData = await postAPI("/prisma/findMany", column?.table)
+        setEngineDatas((prev) => ({
+          ...prev,
+          [column?.table]: responseData
+        }))
+      }
+    })
+  }, [])
 
   const handleDeleteAll = async () => {
     try {
@@ -309,7 +322,29 @@ const CustomTable = ({
 
   const handleAddData = async (newData) => {
     try {
-      const response = await postAPI(api_route, { newData }, "POST");
+      const connections = Object.keys(newData).filter((key) => Object.keys(engineDatas).some((key2) => key === key2))
+
+      const connectionsObj = connections.map((connection) => {
+        return {
+          [connection.toLowerCase()]: {
+            connect: {
+              id: newData[connection].id
+            }
+          }
+        }
+      })
+
+      const result = connectionsObj.reduce((acc, curr) => {
+        return { ...acc, ...curr };
+      }, newData);
+
+      connections.forEach(connection => {
+        delete result[connection];
+      });
+
+      const response = await postAPI(api_route, {
+        newData: result
+      }, "POST");
 
       if (!response) {
         throw new Error("Veri Eklemesi (table)");
@@ -578,53 +613,89 @@ const CustomTable = ({
                           className="grid grid-col-4 items-center gap-4"
                           key={col_index + columnKey}
                         >
-                          {column?.type === `enum` ? (
+                          {column?.engine === "prisma" ? (
                             <>
                               <Label className="text-left w-full capitalize">
                                 {column?.header}
                               </Label>
 
-                              <Select onValueChange={(newval) => {
-                                setAddModalState((prevState) => ({
-                                  ...prevState,
-                                  [columnKey]: newval,
-                                }))
-                              }}>
+                              <Select
+                                value={addModalState[column?.table] && addModalState[column?.table][column.selectableField]}
+
+                                onValueChange={(newval) => {
+                                  const val = engineDatas[column?.table].filter((item) => item[column.selectableField] === newval)
+
+                                  if (val[0]) {
+                                    setAddModalState((prevState) => ({
+                                      ...prevState,
+                                      [column?.table]: val[0],
+                                    }))
+                                  }
+                                }}>
+
                                 <SelectTrigger>
-                                  <SelectValue placeholder='Select a personal role' />
+                                  <SelectValue placeholder="" />
                                 </SelectTrigger>
 
                                 <SelectContent>
                                   <SelectGroup>
-                                    <SelectLabel>Roles</SelectLabel>
-                                    {column?.list?.filter((x) => x.roles.includes(role))?.map((item) => <SelectItem value={item.role}>{item.title}</SelectItem>)}
+                                    <SelectLabel>{column?.header}</SelectLabel>
+                                    {engineDatas && engineDatas[column?.table] && engineDatas[column?.table]?.map((item) => <SelectItem value={item[column.selectableField]}>{item[column.selectableField]}</SelectItem>)}
                                   </SelectGroup>
                                 </SelectContent>
                               </Select>
                             </>
                           ) : (
                             <>
-                              <Label className="text-left w-full capitalize">
-                                {column?.header}
-                              </Label>
-                              <Input
-                                onChange={(event) =>
-                                  setAddModalState((prevState) => ({
-                                    ...prevState,
-                                    [columnKey]: event.target.value,
-                                  }))
-                                }
-                                type={column?.type}
-                                value={addModalState[columnKey]}
-                                required
-                                id={columnKey}
-                                placeholder={
-                                  (addModalLang
-                                    ? addModalLang?.code + " "
-                                    : "") +
-                                  column?.header
-                                }
-                              />
+                              {column?.type === `enum` ? (
+                                <>
+                                  <Label className="text-left w-full capitalize">
+                                    {column?.header}
+                                  </Label>
+
+                                  <Select onValueChange={(newval) => {
+                                    setAddModalState((prevState) => ({
+                                      ...prevState,
+                                      [columnKey]: newval,
+                                    }))
+                                  }}>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="" />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                      <SelectGroup>
+                                        <SelectLabel>{column?.header}</SelectLabel>
+                                        {column?.list?.filter((x) => x.roles.includes(role))?.map((item) => <SelectItem value={item.role}>{item.title}</SelectItem>)}
+                                      </SelectGroup>
+                                    </SelectContent>
+                                  </Select>
+                                </>
+                              ) : (
+                                <>
+                                  <Label className="text-left w-full capitalize">
+                                    {column?.header}
+                                  </Label>
+                                  <Input
+                                    onChange={(event) =>
+                                      setAddModalState((prevState) => ({
+                                        ...prevState,
+                                        [columnKey]: event.target.value,
+                                      }))
+                                    }
+                                    type={column?.type}
+                                    value={addModalState[columnKey]}
+                                    required
+                                    id={columnKey}
+                                    placeholder={
+                                      (addModalLang
+                                        ? addModalLang?.code + " "
+                                        : "") +
+                                      column?.header
+                                    }
+                                  />
+                                </>
+                              )}
                             </>
                           )}
                         </div>
@@ -709,7 +780,7 @@ const CustomTable = ({
                             All
                           </SelectItem>
                           {table
-                            .uniqueValues(column.dt_name)
+                            .uniqueValues(column.dt_name, column?.selectableField)
                             .map((val, idx) => (
                               <SelectItem
                                 key={idx}
@@ -770,11 +841,19 @@ const CustomTable = ({
                     const CustomComponent = col?.cell ?? null;
                     return (
                       <TableCell className="whitespace-nowrap" key={col_idx}>
-                        {CustomComponent ? (
-                          <CustomComponent {...col} {...dt} setData={setData} />
+                        {col?.engine === "prisma" ? (
+                          <>
+                            {dt[col?.table?.toLowerCase()][col?.selectableField]}
+                          </>
                         ) : (
-                          dt[col.dt_name + lang?.code ?? ""] ?? dt[col.dt_name]
-                        )}{" "}
+                          <>
+                            {CustomComponent ? (
+                              <CustomComponent {...col} {...dt} setData={setData} />
+                            ) : (
+                              dt[col.dt_name + lang?.code ?? ""] ?? dt[col.dt_name]
+                            )}
+                          </>
+                        )}
                       </TableCell>
                     );
                   })}
