@@ -23,11 +23,9 @@ const StepByStep = () => {
     getAllOrderData();
   }, []);
 
-  console.log(orderData)
-
   return (
     <div className='h-screen w-full flex'>
-      {/* {orderData && <PrintOrder data={orderData} lang={lang} />} */}
+      {orderData && <PrintOrder data={orderData} lang={lang} />}
     </div>
   )
 }
