@@ -304,7 +304,15 @@ const handler = async (req, res) => {
     }
 
     if (req.method === 'GET') {
-      try {
+      if (req.method === 'GET') {
+        const OfferOrders = getAllData('OfferOrder');
+
+        const OfferOrderColors = getAllData('OfferOrderColors');
+        const OfferOrderFabrics = getAllData('OfferOrderFabrics');
+        const OfferOrderMeasurements = getAllData('OfferOrderMeasurements');
+        const OfferOrderMetals = getAllData('OfferOrderMetals');
+        const OfferOrderExtra = getAllData('OfferOrderExtra');
+
         const [
           OfferOrdersResult,
           OfferOrderColorsResult,
@@ -313,86 +321,110 @@ const handler = async (req, res) => {
           OfferOrderMetalsResult,
           OfferOrderExtraResult,
         ] = await Promise.all([
-          getAllData('OfferOrder'),
-          getAllData('OfferOrderColors'),
-          getAllData('OfferOrderFabrics'),
-          getAllData('OfferOrderMeasurements'),
-          getAllData('OfferOrderMetals'),
-          getAllData('OfferOrderExtra'),
+          OfferOrders,
+          OfferOrderColors,
+          OfferOrderFabrics,
+          OfferOrderMeasurements,
+          OfferOrderMetals,
+          OfferOrderExtra,
         ]);
 
         if (!OfferOrdersResult || OfferOrdersResult?.error) {
           throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4';
         }
 
-        // Benzersiz orderCode'ları direkt olarak veritabanından al
-        const uniqueOrderCodes = OfferOrdersResult.reduce((acc, order) => {
-          if (!acc.includes(order.orderCode)) {
-            acc.push(order.orderCode);
+        // Benzersiz orderCode'ları saklamak için bir dizi oluştur
+        const uniqueOrderCodes = [];
+
+        // Her bir siparişi kontrol et
+        OfferOrdersResult.forEach((order) => {
+          const orderCode = order.orderCode;
+
+          // Eğer orderCode daha önce eklenmemişse, diziye ekle
+          if (!uniqueOrderCodes.includes(orderCode)) {
+            uniqueOrderCodes.push(orderCode);
           }
-          return acc;
-        }, []);
+        });
 
         const combinetData = [];
 
-        for (const orderCode of uniqueOrderCodes) {
-          const [
-            matchingColors,
-            matchingFabrics,
-            matchingMeasurements,
-            matchingMetals,
-            matchingExtras,
-            matchingOrder,
-          ] = await Promise.all([
-            OfferOrderColorsResult.filter(
+        await Promise.all(
+          uniqueOrderCodes.map(async (orderCode) => {
+            // Her bir sipariş kodu için renkleri seç
+            const matchingColors = OfferOrderColorsResult.filter(
               (color) => color.orderCode === orderCode
-            ),
-            OfferOrderFabricsResult.filter(
-              (fabric) => fabric.orderCode === orderCode
-            ),
-            OfferOrderMeasurementsResult.filter(
-              (measurement) => measurement.orderCode === orderCode
-            ),
-            OfferOrderMetalsResult.filter(
-              (metal) => metal.orderCode === orderCode
-            ),
-            OfferOrderExtraResult.filter(
-              (extra) => extra.orderCode === orderCode
-            ),
-            OfferOrdersResult.filter((order) => order.orderCode === orderCode),
-          ]);
+            );
 
-          const [
-            Colours,
-            Fabrics,
-            Measurements,
-            Metals,
-            Extras,
-            Products,
-            Customer,
-            Personel,
-          ] = await Promise.all([
-            Promise.all(
-              matchingColors.map((color) =>
-                getDataByUnique('Colors', { id: color.orderId })
-              )
-            ),
-            Promise.all(
-              matchingFabrics.map((fabric) =>
-                getDataByUnique('Fabrics', { id: fabric.orderId })
-              )
-            ),
-            Promise.all(
-              matchingMeasurements.map((measurement) =>
-                getDataByUnique('Measurements', { id: measurement.orderId })
-              )
-            ),
-            Promise.all(
-              matchingMetals.map((metal) =>
-                getDataByUnique('Metals', { id: metal.orderId })
-              )
-            ),
-            Promise.all(
+            // Her bir sipariş kodu için kumaşları seç
+            const matchingFabrics = OfferOrderFabricsResult.filter(
+              (fabric) => fabric.orderCode === orderCode
+            );
+
+            // Her bir sipariş kodu için ölçüleri seç
+            const matchingMeasurements = OfferOrderMeasurementsResult.filter(
+              (measurement) => measurement.orderCode === orderCode
+            );
+
+            // Her bir sipariş kodu için metalleri seç
+            const matchingMetals = OfferOrderMetalsResult.filter(
+              (metal) => metal.orderCode === orderCode
+            );
+
+            // Her bir sipariş kodu için extraları seç
+            const matchingExtras = OfferOrderExtraResult.filter(
+              (extra) => extra.orderCode === orderCode
+            );
+
+            const matchingOrder = OfferOrdersResult.filter(
+              (order) => order.orderCode === orderCode
+            );
+
+            // Her bir renk için API çağrısını yaparak Renkler dizisine eklemek
+            const Colours = await Promise.all(
+              matchingColors.map(async (color) => {
+                const colourData = await getAPI(
+                  `/createProduct/colors?colourId=${color.colourId}`
+                );
+                colourData.data.orderId = color.orderId;
+                return colourData.data;
+              })
+            );
+
+            // Her bir ölçü için API çağrısını yaparak Ölçüler dizisine eklemek
+            const Measurements = await Promise.all(
+              matchingMeasurements.map(async (measurement) => {
+                const measurementData = await getAPI(
+                  `/createProduct/measurements?measurementId=${measurement.measurementId}`
+                );
+                measurementData.data.orderId = measurement.orderId;
+                return measurementData.data;
+              })
+            );
+
+            // Her bir metaller için API çağrısını yaparak Metaller dizisine eklemek
+            const Metals = await Promise.all(
+              matchingMetals.map(async (metal) => {
+                const metalData = await getAPI(
+                  `/createProduct/metals?metalId=${metal.metalId}`
+                );
+                metalData.data.orderId = metal.orderId;
+                return metalData.data;
+              })
+            );
+
+            // Her bir kumaş için API çağrısını yaparak Kumaşlar dizisine eklemek
+            const Fabrics = await Promise.all(
+              matchingFabrics.map(async (fabric) => {
+                const fabricData = await getAPI(
+                  `/createProduct/fabrics?fabricsId=${fabric.fabricsId}`
+                );
+                fabricData.data.orderId = fabric.orderId;
+                return fabricData.data;
+              })
+            );
+
+            // Her bir ekstra için API çağrısını yaparak Extralar dizisine eklemek
+            const Extras = await Promise.all(
               matchingExtras.map(async (extra) => {
                 const extraData = await getAPI(
                   `/createProduct/createProduct?extraId=${extra.extraId}`
@@ -400,59 +432,56 @@ const handler = async (req, res) => {
                 extraData.data.orderId = extra.orderId;
                 return extraData.data;
               })
-            ),
-            Promise.all(
-              matchingOrder.map((order) =>
-                getDataByUnique('Products', { id: order.productId })
-              )
-            ),
-            Promise.all(
-              matchingOrder.map((order) =>
-                getDataByUnique('Customer', { id: order.customerId })
-              )
-            ),
-            Promise.all(
-              matchingOrder.map((order) =>
-                getAPI(`/user?id=${order.personelId}`)
-              )
-            ),
-          ]);
+            );
 
-          console.log([
-            Colours,
-            Fabrics,
-            Measurements,
-            Metals,
-            Extras,
-            Products,
-            Customer,
-            Personel,
-          ])
+            // Her bir ürün için API çağırısını yaparak Ürünler dizisine eklemek
+            const Products = await Promise.all(
+              matchingOrder.map(async (order) => {
+                const productData = await getAPI(
+                  `/createProduct/createProduct?productId=${order.productId}`
+                );
+                productData.data.orderId = order.orderId;
+                return productData.data;
+              })
+            );
 
-          combinetData.push({
-            orderCode: orderCode,
-            Orders: matchingOrder,
-            Renkler: Colours,
-            Kumaşlar: Fabrics,
-            Ölçüler: Measurements,
-            Metaller: Metals,
-            Extralar: Extras,
-            Ürünler: Products,
-            Müşteri: Customer,
-            Personel: Personel,
-          });
-        }
+            const Customer = await Promise.all(
+              matchingOrder.map(async (order) => {
+                const customerData = await getDataByUnique('Customer', {
+                  id: order.customerId,
+                });
+                return customerData;
+              })
+            );
+
+            const Personel = await Promise.all(
+              matchingOrder.map(async (order) => {
+                const personelData = await getDataByUnique('User', {
+                  id: order.personelId,
+                });
+                return personelData;
+              })
+            );
+
+            combinetData.push({
+              orderCode: orderCode,
+              Orders: matchingOrder,
+              Renkler: Colours,
+              Kumaşlar: Fabrics,
+              Ölçüler: Measurements,
+              Metaller: Metals,
+              Extralar: Extras,
+              Ürünler: Products,
+              Müşteri: Customer,
+              Personel: Personel,
+            });
+          })
+        );
 
         return res.status(200).json({
           status: 'success',
           data: combinetData,
           message: 'Siparişler başarıyla getirildi.',
-        });
-      } catch (error) {
-        console.error('Hata:', error);
-        return res.status(500).json({
-          status: 'error',
-          message: 'Bir hata oluştu. Lütfen tekrar deneyin.',
         });
       }
     }
