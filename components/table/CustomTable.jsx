@@ -113,7 +113,7 @@ const CustomTable = ({
   {
     /* Engine prisma ise prismadan gelen verileri {tablo ismi : veri} formatında depolayacak state */
   }
-  const [engineDatas, setEngineDatas] = useState();
+  const [engineDatas, setEngineDatas] = useState({});
 
   const [lang, setLang] = useState(
     langs.filter(
@@ -322,29 +322,37 @@ const CustomTable = ({
 
   const handleAddData = async (newData) => {
     try {
-      const connections = Object.keys(newData).filter((key) => Object.keys(engineDatas).some((key2) => key === key2))
+      let response;
 
-      const connectionsObj = connections.map((connection) => {
-        return {
-          [connection.toLowerCase()]: {
-            connect: {
-              id: newData[connection].id
+      if (typeof engineDatas === "object" && Object?.keys(engineDatas)?.length > 0) {
+        const connections = Object?.keys(newData)?.filter((key) => Object.keys(engineDatas).some((key2) => key === key2))
+
+        const connectionsObj = connections.map((connection) => {
+          return {
+            [connection.toLowerCase()]: {
+              connect: {
+                id: newData[connection].id
+              }
             }
           }
-        }
-      })
+        })
 
-      const result = connectionsObj.reduce((acc, curr) => {
-        return { ...acc, ...curr };
-      }, newData);
+        const result = connectionsObj.reduce((acc, curr) => {
+          return { ...acc, ...curr };
+        }, newData);
 
-      connections.forEach(connection => {
-        delete result[connection];
-      });
+        connections.forEach(connection => {
+          delete result[connection];
+        });
 
-      const response = await postAPI(api_route, {
-        newData: result
-      }, "POST");
+        response = await postAPI(api_route, {
+          newData: result
+        }, "POST");
+      } else {
+        response = await postAPI(api_route, {
+          newData: newData
+        }, "POST");
+      }
 
       if (!response) {
         throw new Error("Veri Eklemesi (table)");
