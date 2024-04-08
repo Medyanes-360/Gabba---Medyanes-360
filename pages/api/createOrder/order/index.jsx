@@ -418,6 +418,17 @@ const handler = async (req, res) => {
             ),
           ]);
 
+          console.log([
+            Colours,
+            Fabrics,
+            Measurements,
+            Metals,
+            Extras,
+            Products,
+            Customer,
+            Personel,
+          ])
+
           combinetData.push({
             orderCode: orderCode,
             Orders: matchingOrder,

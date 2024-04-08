@@ -7,6 +7,7 @@ export default withAuth(async function middleware(req) {
   // Personal rolünde izin verilen sayfalar
   const allowedPersonalPaths = [
     '',
+    '*',
     'dashboard',
     'dashboard/stock',
     'dashboard/stock-control',
@@ -25,22 +26,22 @@ export default withAuth(async function middleware(req) {
     return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/sign-in`);
   }
 
-  // Eğer rolü manager ise ama sayfaya erişimi yoksa dashboard'a yönlendiriyoruz.
-  if (
-    session.user.role == 'manager' &&
-    !allowedManagerPaths.some((path) => currentPath === `/${path}`)
-  ) {
-    return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/dashboard`);
-  }
+  // // Eğer rolü manager ise ama sayfaya erişimi yoksa dashboard'a yönlendiriyoruz.
+  // if (
+  //   session.user.role == 'manager' &&
+  //   !allowedManagerPaths.some((path) => currentPath === `/${path}`)
+  // ) {
+  //   return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/dashboard`);
+  // }
 
-  // Eğer rolü personal ise ama sayfaya erişimi yoksa dashboard'a yönlendiriyoruz.
-  if (
-    (session.user.role =
-      'personal' &&
-      !allowedPersonalPaths.some((path) => currentPath === `/${path}`))
-  ) {
-    return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/dashboard`);
-  }
+  // // Eğer rolü personal ise ama sayfaya erişimi yoksa dashboard'a yönlendiriyoruz.
+  // if (
+  //   (session.user.role =
+  //     'personal' &&
+  //     !allowedPersonalPaths.some((path) => currentPath === `/${path}`))
+  // ) {
+  //   return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/dashboard`);
+  // }
 });
 
 //https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher

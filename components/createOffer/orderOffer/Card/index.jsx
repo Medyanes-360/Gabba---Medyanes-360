@@ -102,36 +102,35 @@ const Card = ({
                   </li>
                 </ul>
                 <div className='flex my-4 gap-2'>
-                  <Image
-                    onClick={() => {
-                      setSelectedOrder({ data: item, lang: 'en' });
-                    }}
-                    className='w-10 h-10 mb-3 rounded-full shadow-lg hover:cursor-pointer hover:scale-110 transition-all'
-                    src='/en_flag.svg'
-                    width={100}
-                    height={100}
-                    alt='Invoice icon'
-                  />
-                  <Image
-                    onClick={() => {
-                      setSelectedOrder({ data: item, lang: 'ua' });
-                    }}
-                    className='w-10 h-10 mb-3 rounded-full shadow-lg hover:cursor-pointer hover:scale-110 transition-all'
-                    src='/ua_flag.svg'
-                    width={100}
-                    height={100}
-                    alt='Invoice icon'
-                  />
-                  <Image
-                    onClick={() => {
-                      setSelectedOrder({ data: item, lang: 'tr' });
-                    }}
-                    className='w-10 h-10 mb-3 rounded-full shadow-lg hover:cursor-pointer hover:scale-110 transition-all'
-                    src='/tr_flag.svg'
-                    width={100}
-                    height={100}
-                    alt='Invoice icon'
-                  />
+                  <Link href={`/document?id=${item.orderCode}&lang=en`}>
+                    <Image
+                      className='w-10 h-10 mb-3 rounded-full shadow-lg hover:cursor-pointer hover:scale-110 transition-all'
+                      src='/en_flag.svg'
+                      width={100}
+                      height={100}
+                      alt='Invoice icon'
+                    />
+                  </Link>
+
+                  <Link href={`/document?id=${item.orderCode}&lang=ua`}>
+                    <Image
+                      className='w-10 h-10 mb-3 rounded-full shadow-lg hover:cursor-pointer hover:scale-110 transition-all'
+                      src='/ua_flag.svg'
+                      width={100}
+                      height={100}
+                      alt='Invoice icon'
+                    />
+                  </Link>
+
+                  <Link href={`/document?id=${item.orderCode}&lang=tr`}>
+                    <Image
+                      className='w-10 h-10 mb-3 rounded-full shadow-lg hover:cursor-pointer hover:scale-110 transition-all'
+                      src='/tr_flag.svg'
+                      width={100}
+                      height={100}
+                      alt='Invoice icon'
+                    />
+                  </Link>
 
                   {/* <Button>
                     <Link href={`/stepbystep/${item.orderCode}`}>Go Panel</Link>
