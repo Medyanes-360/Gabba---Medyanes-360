@@ -61,6 +61,13 @@ const handler = async (req, res) => {
       const result = await handleDelete(req);
       return res.status(200).json(result);
     } else if (req.method === 'PUT') {
+      // Remove 'store' and 'storeId' keys from newData
+      if (req.body.newData.store &&
+        req.body.newData.storeId) {
+        delete req.body.newData.store;
+        delete req.body.newData.storeId;
+      }
+
       const financialManagementSpecial = await updateDataByMany(
         'User',
         {
@@ -70,7 +77,8 @@ const handler = async (req, res) => {
         },
         req.body.newData
       );
-      
+      console.log(financialManagementSpecial)
+
       if (!financialManagementSpecial || financialManagementSpecial.error) {
         throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4';
       }
@@ -96,6 +104,7 @@ const handler = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error)
     return res
       .status(500)
       .json({ status: 'error', error, message: error.message });
