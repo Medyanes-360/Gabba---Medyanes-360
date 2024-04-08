@@ -8,30 +8,31 @@ import { postAPI } from '@/services/fetchAPI';
 
 const Card = ({
   orderData,
-  setOrderData,
   setSelectedOrder,
-  setShowOrderOffer,
   setIsloading,
   getAllOrderData,
 }) => {
   // Silme fonksiyonu buradadır.
   const deleteOrder = async (orderCode) => {
-    setIsloading(true);
-    try {
-      const response = await postAPI('/createOrder/order', {
-        deletedOrderCode: orderCode,
-        processType: 'delete',
-      });
-      console.log(response);
-      if (response.status !== 'success') {
-        setIsloading(false);
-        throw new Error('Bir hata oluştu');
-      }
+    const conf = confirm("Bu Teklif Silinecektir, Emin misiniz ?")
+    if (conf) {
+      setIsloading(true);
+      try {
+        const response = await postAPI('/createOrder/order', {
+          deletedOrderCode: orderCode,
+          processType: 'delete',
+        });
+        console.log(response);
+        if (response.status !== 'success') {
+          setIsloading(false);
+          throw new Error('Bir hata oluştu');
+        }
 
-      getAllOrderData();
-      return toast.success(response.message);
-    } catch (error) {
-      toast.error(error.message);
+        getAllOrderData();
+        return toast.success(response.message);
+      } catch (error) {
+        toast.error(error.message);
+      }
     }
   };
   return (
@@ -89,7 +90,7 @@ const Card = ({
                       return (
                         total +
                         (order.productPrice + order.productFeaturePrice) *
-                          order.stock
+                        order.stock
                       );
                     }, 0)}
                   </li>
@@ -101,7 +102,7 @@ const Card = ({
                   </li>
                 </ul>
                 <div className='flex my-4 gap-2'>
-                  {/* <Image
+                  <Image
                     onClick={() => {
                       setSelectedOrder({ data: item, lang: 'en' });
                     }}
@@ -130,11 +131,11 @@ const Card = ({
                     width={100}
                     height={100}
                     alt='Invoice icon'
-                  /> */}
+                  />
 
-                  <Button>
+                  {/* <Button>
                     <Link href={`/stepbystep/${item.orderCode}`}>Go Panel</Link>
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
             </div>
