@@ -60,31 +60,8 @@ const MusteriTablosu = ({
           </TableHead>
         </TableHeader>
         <TableBody className='text-center'>
-          {selectedMusteri && (
-            <TableRow>
-              <TableCell className='border p-3 bg-green-600 text-white'></TableCell>
-              <TableCell className='border p-3 bg-green-600 text-white font-semibold'>
-                {selectedMusteri.company_name}
-              </TableCell>
-              <TableCell className='border p-3 bg-green-600 text-white font-semibold'>
-                {selectedMusteri.name}
-              </TableCell>
-              <TableCell className='border p-3 bg-green-600 text-white font-semibold'>
-                {selectedMusteri.surname}
-              </TableCell>
-              <TableCell className='border p-3 bg-green-600 text-white font-semibold'>
-                {selectedMusteri.address}
-              </TableCell>
-              <TableCell className='border p-3 bg-green-600 text-white font-semibold'>
-                {selectedMusteri.mailAddress}
-              </TableCell>
-              <TableCell className='border p-3 bg-green-600 text-white font-semibold'>
-                {selectedMusteri.phoneNumber}
-              </TableCell>
-            </TableRow>
-          )}
           {currentMusteriler.map((musteri, index) => (
-            <TableRow key={index}>
+            <TableRow key={index} className={`${(musteri.name + musteri.phoneNumber) === (selectedMusteri?.name + selectedMusteri?.phoneNumber) && "bg-green-200 hover:bg-green-300 transition-all duration-200 ease-in-out"}`}>
               <TableCell className='border border-border'>
                 <Checkbox
                   className="w-5 h-5"

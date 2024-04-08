@@ -24,7 +24,7 @@ const Pagination = ({ currentPage, customers, pageSize, setCurrentPage }) => {
           </PaginationItem>
 
           {pageNumbers.map((num, index) => (
-            <PaginationItem key={index}>
+            <PaginationItem className="cursor-pointer" key={index}>
               <PaginationLink onClick={() => setCurrentPage(num)} isActive={num === currentPage} >{num}</PaginationLink>
             </PaginationItem>
           ))}
