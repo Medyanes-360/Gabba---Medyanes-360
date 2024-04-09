@@ -80,8 +80,8 @@ const CustomTable = ({
   },
 }) => {
   // next-auth kurulunca güncellenecek
-  const { data: session } = useSession()
-  const role = session?.user?.role
+  const { data: session } = useSession();
+  const role = session?.user?.role;
   {
     /* Stateler */
   }
@@ -101,6 +101,10 @@ const CustomTable = ({
   const [openAddModal, setOpenAddModal] = useState(false);
   {
     /* Data ekleme modalının kapanıp açıldığının değerini tutar */
+  }
+  const [updateModal, setUpdateModal] = useState(false);
+  {
+    /* Data guncelleme modalının kapanıp açıldığının değerini tutar */
   }
   const [addModalState, setAddModalState] = useState({});
   {
@@ -236,7 +240,7 @@ const CustomTable = ({
         "DELETE"
       );
 
-      console.log(ids)
+      console.log(ids);
 
       if (!response) {
         throw new Error("Veri Silinemedi (table)");
@@ -262,14 +266,14 @@ const CustomTable = ({
   useEffect(() => {
     columns.map(async (column) => {
       if (column?.engine === "prisma") {
-        const responseData = await postAPI("/prisma/findMany", column?.table)
+        const responseData = await postAPI("/prisma/findMany", column?.table);
         setEngineDatas((prev) => ({
           ...prev,
-          [column?.table]: responseData
-        }))
+          [column?.table]: responseData,
+        }));
       }
-    })
-  }, [])
+    });
+  }, []);
 
   const handleDeleteAll = async () => {
     try {
@@ -298,7 +302,53 @@ const CustomTable = ({
 
   const updateData = async (id, newData) => {
     try {
-      const response = await postAPI(api_route, { id, newData }, "PUT");
+      let response;
+
+      if (
+        typeof engineDatas === "object" &&
+        Object?.keys(engineDatas)?.length > 0
+      ) {
+        const connections = Object?.keys(newData)?.filter((key) =>
+          Object.keys(engineDatas).some(
+            (key2) => key.toLowerCase() === key2.toLowerCase()
+          )
+        );
+
+        const connectionsObj = connections.map((connection) => {
+          return {
+            [connection.toLowerCase()]: {
+              connect: {
+                id: newData[connection].id,
+              },
+            },
+          };
+        });
+
+        const result = connectionsObj.reduce((acc, curr) => {
+          return { ...acc, ...curr };
+        }, newData);
+
+        connections.forEach((connection) => {
+          const x =
+            result[connection]?.id ??
+            result[connection.toLowerCase()]?.id ??
+            result[connection.charAt(0).toUpperCase() + connection.slice(1)]
+              ?.id;
+          
+          delete result[connection];
+          result[connection] = {
+            connect: {
+              id: x,
+            },
+          };
+        });
+
+        console.log(result);
+
+        response = await postAPI(api_route, { id, newData: result }, "PUT");
+      } else {
+        response = await postAPI(api_route, { id, newData }, "PUT");
+      }
 
       if (!response) {
         throw new Error("Veri güncellemesi (table)");
@@ -312,6 +362,7 @@ const CustomTable = ({
       setAddModalLang(null);
       setUpdateDataState({});
       setAddModalLang(null);
+      setUpdateModal(false);
       toast.success(`Data Güncellendi Data`);
       await getData();
     } catch (error) {
@@ -324,34 +375,47 @@ const CustomTable = ({
     try {
       let response;
 
-      if (typeof engineDatas === "object" && Object?.keys(engineDatas)?.length > 0) {
-        const connections = Object?.keys(newData)?.filter((key) => Object.keys(engineDatas).some((key2) => key === key2))
+      if (
+        typeof engineDatas === "object" &&
+        Object?.keys(engineDatas)?.length > 0
+      ) {
+        const connections = Object?.keys(newData)?.filter((key) =>
+          Object.keys(engineDatas).some((key2) => key === key2)
+        );
 
         const connectionsObj = connections.map((connection) => {
           return {
             [connection.toLowerCase()]: {
               connect: {
-                id: newData[connection].id
-              }
-            }
-          }
-        })
+                id: newData[connection].id,
+              },
+            },
+          };
+        });
 
         const result = connectionsObj.reduce((acc, curr) => {
           return { ...acc, ...curr };
         }, newData);
 
-        connections.forEach(connection => {
+        connections.forEach((connection) => {
           delete result[connection];
         });
 
-        response = await postAPI(api_route, {
-          newData: result
-        }, "POST");
+        response = await postAPI(
+          api_route,
+          {
+            newData: result,
+          },
+          "POST"
+        );
       } else {
-        response = await postAPI(api_route, {
-          newData: newData
-        }, "POST");
+        response = await postAPI(
+          api_route,
+          {
+            newData: newData,
+          },
+          "POST"
+        );
       }
 
       if (!response) {
@@ -628,19 +692,26 @@ const CustomTable = ({
                               </Label>
 
                               <Select
-                                value={addModalState[column?.table] && addModalState[column?.table][column.selectableField]}
-
+                                value={
+                                  addModalState[column?.table] &&
+                                  addModalState[column?.table][
+                                    column.selectableField
+                                  ]
+                                }
                                 onValueChange={(newval) => {
-                                  const val = engineDatas[column?.table].filter((item) => item[column.selectableField] === newval)
+                                  const val = engineDatas[column?.table].filter(
+                                    (item) =>
+                                      item[column.selectableField] === newval
+                                  );
 
                                   if (val[0]) {
                                     setAddModalState((prevState) => ({
                                       ...prevState,
                                       [column?.table]: val[0],
-                                    }))
+                                    }));
                                   }
-                                }}>
-
+                                }}
+                              >
                                 <SelectTrigger>
                                   <SelectValue placeholder="" />
                                 </SelectTrigger>
@@ -648,7 +719,17 @@ const CustomTable = ({
                                 <SelectContent>
                                   <SelectGroup>
                                     <SelectLabel>{column?.header}</SelectLabel>
-                                    {engineDatas && engineDatas[column?.table] && engineDatas[column?.table]?.map((item) => <SelectItem value={item[column.selectableField]}>{item[column.selectableField]}</SelectItem>)}
+                                    {engineDatas &&
+                                      engineDatas[column?.table] &&
+                                      engineDatas[column?.table]?.map(
+                                        (item) => (
+                                          <SelectItem
+                                            value={item[column.selectableField]}
+                                          >
+                                            {item[column.selectableField]}
+                                          </SelectItem>
+                                        )
+                                      )}
                                   </SelectGroup>
                                 </SelectContent>
                               </Select>
@@ -661,20 +742,32 @@ const CustomTable = ({
                                     {column?.header}
                                   </Label>
 
-                                  <Select onValueChange={(newval) => {
-                                    setAddModalState((prevState) => ({
-                                      ...prevState,
-                                      [columnKey]: newval,
-                                    }))
-                                  }}>
+                                  <Select
+                                    onValueChange={(newval) => {
+                                      setAddModalState((prevState) => ({
+                                        ...prevState,
+                                        [columnKey]: newval,
+                                      }));
+                                    }}
+                                  >
                                     <SelectTrigger>
                                       <SelectValue placeholder="" />
                                     </SelectTrigger>
 
                                     <SelectContent>
                                       <SelectGroup>
-                                        <SelectLabel>{column?.header}</SelectLabel>
-                                        {column?.list?.filter((x) => x.roles.includes(role))?.map((item) => <SelectItem value={item.role}>{item.title}</SelectItem>)}
+                                        <SelectLabel>
+                                          {column?.header}
+                                        </SelectLabel>
+                                        {column?.list
+                                          ?.filter((x) =>
+                                            x.roles.includes(role)
+                                          )
+                                          ?.map((item) => (
+                                            <SelectItem value={item.role}>
+                                              {item.title}
+                                            </SelectItem>
+                                          ))}
                                       </SelectGroup>
                                     </SelectContent>
                                   </Select>
@@ -698,8 +791,7 @@ const CustomTable = ({
                                     placeholder={
                                       (addModalLang
                                         ? addModalLang?.code + " "
-                                        : "") +
-                                      column?.header
+                                        : "") + column?.header
                                     }
                                   />
                                 </>
@@ -788,7 +880,10 @@ const CustomTable = ({
                             All
                           </SelectItem>
                           {table
-                            .uniqueValues(column.dt_name, column?.selectableField)
+                            .uniqueValues(
+                              column.dt_name,
+                              column?.selectableField
+                            )
                             .map((val, idx) => (
                               <SelectItem
                                 key={idx}
@@ -851,14 +946,23 @@ const CustomTable = ({
                       <TableCell className="whitespace-nowrap" key={col_idx}>
                         {col?.engine === "prisma" ? (
                           <>
-                            {dt[col?.table?.toLowerCase()][col?.selectableField]}
+                            {
+                              dt[col?.table?.toLowerCase()][
+                                col?.selectableField
+                              ]
+                            }
                           </>
                         ) : (
                           <>
                             {CustomComponent ? (
-                              <CustomComponent {...col} {...dt} setData={setData} />
+                              <CustomComponent
+                                {...col}
+                                {...dt}
+                                setData={setData}
+                              />
                             ) : (
-                              dt[col.dt_name + lang?.code ?? ""] ?? dt[col.dt_name]
+                              dt[col.dt_name + lang?.code ?? ""] ??
+                              dt[col.dt_name]
                             )}
                           </>
                         )}
@@ -866,7 +970,7 @@ const CustomTable = ({
                     );
                   })}
                   <TableCell>
-                    <Dialog>
+                    <Dialog onOpenChange={setUpdateModal} open={updateModal}>
                       <DropdownMenu>
                         <DropdownMenuTrigger>
                           <Button variant="ghost" className="h-8 w-8 p-0">
@@ -887,6 +991,7 @@ const CustomTable = ({
                           {actions && actions.update && (
                             <DialogTrigger
                               onClick={() => {
+                                console.log(dt);
                                 setUpdateDataState(dt);
                               }}
                               className="w-full"
@@ -914,9 +1019,9 @@ const CustomTable = ({
                         >
                           <div className="w-full flex items-start pr-8">
                             <DialogHeader>
-                              <DialogTitle>Add Data</DialogTitle>
+                              <DialogTitle>Update Data</DialogTitle>
                               <DialogDescription>
-                                Click add when you're done.
+                                Click Update when you're done.
                               </DialogDescription>
                             </DialogHeader>
 
@@ -961,7 +1066,7 @@ const CustomTable = ({
                             </DropdownMenu>
                           </div>
 
-                          {/* DATA EKLMEK İÇİN İNPUTLAR */}
+                          {/* DATA Guncellemek İÇİN İNPUTLAR */}
                           <div className="flex flex-col gap-5 py-6">
                             {columns
                               // eğerki bu header (başlık) yani column'umun enableForm değeri true ise ve modal'da tuttuğum lang (language) data null ise veya column'umun translate değeri true ise filterdan geçir.
@@ -980,29 +1085,153 @@ const CustomTable = ({
 
                                 return (
                                   <div
-                                    className="grid gridcol-4 items-center gap-4"
+                                    className="grid grid-col-4 items-center gap-4"
                                     key={col_index + columnKey}
                                   >
-                                    <Label className="text-left w-full capitalize">
-                                      {column?.header}
-                                    </Label>
-                                    <Input
-                                      onChange={(event) =>
-                                        setUpdateDataState((prevState) => ({
-                                          ...prevState,
-                                          [columnKey]: event.target.value,
-                                        }))
-                                      }
-                                      type={column?.type}
-                                      value={updateDataState[columnKey] ?? ""}
-                                      id={columnKey}
-                                      placeholder={
-                                        (addModalLang
-                                          ? addModalLang?.code + " "
-                                          : "") +
-                                        column?.header
-                                      }
-                                    />
+                                    {column?.engine === "prisma" ? (
+                                      <>
+                                        <Label className="text-left w-full capitalize">
+                                          {column?.header}
+                                        </Label>
+
+                                        <Select
+                                          value={
+                                            (updateDataState[column?.table] &&
+                                              updateDataState[column?.table][
+                                                column?.selectableField
+                                              ]) ??
+                                            (updateDataState[
+                                              column?.table?.toLowerCase()
+                                            ] &&
+                                              updateDataState[
+                                                column?.table?.toLowerCase()
+                                              ][column?.selectableField])
+                                          }
+                                          onValueChange={(newval) => {
+                                            const val = engineDatas[
+                                              column?.table
+                                            ].filter(
+                                              (item) =>
+                                                item[column.selectableField] ===
+                                                newval
+                                            );
+
+                                            if (val[0]) {
+                                              setUpdateDataState(
+                                                (prevState) => ({
+                                                  ...prevState,
+                                                  [column?.table]: val[0],
+                                                })
+                                              );
+                                            }
+                                          }}
+                                        >
+                                          <SelectTrigger>
+                                            <SelectValue placeholder="" />
+                                          </SelectTrigger>
+
+                                          <SelectContent>
+                                            <SelectGroup>
+                                              <SelectLabel>
+                                                {column?.header}
+                                              </SelectLabel>
+                                              {engineDatas &&
+                                                engineDatas[column?.table] &&
+                                                engineDatas[column?.table]?.map(
+                                                  (item) => (
+                                                    <SelectItem
+                                                      value={
+                                                        item[
+                                                          column.selectableField
+                                                        ]
+                                                      }
+                                                    >
+                                                      {
+                                                        item[
+                                                          column.selectableField
+                                                        ]
+                                                      }
+                                                    </SelectItem>
+                                                  )
+                                                )}
+                                            </SelectGroup>
+                                          </SelectContent>
+                                        </Select>
+                                      </>
+                                    ) : (
+                                      <>
+                                        {column?.type === `enum` ? (
+                                          <>
+                                            <Label className="text-left w-full capitalize">
+                                              {column?.header}
+                                            </Label>
+
+                                            <Select
+                                              value={
+                                                updateDataState[columnKey] ?? ""
+                                              }
+                                              onValueChange={(newval) => {
+                                                setUpdateDataState(
+                                                  (prevState) => ({
+                                                    ...prevState,
+                                                    [columnKey]: newval,
+                                                  })
+                                                );
+                                              }}
+                                            >
+                                              <SelectTrigger>
+                                                <SelectValue placeholder="" />
+                                              </SelectTrigger>
+
+                                              <SelectContent>
+                                                <SelectGroup>
+                                                  <SelectLabel>
+                                                    {column?.header}
+                                                  </SelectLabel>
+                                                  {column?.list
+                                                    ?.filter((x) =>
+                                                      x.roles.includes(role)
+                                                    )
+                                                    ?.map((item) => (
+                                                      <SelectItem
+                                                        value={item.role}
+                                                      >
+                                                        {item.title}
+                                                      </SelectItem>
+                                                    ))}
+                                                </SelectGroup>
+                                              </SelectContent>
+                                            </Select>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <Label className="text-left w-full capitalize">
+                                              {column?.header}
+                                            </Label>
+                                            <Input
+                                              onChange={(event) =>
+                                                setUpdateDataState(
+                                                  (prevState) => ({
+                                                    ...prevState,
+                                                    [columnKey]:
+                                                      event.target.value,
+                                                  })
+                                                )
+                                              }
+                                              type={column?.type}
+                                              value={updateDataState[columnKey]}
+                                              required
+                                              id={crypto.randomUUID()}
+                                              placeholder={
+                                                (addModalLang
+                                                  ? addModalLang?.code + " "
+                                                  : "") + column?.header
+                                              }
+                                            />
+                                          </>
+                                        )}
+                                      </>
+                                    )}
                                   </div>
                                 );
                               })}
@@ -1020,11 +1249,9 @@ const CustomTable = ({
                                 Close
                               </Button>
                             </DialogClose>
-                            <DialogClose>
-                              <Button type="submit" variant="destructive">
-                                Update Data
-                              </Button>
-                            </DialogClose>
+                            <Button type="submit" variant="destructive">
+                              Update Data
+                            </Button>
                           </DialogFooter>
                         </form>
                       </DialogContent>
