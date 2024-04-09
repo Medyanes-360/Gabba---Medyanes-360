@@ -66,7 +66,7 @@ const ListBasket = ({
           <Form onSubmit={FormProps.handleSubmit} id="createOfferForm">
             <div className="flex flex-col justify-center items-center">
               {isCustomerAndPersonel ? (
-                <Customer getData={getData} FormProps={FormProps} customers={customers} />
+                <Customer toast={toast} getData={getData} FormProps={FormProps} customers={customers} />
               ) : (
                 <>
                   {basketData.length === 0 ? (

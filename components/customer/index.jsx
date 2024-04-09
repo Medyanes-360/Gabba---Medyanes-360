@@ -119,10 +119,11 @@ const MusteriTablosu = ({
   );
 };
 
-const Customer = ({ setAddCustomerPopup, customers, FormProps, getData }) => {
+const Customer = ({ setAddCustomerPopup, customers, FormProps, getData, toast }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const { isLoading, setIsLoading } = useLoadingContext();
   const [selectedMusteri, setSelectedMusteri] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
   const [filteredMusteriler, setFilteredMusteriler] = useState(customers); // Filtrelenmiş müşteri verilerini saklamak için state
   const pageSize = 5;
 
@@ -146,7 +147,7 @@ const Customer = ({ setAddCustomerPopup, customers, FormProps, getData }) => {
           setFilteredMusteriler={setFilteredMusteriler}
           setCurrentPage={setCurrentPage}
         />
-        <Dialog>
+        <Dialog onOpenChange={setOpenModal} open={openModal}>
           <DialogTrigger asChild>
             {/*
               <Button
@@ -189,6 +190,7 @@ const Customer = ({ setAddCustomerPopup, customers, FormProps, getData }) => {
                     (res) => {
                       if (res.status == "error") {
                         setIsLoading(false);
+                        setOpenModal(false)
                         return toast.error(res.message);
                       }
                       if (res.status == "success") {
@@ -196,6 +198,7 @@ const Customer = ({ setAddCustomerPopup, customers, FormProps, getData }) => {
                         getData("onlyCustomer");
                         resetForm();
                         setAddCustomerPopup(false);
+                        setOpenModal(false)
                         return toast.success(res.message);
                       }
                     }
