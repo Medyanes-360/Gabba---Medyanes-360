@@ -64,6 +64,7 @@ const handler = async (req, res) => {
       // Remove 'store' and 'storeId' keys from newData object
       const { Store, store, storeId, ...newDataWithoutStoreProps } = req.body.newData;
 
+
       const financialManagementSpecial = await updateDataByMany(
         "User",
         {
@@ -71,7 +72,7 @@ const handler = async (req, res) => {
             equals: req.body.id,
           },
         },
-        newDataWithoutStoreProps
+        Store ? { ...newDataWithoutStoreProps, storeId: Store.id } : { ...newDataWithoutStoreProps }
       );
 
       if (!financialManagementSpecial || financialManagementSpecial.error) {
@@ -84,15 +85,11 @@ const handler = async (req, res) => {
         message: financialManagementSpecial.message,
       });
     } else if (req.method === "POST") {
-      const obj = req.body.newData;
-      delete obj["storeId"];
-      delete obj["Store"];
+      const { Store, storeId, ...newDataWithoutStoreProps } = req.body.newData;
 
       const financialManagementSpecial = await createNewData("User", {
-        ...obj,
+        ...newDataWithoutStoreProps,
       });
-
-      console.log(obj);
 
       if (!financialManagementSpecial || financialManagementSpecial.error) {
         throw "Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4";

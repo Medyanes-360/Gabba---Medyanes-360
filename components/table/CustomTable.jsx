@@ -302,53 +302,7 @@ const CustomTable = ({
 
   const updateData = async (id, newData) => {
     try {
-      let response;
-
-      if (
-        typeof engineDatas === "object" &&
-        Object?.keys(engineDatas)?.length > 0
-      ) {
-        const connections = Object?.keys(newData)?.filter((key) =>
-          Object.keys(engineDatas).some(
-            (key2) => key.toLowerCase() === key2.toLowerCase()
-          )
-        );
-
-        const connectionsObj = connections.map((connection) => {
-          return {
-            [connection.toLowerCase()]: {
-              connect: {
-                id: newData[connection].id,
-              },
-            },
-          };
-        });
-
-        const result = connectionsObj.reduce((acc, curr) => {
-          return { ...acc, ...curr };
-        }, newData);
-
-        connections.forEach((connection) => {
-          const x =
-            result[connection]?.id ??
-            result[connection.toLowerCase()]?.id ??
-            result[connection.charAt(0).toUpperCase() + connection.slice(1)]
-              ?.id;
-          
-          delete result[connection];
-          result[connection] = {
-            connect: {
-              id: x,
-            },
-          };
-        });
-
-        console.log(result);
-
-        response = await postAPI(api_route, { id, newData: result }, "PUT");
-      } else {
-        response = await postAPI(api_route, { id, newData }, "PUT");
-      }
+      const response = await postAPI(api_route, { id, newData }, "PUT");
 
       if (!response) {
         throw new Error("Veri güncellemesi (table)");
@@ -695,7 +649,7 @@ const CustomTable = ({
                                 value={
                                   addModalState[column?.table] &&
                                   addModalState[column?.table][
-                                    column.selectableField
+                                  column.selectableField
                                   ]
                                 }
                                 onValueChange={(newval) => {
@@ -948,7 +902,7 @@ const CustomTable = ({
                           <>
                             {
                               dt[col?.table?.toLowerCase()][
-                                col?.selectableField
+                              col?.selectableField
                               ]
                             }
                           </>
@@ -1098,13 +1052,13 @@ const CustomTable = ({
                                           value={
                                             (updateDataState[column?.table] &&
                                               updateDataState[column?.table][
-                                                column?.selectableField
+                                              column?.selectableField
                                               ]) ??
                                             (updateDataState[
                                               column?.table?.toLowerCase()
                                             ] &&
                                               updateDataState[
-                                                column?.table?.toLowerCase()
+                                              column?.table?.toLowerCase()
                                               ][column?.selectableField])
                                           }
                                           onValueChange={(newval) => {
@@ -1142,13 +1096,13 @@ const CustomTable = ({
                                                     <SelectItem
                                                       value={
                                                         item[
-                                                          column.selectableField
+                                                        column.selectableField
                                                         ]
                                                       }
                                                     >
                                                       {
                                                         item[
-                                                          column.selectableField
+                                                        column.selectableField
                                                         ]
                                                       }
                                                     </SelectItem>
