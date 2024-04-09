@@ -185,12 +185,12 @@ const Customer = ({ setAddCustomerPopup, customers, FormProps, getData, toast })
                   phoneNumber: "",
                 }}
                 onSubmit={async (values, { resetForm }) => {
+                  setOpenModal(false)
                   setIsLoading(true);
                   const response = await postAPI("/customer", values).then(
                     (res) => {
                       if (res.status == "error") {
                         setIsLoading(false);
-                        setOpenModal(false)
                         return toast.error(res.message);
                       }
                       if (res.status == "success") {
@@ -198,7 +198,6 @@ const Customer = ({ setAddCustomerPopup, customers, FormProps, getData, toast })
                         getData("onlyCustomer");
                         resetForm();
                         setAddCustomerPopup(false);
-                        setOpenModal(false)
                         return toast.success(res.message);
                       }
                     }
