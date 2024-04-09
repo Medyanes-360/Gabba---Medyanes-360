@@ -119,7 +119,7 @@ const MusteriTablosu = ({
   );
 };
 
-const Customer = ({ setAddCustomerPopup, customers, FormProps }) => {
+const Customer = ({ setAddCustomerPopup, customers, FormProps, getData }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const { isLoading, setIsLoading } = useLoadingContext();
   const [selectedMusteri, setSelectedMusteri] = useState(null);

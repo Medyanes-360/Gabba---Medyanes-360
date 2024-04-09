@@ -24,6 +24,7 @@ const ListBasket = ({
   setHiddenBasketBar,
   setSelectedBasketFeatures,
   customers,
+  getData
 }) => {
   const { data } = useSession();
   
@@ -65,7 +66,7 @@ const ListBasket = ({
           <Form onSubmit={FormProps.handleSubmit} id="createOfferForm">
             <div className="flex flex-col justify-center items-center">
               {isCustomerAndPersonel ? (
-                <Customer toast={toast} FormProps={FormProps} customers={customers} />
+                <Customer getData={getData} FormProps={FormProps} customers={customers} />
               ) : (
                 <>
                   {basketData.length === 0 ? (
