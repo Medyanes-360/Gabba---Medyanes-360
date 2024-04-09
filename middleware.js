@@ -1,16 +1,16 @@
-import { withAuth } from 'next-auth/middleware';
-import { NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt';
+import { withAuth } from "next-auth/middleware";
+import { NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 export default withAuth(async function middleware(req) {
   // Manager rolünde izin verilen sayfalar
-  const allowedManagerPaths = ['', 'dashboard', 'dashboard/personal'];
+  const allowedManagerPaths = ["", "dashboard", "dashboard/personal"];
   // Personal rolünde izin verilen sayfalar
   const allowedPersonalPaths = [
-    '',
-    '*',
-    'dashboard',
-    'dashboard/stock',
-    'dashboard/stock-control',
+    "",
+    "*",
+    "dashboard",
+    "dashboard/stock",
+    "dashboard/stock-control",
   ];
 
   // Kullanıcının bilgisi alınır.
@@ -47,10 +47,10 @@ export default withAuth(async function middleware(req) {
 //https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
 export const config = {
   matcher: [
-    '/',
-    '/dashboard/:path*',
-    '/createProduct/:path*',
-    '/financialManagement',
-    '/createOffer',
+    "/",
+    "/dashboard/:path*",
+    "/createProduct/:path*",
+    "/financialManagement",
+    "/createOffer",
   ],
 };
