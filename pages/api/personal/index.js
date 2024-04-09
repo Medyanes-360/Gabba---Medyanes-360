@@ -64,7 +64,6 @@ const handler = async (req, res) => {
       // Remove 'store' and 'storeId' keys from newData object
       const { Store, store, storeId, ...newDataWithoutStoreProps } = req.body.newData;
 
-
       const financialManagementSpecial = await updateDataByMany(
         "User",
         {

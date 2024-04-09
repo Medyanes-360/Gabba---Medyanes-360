@@ -901,9 +901,7 @@ const CustomTable = ({
                         {col?.engine === "prisma" ? (
                           <>
                             {
-                              dt[col?.table?.toLowerCase()][
-                              col?.selectableField
-                              ]
+                              dt[col?.table?.toLowerCase()][col?.selectableField]
                             }
                           </>
                         ) : (
