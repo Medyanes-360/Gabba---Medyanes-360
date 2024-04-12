@@ -277,7 +277,7 @@ model User {
   mailAddress String? @unique
 
   store   Store?  @relation(fields: [storeId], references: [id])
-  storeId String? @map("storeId") @db.ObjectId
+  storeId String? @unique @map("storeId") @db.ObjectId
 
   maxTax String?
   role   String?
@@ -391,10 +391,8 @@ model Store {
   nameUkrainian String?
   nameTurkish   String?
 
-  company_name          String
-  company_nameEnglish   String?
-  company_nameUkrainian String?
-  company_nameTurkish   String?
+  company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?  @unique @map("companyId") @db.ObjectId
 
   country          String
   countryEnglish   String?
@@ -424,12 +422,9 @@ model Store {
 model Company {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  yetkili String
+  name String @unique
 
-  firma          String
-  firmaEnglish   String?
-  firmaUkrainian String?
-  firmaTurkish   String?
+  yetkili String
 
   tel1 String
   tel2 String
@@ -465,6 +460,7 @@ model Company {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Store     Store?
 }
 
 model Expense {
