@@ -8,10 +8,8 @@ import { useSearchParams } from 'next/navigation';
 const StepByStep = () => {
   const id = useSearchParams().get("id")
   const lang = useSearchParams().get("lang")
-  console.log(id)
-  console.log(lang)
 
-  const [orderData, setOrderData] = useState();
+  const [orderData, setOrderData] = useState(null);
 
   const getAllOrderData = async () => {
     const response = await getAPI('/createOrder/order');
@@ -21,7 +19,7 @@ const StepByStep = () => {
 
   useEffect(() => {
     getAllOrderData();
-  }, []);
+  }, [id, lang]);
 
   return (
     <div className='h-screen w-full flex'>
