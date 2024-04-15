@@ -42,13 +42,8 @@ const handleDelete = async (req) => {
 const handler = async (req, res) => {
   try {
     if (req.method === "GET") {
-      const financialManagementSpecial = await prisma["Store"].findMany({
-        where: {},
-        include: {
-          company: true,
-        },
-      });
 
+      const financialManagementSpecial = await getAllData("store");     
       if (!financialManagementSpecial || financialManagementSpecial.error) {
         throw "Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4";
       }
@@ -61,7 +56,7 @@ const handler = async (req, res) => {
       const result = await handleDelete(req);
       return res.status(200).json(result);
     } else if (req.method === "PUT") {
-      const { Company, company, companyId, ...newDataWithoutStoreProps } =
+      const { Company, companyId, ...newDataWithoutStoreProps } =
         req.body.newData;
 
       const financialManagementSpecial = await updateDataByMany(
@@ -71,11 +66,10 @@ const handler = async (req, res) => {
             equals: req.body.id,
           },
         },
-        { ...newDataWithoutStoreProps, companyId: Company?.id ?? companyId }
+        Company
+          ? { ...newDataWithoutStoreProps, companyId: Company.id }
+          : { ...newDataWithoutStoreProps }
       );
-
-      console.log("res", financialManagementSpecial);
-
       if (!financialManagementSpecial || financialManagementSpecial.error) {
         throw "Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4";
       }
