@@ -1,19 +1,21 @@
-'use client'
-import { getAPI } from '@/services/fetchAPI'
-import React, { useEffect, useState } from 'react'
-import PrintOrder from '@/components/createOffer/orderOffer/PrintOrder';
-import { useSearchParams } from 'next/navigation';
+"use client";
+import { getAPI } from "@/services/fetchAPI";
+import React, { useEffect, useState } from "react";
+import PrintOrder from "@/components/createOffer/orderOffer/PrintOrder";
+import { useSearchParams } from "next/navigation";
 
 // Adım adım bir formu temsil eden bileşen
 const StepByStep = () => {
-  const id = useSearchParams().get("id")
-  const lang = useSearchParams().get("lang")
+  const id = useSearchParams().get("id");
+  const lang = useSearchParams().get("lang");
 
   const [orderData, setOrderData] = useState(null);
 
   const getAllOrderData = async () => {
-    const response = await getAPI('/createOrder/order');
-    const filtered = response.data?.filter((fl) => fl.orderCode === id)[0]
+    const response = await getAPI("/createOrder/order");
+    console.log("response", response);
+    const filtered = response.data?.filter((fl) => fl.orderCode === id)[0];
+    console.log("filtered", filtered);
     setOrderData(filtered);
   };
 
@@ -22,10 +24,10 @@ const StepByStep = () => {
   }, [id, lang]);
 
   return (
-    <div className='h-screen w-full flex'>
+    <div className="h-screen w-full flex">
       {orderData && <PrintOrder data={orderData} lang={lang} />}
     </div>
-  )
-}
+  );
+};
 
-export default StepByStep
+export default StepByStep;
