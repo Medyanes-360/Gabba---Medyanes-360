@@ -48,7 +48,7 @@ const handler = async (req, res) => {
           company: true,
         },
       });
-      
+
       if (!financialManagementSpecial || financialManagementSpecial.error) {
         throw "Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4";
       }
@@ -61,7 +61,7 @@ const handler = async (req, res) => {
       const result = await handleDelete(req);
       return res.status(200).json(result);
     } else if (req.method === "PUT") {
-      const { Company, companyId, ...newDataWithoutStoreProps } =
+      const { Company, company, companyId, ...newDataWithoutStoreProps } =
         req.body.newData;
 
       const financialManagementSpecial = await updateDataByMany(
@@ -71,10 +71,11 @@ const handler = async (req, res) => {
             equals: req.body.id,
           },
         },
-        Company
-          ? { ...newDataWithoutStoreProps, companyId: Company.id }
-          : { ...newDataWithoutStoreProps }
+        { ...newDataWithoutStoreProps, companyId: Company?.id ?? companyId }
       );
+
+      console.log("res", financialManagementSpecial);
+
       if (!financialManagementSpecial || financialManagementSpecial.error) {
         throw "Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4";
       }

@@ -71,7 +71,7 @@ const handler = async (req, res) => {
             equals: req.body.id,
           },
         },
-        Store ? { ...newDataWithoutStoreProps, storeId: Store.id } : { ...newDataWithoutStoreProps }
+        { ...newDataWithoutStoreProps, storeId: Store?.id ?? storeId }
       );
 
       if (!financialManagementSpecial || financialManagementSpecial.error) {
