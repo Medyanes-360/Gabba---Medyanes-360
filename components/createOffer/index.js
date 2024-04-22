@@ -12,8 +12,10 @@ import { FaFileInvoice } from "react-icons/fa";
 import { BsCart3 } from "react-icons/bs";
 import { IoChevronForwardOutline } from "react-icons/io5";
 import { IoChevronBackOutline } from "react-icons/io5";
+import { useSession } from "next-auth/react";
 
 const CreateOfferComponent = () => {
+  const { data } = useSession()
   const [showOrderOffer, setShowOrderOffer] = useState(false);
   const [hiddenBasketBar, setHiddenBasketBar] = useState(false);
   const [isloading, setIsloading] = useState(false);
@@ -35,8 +37,7 @@ const CreateOfferComponent = () => {
     try {
       setIsloading(true);
       if (condition === "onlyBasket") {
-        const response = getAPI("/createOffer/basket");
-        const [dataResult] = await Promise.all([response]);
+        const dataResult = await getAPI(`/createOffer/basket?userId=${data?.user?.id}`);
         setIsloading(false);
         return setBasketData(dataResult.data);
       }
@@ -47,11 +48,9 @@ const CreateOfferComponent = () => {
         return setIsloading(false);
       }
 
-      const response1 = getAPI("/createProduct/createProduct");
-      const response2 = getAPI("/createOffer/basket");
-      const response3 = getAPI("/customer");
-      const [createProductResult, basketResult, customerResult] =
-        await Promise.all([response1, response2, response3]);
+      const createProductResult = await getAPI("/createProduct/createProduct");
+      const basketResult = await getAPI(`/createOffer/basket?userId=${data?.user?.id}`);
+      const customerResult = await getAPI("/customer");
 
       if (!createProductResult) {
         throw new Error("Veri çekilemedi 2");
@@ -65,6 +64,7 @@ const CreateOfferComponent = () => {
       await createProductResult.data.createProducts.sort((a, b) =>
         a.productName.localeCompare(b.productName)
       );
+
       await Promise.all(
         await createProductResult.data.createProducts.map(async (item) => {
           const { result } = await FinancialManagementCalculate(
@@ -77,6 +77,7 @@ const CreateOfferComponent = () => {
       setProducts(createProductResult.data.createProducts);
       setProductFeatures(createProductResult.data.productFeatures);
       setBasketData(basketResult.data);
+      console.log(basketResult.data)
       setCustomers(customerResult.data);
       setIsloading(false);
     } catch (error) {
@@ -125,7 +126,7 @@ const CreateOfferComponent = () => {
               <div className="relative py-2 hover:scale-110 transition-all">
                 <div className="t-0 absolute left-3">
                   <p className="flex h-2 w-2 items-center justify-center rounded-full bg-red-500 p-3 text-md text-white">
-                    {basketData.length}
+                    {basketData?.length ?? 0}
                   </p>
                 </div>
                 <BsCart3 size={25} className="file: mt-4 h-6 w-6" />

@@ -20,7 +20,7 @@ const Pagination = ({ currentPage, customers, pageSize, setCurrentPage }) => {
       <PaginationComponent>
         <PaginationContent>
           <PaginationItem className={cn("cursor-pointer", currentPage === 1 && "opacity-25 cursor-default")}>
-            <PaginationPrevious onClick={() => setCurrentPage((prev) => prev - 1)} />
+            <PaginationPrevious onClick={() => currentPage > 1 && setCurrentPage((prev) => prev - 1)} />
           </PaginationItem>
 
           {pageNumbers.map((num, index) => (
@@ -30,7 +30,7 @@ const Pagination = ({ currentPage, customers, pageSize, setCurrentPage }) => {
           ))}
 
           <PaginationItem className={cn("cursor-pointer", currentPage === totalPageCount && "opacity-25 cursor-default")}>
-            <PaginationNext onClick={() => setCurrentPage((prev) => prev + 1)} />
+            <PaginationNext onClick={() => currentPage !== totalPageCount && setCurrentPage((prev) => prev + 1)} />
           </PaginationItem>
         </PaginationContent>
       </PaginationComponent>

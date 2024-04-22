@@ -27,7 +27,7 @@ const ListBasket = ({
   getData
 }) => {
   const { data } = useSession();
-  
+
   return (
     <>
       <Formik
@@ -83,7 +83,7 @@ const ListBasket = ({
                         Sepet
                       </h1>
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-4 p-4">
-                        {basketData.map((item) => (
+                        {basketData && basketData.length > 0 && basketData?.map((item) => (
                           <BasketCard
                             key={item.id}
                             item={item}

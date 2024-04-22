@@ -46,7 +46,7 @@ export async function createNewDataMany(tableName, newData) {
 }
 
 // GET BY UNIQUE ONE VALUE
-export async function getDataByUnique(tableName, where) {
+export async function getDataByUnique(tableName, where, include) {
   try {
     const data = await prisma[tableName].findUnique({ where: where });
     return data;

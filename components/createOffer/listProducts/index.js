@@ -5,6 +5,7 @@ import { getAPI, postAPI } from '@/services/fetchAPI';
 import 'react-toastify/dist/ReactToastify.css';
 import { IoCloseOutline } from 'react-icons/io5';
 import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik';
+import { useSession } from 'next-auth/react';
 
 function ListProducts({
   toast,
@@ -108,7 +109,6 @@ function ListProducts({
   }
 
   useEffect(() => {
-    console.log(products)
     getAllFeatureValues();
   }, []);
 
@@ -287,6 +287,8 @@ function ListProducts({
     }
   };
 
+  const { data } = useSession()
+
   return (
     <>
       {
@@ -354,6 +356,7 @@ function ListProducts({
 
               const response = await postAPI('/createOffer/basket', {
                 data: values,
+                userId: data?.user?.id
               });
 
               if (response.status !== 'success' || response.status == 'error') {

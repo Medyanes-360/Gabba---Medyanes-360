@@ -1,11 +1,14 @@
 import prisma from "@/lib/prisma";
 
 export default async function handler(req, res) {
-    if(req.method === 'POST') {
+    if (req.method === 'POST') {
         const data = await prisma.user.findUnique({
             where: {
                 phoneNumber: req.body.phoneNumber,
             },
+            include: {
+                "OfferBasket": true
+            }
         });
 
         return res.status(201).json({

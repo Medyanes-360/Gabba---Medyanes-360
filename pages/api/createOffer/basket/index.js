@@ -12,7 +12,7 @@ import {
 const handler = async (req, res) => {
   try {
     if (req.method === 'POST') {
-      const { data, processType, id, stock } = req.body;
+      const { data, processType, id, stock, userId } = req.body;
 
       if (processType === 'updateBasket') {
         const basketData = {
@@ -262,6 +262,7 @@ const handler = async (req, res) => {
         productId: data.selectedOfferProduct,
         productPrice: parseFloat(data.selectedOfferProductPrice),
         productFeaturePrice: parseFloat(data.selectedOfferProductFeaturePrice),
+        user: { connect: { id: userId } }
       };
 
       const responseCreateBasket = await createNewData(
@@ -430,7 +431,7 @@ const handler = async (req, res) => {
       // OfferBaskets içindeki her bir öğeyi kontrol et
 
       await Promise.all(
-        OfferBaskets.map(async (offerBasket) => {
+        OfferBaskets.filter((dtres) => dtres.userId === req.query.userId).map(async (offerBasket) => {
           const offerBasketId = offerBasket.id;
 
           // OfferBasketColors içinde OfferBaskets ID'sine göre eşleşen renkleri seçme
