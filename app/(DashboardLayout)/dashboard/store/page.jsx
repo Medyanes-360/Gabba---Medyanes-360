@@ -14,6 +14,10 @@ const Store = () => {
         pagination={true}
         paginationType='page'
         defaultLang='Us'
+        actions={{
+          delete: false,
+          update: true
+        }}
       />
     </>
   );

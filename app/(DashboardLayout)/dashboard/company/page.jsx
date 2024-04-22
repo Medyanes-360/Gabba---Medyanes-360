@@ -15,6 +15,10 @@ const Addcompany = () => {
         pagination={true}
         paginationType='page'
         defaultLang='Us'
+        actions={{
+          delete: false,
+          update: true
+        }}
       />
     </>
   );
