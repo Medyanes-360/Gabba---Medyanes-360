@@ -9,7 +9,7 @@ import ButtonList from '@/components/dashboard/ButtonList';
 import UserIcon from '@/assets/icons/UserIcon';
 import BurgerIcon from '@/assets/icons/BurgerIcon';
 import { useMediaQuery } from '@/lib/table/useMediaQuery';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 
 const Sidebar = ({ buttons }) => {
   const pathname = usePathname();
@@ -162,6 +162,14 @@ const Sidebar = ({ buttons }) => {
                   {data.user.role}
                 </span>
               </div>
+
+              <button
+                onClick={() => signOut()}
+                className="py-3 px-4 rounded-md bg-slate-800 text-white"
+                type="button"
+              >
+                Çıkış Yap
+              </button>
             </div>
           )}
         </div>
