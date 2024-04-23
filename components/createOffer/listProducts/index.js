@@ -147,7 +147,7 @@ function ListProducts({
     return (
       products &&
       products.length > 0 &&
-      products.filter(prdt => prdt.productName.includes(search)).map(
+      products.filter(prdt => prdt.productName.toLowerCase().includes(search.toLowerCase())).map(
         (product, index) =>
           product.productPrice > 0 && (
             <tr key={product.id} className='border-b'>
