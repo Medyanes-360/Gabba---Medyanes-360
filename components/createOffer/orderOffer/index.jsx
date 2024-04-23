@@ -10,6 +10,7 @@ const OrderOffer = ({
   selectedOrder,
   setSelectedOrder,
   setShowOrderOffer,
+  cari
 }) => {
   const [orderData, setOrderData] = useState([]);
 
@@ -35,6 +36,7 @@ const OrderOffer = ({
         <PrintOrder data={selectedOrder.data} lang={selectedOrder.lang} />
       ) : (
         <Card
+          cari={cari}
           orderData={orderData}
           setOrderData={setOrderData}
           setSelectedOrder={setSelectedOrder}

@@ -25,6 +25,7 @@ const CreateOfferComponent = () => {
   const [showBasketOffer, setShowBasketOffer] = useState(false);
   const [isCustomerAndPersonel, setIsCustomerAndPersonel] = useState(false);
   const [search, setSearch] = useState('');
+  const [cari, setCari] = useState('');
   const [allFeatureValues, setAllFeatureValues] = useState([]);
   // Müşteriler bilgisi
   const [customers, setCustomers] = useState([]);
@@ -102,7 +103,8 @@ const CreateOfferComponent = () => {
         {/* Filtreleme ve Teklifler Butonu */}
         {!showBasketOffer && (
           <div className="flex justify-center item-center flex-col md:flex-row gap-2 px-4 my-2">
-            <Input value={search} onChange={(e) => setSearch(e.target.value)} className="w-full my-auto" placeholder="Ürün Isimlerinde Arayın..."/>
+            {!showOrderOffer && <Input value={search} onChange={(e) => setSearch(e.target.value)} className="w-full my-auto" placeholder="Ürün Isimlerinde Arayın..." />}
+            {showOrderOffer && <Input value={cari} onChange={(e) => setCari(e.target.value)} className="w-full my-auto" placeholder="Müşteri Isimlerinde Arayın..." />}
             {!showOrderOffer && (
               <button
                 onClick={() => {
@@ -218,6 +220,7 @@ const CreateOfferComponent = () => {
       {showOrderOffer && (
         <OrderOffer
           toast={toast}
+          cari={cari}
           showOrderOffer={showOrderOffer}
           setShowOrderOffer={setShowOrderOffer}
           setIsloading={setIsloading}
@@ -247,7 +250,7 @@ const CreateOfferComponent = () => {
       )}
       {!showBasketOffer && !showOrderOffer && products.length > 0 && (
         <ListProducts
-        search={search}
+          search={search}
           getData={getData}
           toast={toast}
           isloading={isloading}

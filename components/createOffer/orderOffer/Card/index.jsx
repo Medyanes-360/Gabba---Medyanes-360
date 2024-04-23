@@ -10,6 +10,7 @@ const Card = ({
   orderData,
   setSelectedOrder,
   setIsloading,
+  cari,
   getAllOrderData,
 }) => {
   // Silme fonksiyonu buradadır.
@@ -39,7 +40,7 @@ const Card = ({
     <div className='grid xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 p-3'>
       {orderData &&
         orderData.length > 0 &&
-        orderData.map((item) => {
+        orderData.filter((ordt) => (ordt.Müşteri[0].name + ' ' + ordt.Müşteri[0].surname).includes(cari)).map((item) => {
           return (
             <div
               key={item.orderCode}
