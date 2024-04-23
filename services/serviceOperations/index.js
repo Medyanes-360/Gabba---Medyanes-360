@@ -9,7 +9,6 @@ import prisma from '@/lib/prisma/index';
 export async function getAllData(tableName, params = {}) {
   try {
     const data = await prisma[tableName].findMany(params);
-    console.log(params)
     return data;
   } catch (error) {
     return { error: error.message };

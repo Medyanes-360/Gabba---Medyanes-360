@@ -234,13 +234,13 @@ const Invoice = ({ data, lang }) => {
                 ...x_d.extras,
                 {
                   name: 'Renk',
-                  value: x_m.colourHex,
+                  value: x_m.colourHex === "" ? x_m.colourDescription : x_m.colourHex,
                 },
               ]
               : [
                 {
                   name: 'Renk',
-                  value: x_m.colourHex,
+                  value: x_m.colourHex === "" ? x_m.colourDescription : x_m.colourHex,
                 },
               ],
           };
@@ -372,12 +372,12 @@ const Invoice = ({ data, lang }) => {
           <thead className='h-[50px] w-full bg-[#FFC90B]'>
             <tr>
               <th>
-                <span className='text-[10pt] text-[#363B46] font-bold'>
+                {/* <span className='text-[10pt] text-[#363B46] font-bold'>
                   {langs.invoice[lang]}#
-                </span>
+                </span> */}
               </th>
               <th>
-                <span className='text-[10pt] text-[#000] font-bold'>45489</span>
+                {/* <span className='text-[10pt] text-[#000] font-bold'>45489</span> */}
               </th>
               <th>
                 <div className='flex items-center justify-around'>
@@ -395,7 +395,15 @@ const Invoice = ({ data, lang }) => {
                       {langs.date[lang]}:
                     </span>
                     <span className='text-[10pt] text-[#000] font-bold'>
-                      12 / 04 / 2023
+                    {data.Orders.map(
+                      (orders, index) =>
+                        index == 0 &&
+                        orders.createdAt
+                          .split('T')[0]
+                          .split('-')
+                          .reverse()
+                          .join('.')
+                    )}
                     </span>
                   </div>
                 </div>

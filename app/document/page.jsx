@@ -13,9 +13,7 @@ const StepByStep = () => {
 
   const getAllOrderData = async () => {
     const response = await getAPI("/createOrder/order");
-    console.log("response", response);
     const filtered = response.data?.filter((fl) => fl.orderCode === id)[0];
-    console.log("filtered", filtered);
     setOrderData(filtered);
   };
 

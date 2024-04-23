@@ -474,6 +474,7 @@ const handler = async (req, res) => {
               Ürünler: Products,
               Müşteri: Customer,
               Personel: Personel,
+              Date: OfferOrdersResult.createdAt
             });
           })
         );
