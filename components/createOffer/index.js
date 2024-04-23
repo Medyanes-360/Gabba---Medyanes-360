@@ -13,6 +13,7 @@ import { BsCart3 } from "react-icons/bs";
 import { IoChevronForwardOutline } from "react-icons/io5";
 import { IoChevronBackOutline } from "react-icons/io5";
 import { useSession } from "next-auth/react";
+import { Input } from "../ui/input";
 
 const CreateOfferComponent = () => {
   const { data } = useSession()
@@ -23,6 +24,7 @@ const CreateOfferComponent = () => {
   const [productFeatures, setProductFeatures] = useState([]);
   const [showBasketOffer, setShowBasketOffer] = useState(false);
   const [isCustomerAndPersonel, setIsCustomerAndPersonel] = useState(false);
+  const [search, setSearch] = useState('');
   const [allFeatureValues, setAllFeatureValues] = useState([]);
   // Müşteriler bilgisi
   const [customers, setCustomers] = useState([]);
@@ -100,10 +102,7 @@ const CreateOfferComponent = () => {
         {/* Filtreleme ve Teklifler Butonu */}
         {!showBasketOffer && (
           <div className="flex justify-center item-center flex-col md:flex-row gap-2 px-4 my-2">
-            <button className="bg-green-500 p-4 text-white rounded lg:text-lg flex flex-row gap-2 flex-nowrap hover:cursor-pointer hover:scale-105 transition-all mt-2 lg:mt-0">
-              <BiFilterAlt size={25} />
-              Filtrele
-            </button>
+            <Input value={search} onChange={(e) => setSearch(e.target.value)} className="w-full my-auto" placeholder="Ürün Isimlerinde Arayın..."/>
             {!showOrderOffer && (
               <button
                 onClick={() => {
@@ -248,6 +247,7 @@ const CreateOfferComponent = () => {
       )}
       {!showBasketOffer && !showOrderOffer && products.length > 0 && (
         <ListProducts
+        search={search}
           getData={getData}
           toast={toast}
           isloading={isloading}

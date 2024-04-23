@@ -11,6 +11,7 @@ function ListProducts({
   toast,
   isloading,
   setIsloading,
+  search,
   getData,
   products,
   productFeatures,
@@ -146,7 +147,7 @@ function ListProducts({
     return (
       products &&
       products.length > 0 &&
-      products.map(
+      products.filter(prdt => prdt.productName.includes(search)).map(
         (product, index) =>
           product.productPrice > 0 && (
             <tr key={product.id} className='border-b'>

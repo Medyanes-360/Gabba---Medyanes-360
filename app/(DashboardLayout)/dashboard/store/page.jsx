@@ -18,6 +18,8 @@ const Store = () => {
           delete: false,
           update: true
         }}
+        selectedDelete={false}
+        deleteAll={false}
       />
     </>
   );

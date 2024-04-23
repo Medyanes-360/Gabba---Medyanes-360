@@ -19,6 +19,8 @@ const Addcompany = () => {
           delete: false,
           update: true
         }}
+        selectedDelete={false}
+        deleteAll={false}
       />
     </>
   );
