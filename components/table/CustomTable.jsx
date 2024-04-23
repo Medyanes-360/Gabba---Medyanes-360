@@ -54,7 +54,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { ArrowDownIcon, ArrowDownUp, ArrowUpIcon } from "lucide-react";
+import { ArrowDownIcon, ArrowDownUp, ArrowUpIcon, Plus, Trash } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { getAPI, postAPI } from "@/services/fetchAPI";
@@ -478,303 +478,307 @@ const CustomTable = ({
         )}
         {/* SET LANGUAGE END */}
 
-        {/* Theme Toggle Butonu sistemde hali hazırda olan bir component. */}
-        {false && <ThemeToggle />}
+        <div className="ml-auto flex items-center gap-4">
+          {/* Theme Toggle Butonu sistemde hali hazırda olan bir component. */}
+          {false && <ThemeToggle />}
 
-        {/* DELETE SELECTED STAR */}
-        {/* Burada bir modal ve bu modal'ın tetikleyici butonu var, buradaki modal emin misiniz tarzı bir soru soruyor. */}
-        {selectedDelete && (
-          <AlertDialog>
-            <AlertDialogTrigger
-              disabled={Object.values(selection).filter((e) => e).length === 0}
-              className="ml-0 2xl:ml-auto disabled:pointer-events-none disabled:opacity-50"
-            >
-              <Button variant="outline">Delete Selected Row's</Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Delete selected rows
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => {
-                    const ids = Array.from(
-                      Object.keys(selection).filter(
-                        (key) => selection[key] === true
-                      )
-                    );
-                    deleteSelected(ids);
-                  }}
-                >
-                  Continue
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
-        {/* DELETE SELECTED END */}
-
-        {/* DELETE ALL START */}
-        {/* Burada bir modal ve bu modal'ın tetikleyixi butonu var, buradaki modal emin misiniz tarzı bir soru soruyor. */}
-        {deleteAll && (
-          <AlertDialog>
-            <AlertDialogTrigger
-              disabled={data.length === 0}
-              className="disabled:pointer-events-none disabled:opacity-50"
-            >
-              <Button variant="outline">Delete All</Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>Delete all rows</AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => {
-                    handleDeleteAll();
-                  }}
-                >
-                  Continue
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
-        {/* DELETE ALL END */}
-
-        {/* BU BLOCK DATA EKLEME MODALINI İÇERİR */}
-        {addData && (
-          <Dialog open={openAddModal} onOpenChange={setOpenAddModal}>
-            {/* Modal'ı tetikleyen buton */}
-            <DialogTrigger asChild>
-              <Button variant="outline">Add Data</Button>
-            </DialogTrigger>
-
-            {/* Modal içeriği */}
-            <DialogContent className="lg:max-w-screen-lg overflow-y-scroll max-h-screen">
-              <form
-                className="outline-none rounded-md py-4"
-                onSubmit={(e) => {
-                  // form tetiklenir (submit) ise dataya modal'daki inputların tutulduğu state'i ve id: datanın uzunluğu + 1 ekle
-                  e.preventDefault();
-
-                  const filtered = Object.keys(addModalState)
-                    .filter((objKey) => objKey !== "id")
-                    .reduce((newObj, key) => {
-                      newObj[key] = addModalState[key];
-                      return newObj;
-                    }, {});
-
-                  handleAddData(filtered);
-                }}
+          {/* DELETE SELECTED STAR */}
+          {/* Burada bir modal ve bu modal'ın tetikleyici butonu var, buradaki modal emin misiniz tarzı bir soru soruyor. */}
+          {selectedDelete && (
+            <AlertDialog>
+              <AlertDialogTrigger
+                disabled={Object.values(selection).filter((e) => e).length === 0}
+                className="ml-0 2xl:ml-auto disabled:pointer-events-none disabled:opacity-50"
               >
-                <div className="w-full flex items-start pr-8">
-                  <DialogHeader>
-                    <DialogTitle>Add Data</DialogTitle>
-                    <DialogDescription>
-                      Click add when you're done.
-                    </DialogDescription>
-                  </DialogHeader>
-
-                  <DropdownMenu>
-                    {/* Data ekleme modalındaki lang (language)'in tutulduğu ve kontrol edildiği kısım */}
-                    <DropdownMenuTrigger className="!ring-0 ml-auto" asChild>
-                      {addModalLang ? (
-                        <Button variant="outline">
-                          <img
-                            alt={addModalLang?.name}
-                            className="w-8"
-                            src={addModalLang?.image}
-                          />
-                        </Button>
-                      ) : (
-                        <Button variant="outline">Deafult</Button>
-                      )}
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start">
-                      <DropdownMenuItem onClick={() => setAddModalLang(null)}>
-                        Default
-                      </DropdownMenuItem>
-                      {langs.map(
-                        (
-                          lang,
-                          idx // tüm dilleri maple ve her birini dropdown içinde bir item olarak kullan
-                        ) => (
-                          <DropdownMenuItem
-                            key={idx}
-                            onClick={() => setAddModalLang(lang)}
-                          >
-                            {lang.code}
-                          </DropdownMenuItem>
+                <Button variant="outline">Delete Selected Row's</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Delete selected rows
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => {
+                      const ids = Array.from(
+                        Object.keys(selection).filter(
+                          (key) => selection[key] === true
                         )
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-
-                {/* DATA EKLMEK İÇİN İNPUTLAR */}
-                <div className="flex flex-col gap-5 py-6">
-                  {columns
-                    // eğerki bu header (başlık) yani column'umun enableForm değeri true ise ve modal'da tuttuğum lang (language) data null ise veya column'umun translate değeri true ise filterdan geçir.
-                    .filter(
-                      (x) =>
-                        x?.enableForm && (addModalLang === null || x?.translate)
-                    )
-                    // filterlanmış columns datamı maple ve bir input döndür
-                    .map((column, col_index) => {
-                      // modal içindeki lang (language) datam null ise sadece column.dt_name değil ise yani bir dil seçildiyse dt_name'e seçilmiş dilimin code (addModalLang.code) değerini ekle ve bu şekilde kullan
-                      const columnKey =
-                        addModalLang === null
-                          ? column?.dt_name
-                          : column?.dt_name + addModalLang?.code;
-
-                      return (
-                        <div
-                          className="grid grid-col-4 items-center gap-4"
-                          key={col_index + columnKey}
-                        >
-                          {column?.engine === "prisma" ? (
-                            <>
-                              <Label className="text-left w-full capitalize">
-                                {column?.header}
-                              </Label>
-
-                              <Select
-                                value={
-                                  addModalState[column?.table] &&
-                                  addModalState[column?.table][
-                                  column.selectableField
-                                  ]
-                                }
-                                onValueChange={(newval) => {
-                                  const val = engineDatas[column?.table].filter(
-                                    (item) =>
-                                      item[column.selectableField] === newval
-                                  );
-
-                                  if (val[0]) {
-                                    setAddModalState((prevState) => ({
-                                      ...prevState,
-                                      [column?.table]: val[0],
-                                    }));
-                                  }
-                                }}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="" />
-                                </SelectTrigger>
-
-                                <SelectContent>
-                                  <SelectGroup>
-                                    <SelectLabel>{column?.header}</SelectLabel>
-                                    {engineDatas &&
-                                      engineDatas[column?.table] &&
-                                      engineDatas[column?.table]?.map(
-                                        (item) => (
-                                          <SelectItem
-                                            value={item[column.selectableField]}
-                                          >
-                                            {item[column.selectableField]}
-                                          </SelectItem>
-                                        )
-                                      )}
-                                  </SelectGroup>
-                                </SelectContent>
-                              </Select>
-                            </>
-                          ) : (
-                            <>
-                              {column?.type === `enum` ? (
-                                <>
-                                  <Label className="text-left w-full capitalize">
-                                    {column?.header}
-                                  </Label>
-
-                                  <Select
-                                    onValueChange={(newval) => {
-                                      setAddModalState((prevState) => ({
-                                        ...prevState,
-                                        [columnKey]: newval,
-                                      }));
-                                    }}
-                                  >
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="" />
-                                    </SelectTrigger>
-
-                                    <SelectContent>
-                                      <SelectGroup>
-                                        <SelectLabel>
-                                          {column?.header}
-                                        </SelectLabel>
-                                        {column?.list
-                                          ?.filter((x) =>
-                                            x.roles.includes(role)
-                                          )
-                                          ?.map((item) => (
-                                            <SelectItem value={item.role}>
-                                              {item.title}
-                                            </SelectItem>
-                                          ))}
-                                      </SelectGroup>
-                                    </SelectContent>
-                                  </Select>
-                                </>
-                              ) : (
-                                <>
-                                  <Label className="text-left w-full capitalize">
-                                    {column?.header}
-                                  </Label>
-                                  <Input
-                                    onChange={(event) =>
-                                      setAddModalState((prevState) => ({
-                                        ...prevState,
-                                        [columnKey]: event.target.value,
-                                      }))
-                                    }
-                                    type={column?.type}
-                                    value={addModalState[columnKey]}
-                                    required
-                                    id={columnKey}
-                                    placeholder={
-                                      (addModalLang
-                                        ? addModalLang?.code + " "
-                                        : "") + column?.header
-                                    }
-                                  />
-                                </>
-                              )}
-                            </>
-                          )}
-                        </div>
                       );
-                    })}
-                </div>
-
-                <DialogFooter>
-                  <DialogClose
-                    onClick={() => setAddModalState({})}
-                    className="mr-4"
+                      deleteSelected(ids);
+                    }}
                   >
-                    <Button variant="secondary" type="reset">
-                      Close
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+          {/* DELETE SELECTED END */}
+
+          {/* DELETE ALL START */}
+          {/* Burada bir modal ve bu modal'ın tetikleyixi butonu var, buradaki modal emin misiniz tarzı bir soru soruyor. */}
+          {deleteAll && (
+            <AlertDialog>
+              <AlertDialogTrigger
+                disabled={data.length === 0}
+                className="disabled:pointer-events-none disabled:opacity-50"
+              >
+                <button className="bg-red-500 flex items-center p-2 rounded gap-2 text-white font-medium text-sm"><Trash size={14} />Delete All <Trash size={16} /></button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>Delete all rows</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => {
+                      handleDeleteAll();
+                    }}
+                  >
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+          {/* DELETE ALL END */}
+
+          {/* BU BLOCK DATA EKLEME MODALINI İÇERİR */}
+          {addData && (
+            <Dialog open={openAddModal} onOpenChange={setOpenAddModal}>
+              {/* Modal'ı tetikleyen buton */}
+              <DialogTrigger asChild>
+                <button className="p-2 bg-green-300 rounded-full">
+                  <Plus color="#000" />
+                </button>
+              </DialogTrigger>
+
+              {/* Modal içeriği */}
+              <DialogContent className="lg:max-w-screen-lg overflow-y-scroll max-h-screen">
+                <form
+                  className="outline-none rounded-md py-4"
+                  onSubmit={(e) => {
+                    // form tetiklenir (submit) ise dataya modal'daki inputların tutulduğu state'i ve id: datanın uzunluğu + 1 ekle
+                    e.preventDefault();
+
+                    const filtered = Object.keys(addModalState)
+                      .filter((objKey) => objKey !== "id")
+                      .reduce((newObj, key) => {
+                        newObj[key] = addModalState[key];
+                        return newObj;
+                      }, {});
+
+                    handleAddData(filtered);
+                  }}
+                >
+                  <div className="w-full flex items-start pr-8">
+                    <DialogHeader>
+                      <DialogTitle>Add Data</DialogTitle>
+                      <DialogDescription>
+                        Click add when you're done.
+                      </DialogDescription>
+                    </DialogHeader>
+
+                    <DropdownMenu>
+                      {/* Data ekleme modalındaki lang (language)'in tutulduğu ve kontrol edildiği kısım */}
+                      <DropdownMenuTrigger className="!ring-0 ml-auto" asChild>
+                        {addModalLang ? (
+                          <Button variant="outline">
+                            <img
+                              alt={addModalLang?.name}
+                              className="w-8"
+                              src={addModalLang?.image}
+                            />
+                          </Button>
+                        ) : (
+                          <Button variant="outline">Deafult</Button>
+                        )}
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        <DropdownMenuItem onClick={() => setAddModalLang(null)}>
+                          Default
+                        </DropdownMenuItem>
+                        {langs.map(
+                          (
+                            lang,
+                            idx // tüm dilleri maple ve her birini dropdown içinde bir item olarak kullan
+                          ) => (
+                            <DropdownMenuItem
+                              key={idx}
+                              onClick={() => setAddModalLang(lang)}
+                            >
+                              {lang.code}
+                            </DropdownMenuItem>
+                          )
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+
+                  {/* DATA EKLMEK İÇİN İNPUTLAR */}
+                  <div className="flex flex-col gap-5 py-6">
+                    {columns
+                      // eğerki bu header (başlık) yani column'umun enableForm değeri true ise ve modal'da tuttuğum lang (language) data null ise veya column'umun translate değeri true ise filterdan geçir.
+                      .filter(
+                        (x) =>
+                          x?.enableForm && (addModalLang === null || x?.translate)
+                      )
+                      // filterlanmış columns datamı maple ve bir input döndür
+                      .map((column, col_index) => {
+                        // modal içindeki lang (language) datam null ise sadece column.dt_name değil ise yani bir dil seçildiyse dt_name'e seçilmiş dilimin code (addModalLang.code) değerini ekle ve bu şekilde kullan
+                        const columnKey =
+                          addModalLang === null
+                            ? column?.dt_name
+                            : column?.dt_name + addModalLang?.code;
+
+                        return (
+                          <div
+                            className="grid grid-col-4 items-center gap-4"
+                            key={col_index + columnKey}
+                          >
+                            {column?.engine === "prisma" ? (
+                              <>
+                                <Label className="text-left w-full capitalize">
+                                  {column?.header}
+                                </Label>
+
+                                <Select
+                                  value={
+                                    addModalState[column?.table] &&
+                                    addModalState[column?.table][
+                                    column.selectableField
+                                    ]
+                                  }
+                                  onValueChange={(newval) => {
+                                    const val = engineDatas[column?.table].filter(
+                                      (item) =>
+                                        item[column.selectableField] === newval
+                                    );
+
+                                    if (val[0]) {
+                                      setAddModalState((prevState) => ({
+                                        ...prevState,
+                                        [column?.table]: val[0],
+                                      }));
+                                    }
+                                  }}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="" />
+                                  </SelectTrigger>
+
+                                  <SelectContent>
+                                    <SelectGroup>
+                                      <SelectLabel>{column?.header}</SelectLabel>
+                                      {engineDatas &&
+                                        engineDatas[column?.table] &&
+                                        engineDatas[column?.table]?.map(
+                                          (item) => (
+                                            <SelectItem
+                                              value={item[column.selectableField]}
+                                            >
+                                              {item[column.selectableField]}
+                                            </SelectItem>
+                                          )
+                                        )}
+                                    </SelectGroup>
+                                  </SelectContent>
+                                </Select>
+                              </>
+                            ) : (
+                              <>
+                                {column?.type === `enum` ? (
+                                  <>
+                                    <Label className="text-left w-full capitalize">
+                                      {column?.header}
+                                    </Label>
+
+                                    <Select
+                                      onValueChange={(newval) => {
+                                        setAddModalState((prevState) => ({
+                                          ...prevState,
+                                          [columnKey]: newval,
+                                        }));
+                                      }}
+                                    >
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="" />
+                                      </SelectTrigger>
+
+                                      <SelectContent>
+                                        <SelectGroup>
+                                          <SelectLabel>
+                                            {column?.header}
+                                          </SelectLabel>
+                                          {column?.list
+                                            ?.filter((x) =>
+                                              x.roles.includes(role)
+                                            )
+                                            ?.map((item) => (
+                                              <SelectItem value={item.role}>
+                                                {item.title}
+                                              </SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                      </SelectContent>
+                                    </Select>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Label className="text-left w-full capitalize">
+                                      {column?.header}
+                                    </Label>
+                                    <Input
+                                      onChange={(event) =>
+                                        setAddModalState((prevState) => ({
+                                          ...prevState,
+                                          [columnKey]: event.target.value,
+                                        }))
+                                      }
+                                      type={column?.type}
+                                      value={addModalState[columnKey]}
+                                      required
+                                      id={columnKey}
+                                      placeholder={
+                                        (addModalLang
+                                          ? addModalLang?.code + " "
+                                          : "") + column?.header
+                                      }
+                                    />
+                                  </>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        );
+                      })}
+                  </div>
+
+                  <DialogFooter>
+                    <DialogClose
+                      onClick={() => setAddModalState({})}
+                      className="mr-4"
+                    >
+                      <Button variant="secondary" type="reset">
+                        Close
+                      </Button>
+                    </DialogClose>
+                    <Button type="submit" variant="destructive">
+                      Add Data
                     </Button>
-                  </DialogClose>
-                  <Button type="submit" variant="destructive">
-                    Add Data
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-        )}
-        {/* ADD DATA MODAL END */}
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          )}
+          {/* ADD DATA MODAL END */}
+        </div>
 
         {
           // column yani tekli filterlarımın uzunluğu 0 dan büyük ise veya herhangi bir sıralama işlemi uygulandıysa bu butonu render et
@@ -878,6 +882,7 @@ const CustomTable = ({
           {/* TableBody -> tbody */}
           <TableBody>
             {table.getRows().map((dt, dt_idx) => {
+              console.log(dt)
               return (
                 /* TableRow -> tr */
                 <TableRow key={dt_idx}>

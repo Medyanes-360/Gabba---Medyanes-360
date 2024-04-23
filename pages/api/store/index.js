@@ -43,7 +43,7 @@ const handler = async (req, res) => {
   try {
     if (req.method === "GET") {
 
-      const financialManagementSpecial = await getAllData("store");     
+      const financialManagementSpecial = await getAllData("store", { include: { company: true } });
       if (!financialManagementSpecial || financialManagementSpecial.error) {
         throw "Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4";
       }
@@ -82,7 +82,7 @@ const handler = async (req, res) => {
       const result = await handleDelete(req);
       return res.status(200).json(result);
     } else if (req.method === "POST") {
-      const { Company, companyId, ...newDataWithoutStoreProps } =
+      const { Store, storeId, ...newDataWithoutStoreProps } =
         req.body.newData;
 
       const financialManagementSpecial = await createNewData("Store", {
