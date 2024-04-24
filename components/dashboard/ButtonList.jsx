@@ -3,10 +3,11 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import classNames from 'classnames';
 import NavigationButton from '@/components/dashboard/NavigationButton';
-import { isRole } from '@/lib/table/useAuth';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useSession } from 'next-auth/react';
 
 const ButtonList = ({ buttons, level = 0, child = false }) => {
+  const { data } = useSession()
   const pathname = usePathname();
   const router = useRouter();
   const [expanded, setExpanded] = useState({});
@@ -25,7 +26,7 @@ const ButtonList = ({ buttons, level = 0, child = false }) => {
   return (
     <div className='flex flex-col gap-4 relative'>
       {buttons
-        .filter((button) => isRole(button.role))
+        .filter((btn) => btn.roles ? btn?.roles?.includes(data.user.role) : true)
         .map((button) => (
           <div
             key={button.id}

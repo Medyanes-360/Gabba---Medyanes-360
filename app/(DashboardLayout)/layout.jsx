@@ -12,46 +12,51 @@ const MainLayout = ({ children }) => {
   // Context oluşturuluyor
   const [isLoading, setIsLoading] = useState(false);
 
-  const { id } = useParams();
-
   const buttons = [
     {
       title: "Panel",
+      roles: ['company_manager', 'manager'],
       buttons: [
         {
           id: "1.1",
           icon: UserIcon,
           label: "Şirket",
           path: "/dashboard/company",
+          roles: ['company_manager']
         },
         {
           id: "1.2",
           icon: UserIcon,
           label: "Mağaza",
           path: "/dashboard/store",
+          roles: ['company_manager', 'manager']
         },
         {
           id: "1.3",
           label: "Çalışan",
           icon: UserIcon,
           path: "/dashboard/personal",
+          roles: ['company_manager', 'manager']
         },
         {
           id: "1.4",
           label: "Tedarikçi",
           icon: UserIcon,
           path: "/dashboard/suplier",
+          roles: ['company_manager', 'manager', 'personal']
         },
         {
           id: "1.5",
           label: "Gider",
           icon: UserIcon,
           path: "/dashboard/expense",
+          roles: ['company_manager', 'manager', 'personal']
         },
       ],
     },
     {
       title: "Diğerleri",
+      roles: ['company_manager', 'manager', 'personal'],
       buttons: [
         {
           id: "1.4",
@@ -63,20 +68,20 @@ const MainLayout = ({ children }) => {
               label: "Stok",
               icon: UserIcon,
               path: "/dashboard/stock",
+              roles: ['company_manager', 'manager', 'personal']
             },
             {
               id: "1.4.2",
               label: "Stok Kontrol",
               icon: UserIcon,
               path: "/dashboard/stock-control",
+              roles: ['company_manager', 'manager', 'personal']
             },
           ],
         },
       ],
     },
   ];
-
-  const { data } = useSession();
 
   return (
     <LoadingContext.Provider value={{ isLoading, setIsLoading }}>

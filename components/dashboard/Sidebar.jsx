@@ -1,12 +1,10 @@
 'use client';
-
 import React, { useEffect, useState, useRef } from 'react';
 import classNames from 'classnames';
 import ChevronsLeft from '@/assets/icons/ChevronsLeft';
 import { usePathname } from 'next/navigation';
 import ChevronsRight from '@/assets/icons/ChevronsRight';
 import ButtonList from '@/components/dashboard/ButtonList';
-import UserIcon from '@/assets/icons/UserIcon';
 import BurgerIcon from '@/assets/icons/BurgerIcon';
 import { useMediaQuery } from '@/lib/table/useMediaQuery';
 import { signOut, useSession } from 'next-auth/react';
@@ -126,7 +124,7 @@ const Sidebar = ({ buttons }) => {
             !isCollapsed ? ' p-4 flex flex-col gap-2' : 'hidden'
           )}
         >
-          {buttons.map(({ buttons: x, title }, key) => (
+          {data?.user && buttons.filter((btn) => btn?.roles ? btn?.roles?.includes(data.user.role) : true).map(({ buttons: x, title }, key) => (
             <div
               key={key}
               className='flex flex-col gap-4 py-5 border-b-2 border-white/20'
