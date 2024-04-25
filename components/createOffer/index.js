@@ -42,7 +42,7 @@ const CreateOfferComponent = () => {
       if (condition === "onlyBasket") {
         const dataResult = await getAPI(`/createOffer/basket?userId=${data?.user?.id}`);
         setIsloading(false);
-        return setBasketData(dataResult.data);
+        return setBasketData(dataResult.data ?? []);
       }
 
       if (condition === "onlyCustomer") {
