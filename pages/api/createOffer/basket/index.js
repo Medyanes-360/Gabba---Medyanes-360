@@ -393,6 +393,7 @@ const handler = async (req, res) => {
 
     if (req.method === 'GET') {
       const OfferBaskets = await getAllData('OfferBasket');
+      console.log(OfferBaskets)
       const OfferBasketColors = await getAllData('OfferBasketColors');
       const OfferBasketFabrics = await getAllData('OfferBasketFabrics');
       const OfferBasketMeasurements = await getAllData(
@@ -429,6 +430,8 @@ const handler = async (req, res) => {
       const combinedData = [];
 
       // OfferBaskets içindeki her bir öğeyi kontrol et
+
+      console.log(OfferBaskets)
 
       await Promise.all(
         OfferBaskets.filter((dtres) => dtres.userId === req.query.userId).map(async (offerBasket) => {
