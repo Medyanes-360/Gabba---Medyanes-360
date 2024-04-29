@@ -10,24 +10,72 @@ const MainLayout = ({ children }) => {
       title: 'Siparişinizi Tamamlayın',
       buttons: [
         {
-          id: '1.1',
+          id: '1',
           label: 'Fişi Gör Veya Gönder',
-          path: `/stepbystep/${id}/1.1`
-        },
-        {
-          id: '1.2',
-          label: '1.2 adım',
-          path: `/stepbystep/${id}/1.2`
+          childs: [
+            {
+              id: '1.1',
+              label: 'Fişi Gör Veya Gönder',
+              path: `/stepbystep/${id}/1.1`,
+            },
+            {
+              id: '1.2',
+              label: 'Ön Ödeme Miktarı',
+              path: `/stepbystep/${id}/1.2`,
+            }
+          ]
         },
         {
           id: '2',
-          label: '2 Adım',
+          label: 'Tedarikçi Seç',
           path: `/stepbystep/${id}/2`
         },
         {
           id: '3',
-          label: '3 Adım',
+          label: 'Ürünler İçin Tarih Gir',
           path: `/stepbystep/${id}/3`
+        },
+        {
+          id: '5',
+          label: 'Ürüm maliyeti ve Çıkış tarihi',
+          path: `/stepbystep/${id}/5`,
+        },
+        {
+          id: '6',
+          label: 'Gümrük',
+          path: `/stepbystep/${id}/6`,
+        },
+        {
+          id: '7',
+          label: '7. Adım',
+          childs: [
+            {
+              id: '7.1',
+              label: '7.1 Adım',
+              path: `/stepbystep/${id}/7.1`,
+            },
+            {
+              id: '7.2',
+              label: '7.2 Adım',
+              path: `/stepbystep/${id}/7.2`,
+            }
+          ]
+        },
+        {
+          id: '8',
+          label: '8. Adım',
+          childs: [
+            {
+              id: '8.1',
+              label: '8.1 Adım',
+              path: `/stepbystep/${id}/8.1`,
+            }
+          ]
+        },
+        {
+          id: '9',
+          label: '9. Adım',
+          path: `/stepbystep/${id}/9`,
         },
       ],
     },
