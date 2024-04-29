@@ -12,6 +12,7 @@ const MainLayout = ({ children }) => {
         {
           id: '1',
           label: 'Fişi Gör Veya Gönder',
+          path: `/stepbystep/${id}/1`,
           childs: [
             {
               id: '1.1',
@@ -48,6 +49,7 @@ const MainLayout = ({ children }) => {
         {
           id: '7',
           label: '7. Adım',
+          path: `/stepbystep/${id}/7`,
           childs: [
             {
               id: '7.1',
@@ -64,6 +66,7 @@ const MainLayout = ({ children }) => {
         {
           id: '8',
           label: '8. Adım',
+          path: `/stepbystep/${id}/8`,
           childs: [
             {
               id: '8.1',

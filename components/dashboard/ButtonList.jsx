@@ -26,7 +26,7 @@ const ButtonList = ({ buttons, level = 0, child = false }) => {
   return (
     <div className='flex flex-col gap-4 relative'>
       {buttons
-        .filter((btn) => btn.roles ? btn?.roles?.includes(data.user.role) : true)
+        .filter((btn) => btn.roles ? btn?.roles?.includes(data.user?.role) : true)
         .map((button) => (
           <div
             key={button.id}
