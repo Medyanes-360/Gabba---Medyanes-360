@@ -48,24 +48,24 @@ const MainLayout = ({ children }) => {
         },
         {
           id: '7',
-          label: '7. Adım',
+          label: 'Cari Kontrolü',
           path: `/stepbystep/${id}/7`,
           childs: [
             {
               id: '7.1',
-              label: '7.1 Adım',
+              label: 'Otomatik Teslim Tutanağı',
               path: `/stepbystep/${id}/7.1`,
             },
             {
               id: '7.2',
-              label: '7.2 Adım',
+              label: 'Ek ücret',
               path: `/stepbystep/${id}/7.2`,
             }
           ]
         },
         {
           id: '8',
-          label: '8. Adım',
+          label: 'Ürünlerin Bir Kısmı Teslim Edildi',
           path: `/stepbystep/${id}/8`,
           childs: [
             {
