@@ -38,7 +38,7 @@ const MainLayout = ({ children }) => {
         },
         {
           id: '5',
-          label: 'Ürüm maliyeti ve Çıkış tarihi',
+          label: 'Ürün maliyeti ve Çıkış tarihi',
           path: `/stepbystep/${id}/5`,
         },
         {

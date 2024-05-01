@@ -28,11 +28,11 @@ const StepPage = () => {
 
   return (
     <div className={'flex h-full w-full items-center justify-center'}>
-        <div class="max-w-sm w-full flex flex-col gap-2">
+        <div className="max-w-sm w-full flex flex-col gap-2">
             <Label>Her Ürün İçin Tarih Giriniz.</Label>
             <Label className={'text-muted-foreground text-xs m-0'}>Ürünler:</Label>
 
-            {data && data?.Ürünler?.map((item) => <div className={'flex flex-col w-fit border shadow-sm rounded p-2 gap-2'}>
+            {data && data?.Ürünler?.map((item) => <div key={item.id} className={'flex flex-col w-fit border shadow-sm rounded p-2 gap-2'}>
                 <div className={'flex items-center gap-2 [&_span]:text-sm mx-auto w-fit'}>
                     <span>{item.selectedCategoryValues}</span>
                     -

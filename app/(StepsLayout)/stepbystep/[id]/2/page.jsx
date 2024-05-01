@@ -39,7 +39,7 @@ const StepPage = () => {
 
   return (
       <div className={'h-full w-full flex items-center justify-center'}>
-          <div class="max-w-sm w-full flex flex-col gap-4">
+          <div className="max-w-sm w-full flex flex-col gap-4">
               <Label>Lütfen bir tedarikçi seçiniz.</Label>
               <Select disabled={data.length === 0} onValueChange={(value) => setTedarikci(value)}>
                   <SelectTrigger className="w-full">
