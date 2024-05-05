@@ -35,7 +35,7 @@ const StepPage = () => {
 
                 {data && data?.Ürünler?.map((item, index) => <div
                     key={item.id}
-                    className={'flex flex-col w-fit border shadow-sm rounded p-2 gap-2'}>
+                    className={'flex flex-col w-full border shadow-sm rounded p-2 gap-2'}>
                     <div className={'flex items-center gap-2 [&_span]:text-sm mx-auto w-fit'}>
                         <span>{item.selectedCategoryValues}</span>
                         -
@@ -71,6 +71,10 @@ const StepPage = () => {
                         <Input value={maliyet[index] ?? ""} onChange={(e) => setMaliyet((prev) => ({...prev, [index]: e.target.value}))} type={'number'} placeholder={'0 TL'}/>
                     </div>
                 </div>)}
+
+                <Button className={"w-full"}>
+                    Bilgileri Guncelle
+                </Button>
             </div>
         </div>
     )
