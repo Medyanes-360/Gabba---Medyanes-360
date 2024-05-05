@@ -29,6 +29,9 @@ const StepPage = () => {
   return (
     <div className={'flex h-full w-full items-center justify-center'}>
         <div className="max-w-sm w-full flex flex-col gap-2">
+            <Label className={"text-xs"}>
+                Açıklama : Bu bölümde siparişlerin tedarikçi tarafından yüklendiği tarih bilgisi girilir, buna göre tedarikçi tarafından ürünlerin birim bazında ne zaman yüklendiği belirlenir.
+            </Label>
             <Label>Her Ürün İçin Tarih Giriniz.</Label>
             <Label className={'text-muted-foreground text-xs m-0'}>Ürünler:</Label>
 

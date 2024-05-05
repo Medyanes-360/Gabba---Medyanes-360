@@ -148,7 +148,8 @@ const MainLayout = ({ children }) => {
               </li>
             </ul>
           </div>
-          <div className='py-6 w-full pl-6 md:pl-0'>{children}</div>
+
+          <div className='py-6 h-full w-full pl-6 md:pl-0'>{children}</div>
         </div>
       </div>
     </div>
