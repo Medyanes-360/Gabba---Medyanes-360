@@ -64,6 +64,8 @@ const StepPage = () => {
                     </PopoverContent>
                 </Popover>
             </div>)}
+
+            <Button className={"w-full"}>Tarihleri Guncelle</Button>
         </div>
     </div>
   )
