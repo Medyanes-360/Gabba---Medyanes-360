@@ -19,7 +19,6 @@ const StepPage = () => {
     const getAllOrderData = async () => {
         const response = await getAPI("/createOrder/order");
         const filtered = response.data?.filter((fl) => fl.orderCode === id)[0];
-        console.log(filtered)
         setData(filtered);
     };
     useEffect(() => {

@@ -16,12 +16,11 @@ const StepPage = () => {
     const { id } = useParams();
     const [data, setData] = useState([])
     const [date, setDate] = useState()
-    const [maliyet, setMaliyet] = useState(0)
+    const [maliyet, setMaliyet] = useState({})
 
     const getAllOrderData = async () => {
         const response = await getAPI("/createOrder/order");
         const filtered = response.data?.filter((fl) => fl.orderCode === id)[0];
-        console.log(filtered)
         setData(filtered);
     };
     useEffect(() => {
@@ -34,7 +33,7 @@ const StepPage = () => {
                 <Label>Her Ürün İçin Tarih Ve Maliyet Bilgisi Giriniz.</Label>
                 <Label className={'text-muted-foreground text-xs m-0'}>Ürünler:</Label>
 
-                {data && data?.Ürünler?.map((item) => <div
+                {data && data?.Ürünler?.map((item, index) => <div
                     key={item.id}
                     className={'flex flex-col w-fit border shadow-sm rounded p-2 gap-2'}>
                     <div className={'flex items-center gap-2 [&_span]:text-sm mx-auto w-fit'}>
@@ -69,7 +68,7 @@ const StepPage = () => {
                     </Popover>
 
                     <div className="flex gap-2 items-center">
-                        <Input value={maliyet} onChange={(e) => setMaliyet(e.target.value)} type={'number'} placeholder={'0 TL'}/>
+                        <Input value={maliyet[index] ?? ""} onChange={(e) => setMaliyet((prev) => ({...prev, [index]: e.target.value}))} type={'number'} placeholder={'0 TL'}/>
                     </div>
                 </div>)}
             </div>

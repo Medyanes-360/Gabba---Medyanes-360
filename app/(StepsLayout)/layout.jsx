@@ -39,6 +39,7 @@ const MainLayout = ({ children }) => {
           id: '3',
           label: 'Ürünler İçin Tarih Gir',
           path: `/stepbystep/${id}/3`,
+          roles: ['company_manager']
         },
         {
           id: '5',
