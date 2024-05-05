@@ -92,8 +92,7 @@ const MainLayout = ({ children }) => {
 
   const getAllOrderData = async () => {
     const response = await getAPI('/createOrder/order');
-    response.data.filter((ord) => id === ord.orderCode)
-    setOrderData();
+    setOrderData(response.data.filter((ord) => id === ord.orderCode)[0]);
   };
 
   useEffect(() => {
