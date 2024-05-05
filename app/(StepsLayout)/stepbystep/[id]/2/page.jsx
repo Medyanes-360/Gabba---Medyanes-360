@@ -13,6 +13,7 @@ import {
 import {Button} from "@/components/ui/button";
 import {useEffect, useState} from "react";
 import {getAPI} from "@/services/fetchAPI";
+import {Input} from "@/components/ui/input";
 
 const StepPage = () => {
     const [tedarikci, setTedarikci] = useState('')
@@ -55,9 +56,12 @@ const StepPage = () => {
                       </SelectGroup>
                   </SelectContent>
               </Select>
+
+              <Input type={"text"} className={"w-full"} placeholder={"Tedarikciye Gonderilecek Aciklama"}/>
+
               <Button onClick={() => {
                   console.log(getTedarikciId())
-              }}>Cariye işle</Button>
+              }}>Tedarikciye verileri gonder</Button>
           </div>
       </div>
   )
