@@ -122,7 +122,7 @@ const MainLayout = ({ children }) => {
                 )}
               </li>
               <li className=''>
-                Müşteri İsmi: {item.Müşteri[0]?.name}{' '}
+                Müşteri İsmi: {orderData && orderData.Müşteri && orderData.Müşteri[0]?.name}{' '}
                 {orderData && orderData?.Müşteri && orderData.Müşteri[0]?.surname}
               </li>
               <li className=''>
