@@ -27,13 +27,13 @@ const StepPage = () => {
               <Label>Stoklara eklenecek ürünleri seçiniz.</Label>
               <Label className={'text-muted-foreground text-xs m-0'}>Ürünler:</Label>
 
-              {data && data?.Ürünler?.map((item) => <div
+              {data && data?.Ürünler?.map((item, index) => <div
                   key={item.id}
-                  className={`flex flex-col w-full ${(checked[item.id] ?? false) ? 'bg-[#dedede]/50' : ''} transition-all duration-200 ease-in-out border shadow-sm rounded p-2 gap-2`}>
+                  className={`flex flex-col w-full ${(checked[index] ?? false) ? 'bg-[#dedede]/50' : ''} transition-all duration-200 ease-in-out border shadow-sm rounded p-2 gap-2`}>
                   <div className={'flex items-center gap-2 [&_span]:text-sm w-full w-fit'}>
                       <Checkbox
-                          checked={checked[item.id] ?? false}
-                          onCheckedChange={(value)=> setChecked((prev) => ({...prev, [item.id]: value})) }
+                          checked={checked[index] ?? false}
+                          onCheckedChange={(value)=> setChecked((prev) => ({...prev, [index]: value})) }
                           className={'mr-4'}/>
                       <span>{item.selectedCategoryValues}</span>
                       -
