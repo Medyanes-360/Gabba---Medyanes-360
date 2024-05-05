@@ -62,11 +62,13 @@ const MainLayout = ({ children }) => {
               id: '7.1',
               label: 'Otomatik Teslim Tutanağı',
               path: `/stepbystep/${id}/7.1`,
+              roles: ['company_manager', 'logistic']
             },
             {
               id: '7.2',
               label: 'Ek ücret',
               path: `/stepbystep/${id}/7.2`,
+              roles: ['company_manager', 'logistic']
             }
           ]
         },
@@ -79,6 +81,7 @@ const MainLayout = ({ children }) => {
               id: '8.1',
               label: '8.1 Adım',
               path: `/stepbystep/${id}/8.1`,
+              roles: ['company_manager', 'logistic']
             }
           ]
         },
@@ -86,6 +89,7 @@ const MainLayout = ({ children }) => {
           id: '9',
           label: '9. Adım',
           path: `/stepbystep/${id}/9`,
+          roles: ['company_manager', 'logistic']
         },
       ],
     },
