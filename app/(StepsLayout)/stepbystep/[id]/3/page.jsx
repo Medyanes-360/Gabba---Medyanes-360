@@ -49,7 +49,7 @@ const StepPage = () => {
                         <Button
                             variant={"outline"}
                             className={cn(
-                                "w-[280px] justify-start text-left font-normal",
+                                "w-full justify-start text-left font-normal",
                                 !date && "text-muted-foreground"
                             )}
                         >
@@ -57,7 +57,7 @@ const StepPage = () => {
                             {date ? format(date, "PPP") : <span>Pick a date</span>}
                         </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[280px] p-0">
+                    <PopoverContent className="w-full p-0">
                         <Calendar
                             mode="single"
                             selected={date}
@@ -68,7 +68,7 @@ const StepPage = () => {
                 </Popover>
             </div>)}
 
-            <Button className={"w-[280px]"}>Tarihleri Guncelle</Button>
+            <Button className={"w-full"}>Tarihleri Guncelle</Button>
         </div>
     </div>
   )
