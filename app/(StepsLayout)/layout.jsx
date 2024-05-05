@@ -111,7 +111,7 @@ const MainLayout = ({ children }) => {
             <ul className='divide-x flex items-center gap-4 divide-gray-700 text-gray-300'>
               <li className=''>
                 Oluşturma Tarihi:{' '}
-                {orderData.Orders.map(
+                {orderData && orderData?.Orders && orderData?.Orders?.map(
                     (orders, index) =>
                         index == 0 &&
                         orders.createdAt
@@ -123,15 +123,15 @@ const MainLayout = ({ children }) => {
               </li>
               <li className=''>
                 Müşteri İsmi: {item.Müşteri[0]?.name}{' '}
-                {orderData.Müşteri[0]?.surname}
+                {orderData && orderData?.Müşteri && orderData.Müşteri[0]?.surname}
               </li>
               <li className=''>
-                Firma İsmi: {orderData.Müşteri[0]?.company_name}
+                Firma İsmi: {orderData && orderData?.Müşteri && orderData.Müşteri[0]?.company_name}
               </li>
-              <li className=''>Ürün Adedi: {orderData.Orders.length}</li>
+              <li className=''>Ürün Adedi: {orderData && orderData?.Orders && orderData.Orders.length}</li>
               <li className=''>
                 Fiyat:{' '}
-                {orderData.Orders.reduce((total, order) => {
+                {orderData && orderData?.Orders && orderData.Orders.reduce((total, order) => {
                   return (
                       total +
                       (order.productPrice + order.productFeaturePrice) *
@@ -142,7 +142,7 @@ const MainLayout = ({ children }) => {
               <li>
                 Durum:{' '}
                 <span className='text-xs font-medium rounded-full bg-blue-900 text-blue-300'>
-                        {orderData.Orders[0].ordersStatus}
+                        {orderData && orderData?.Orders && orderData.Orders[0].ordersStatus}
                       </span>
               </li>
             </ul>
