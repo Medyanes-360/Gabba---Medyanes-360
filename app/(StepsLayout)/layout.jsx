@@ -1,6 +1,8 @@
 'use client';
 import Sidebar from '@/components/dashboard/Sidebar';
 import { useParams } from 'next/navigation';
+import {getAPI} from "@/services/fetchAPI";
+import {useState, useEffect} from 'react'
 
 const MainLayout = ({ children }) => {
   const { id } = useParams()
@@ -13,6 +15,7 @@ const MainLayout = ({ children }) => {
           id: '1',
           label: 'Fişi Gör Veya Gönder',
           path: `/stepbystep/${id}/1`,
+          roles: ['company_manager', 'manager', 'personal'],
           childs: [
             {
               id: '1.1',
@@ -29,7 +32,8 @@ const MainLayout = ({ children }) => {
         {
           id: '2',
           label: 'Tedarikçi Seç',
-          path: `/stepbystep/${id}/2`
+          path: `/stepbystep/${id}/2`,
+          roles: ['company_manager']
         },
         {
           id: '3',
@@ -84,6 +88,16 @@ const MainLayout = ({ children }) => {
     },
   ];
 
+  const [orderData, setOrderData] = useState([]);
+
+  const getAllOrderData = async () => {
+    const response = await getAPI('/createOrder/order');
+    setOrderData(response.data);
+  };
+
+  useEffect(() => {
+    getAllOrderData()
+  }, []);
 
   return (
     <div className='flex h-screen w-full overflow-hidden bg-background pb-4'>
@@ -97,7 +111,7 @@ const MainLayout = ({ children }) => {
             <ul className='divide-x flex items-center gap-4 divide-gray-700 text-gray-300'>
               <li className=''>
                 Oluşturma Tarihi:{' '}
-                {item.Orders.map(
+                {orderData.Orders.map(
                     (orders, index) =>
                         index == 0 &&
                         orders.createdAt
@@ -109,15 +123,15 @@ const MainLayout = ({ children }) => {
               </li>
               <li className=''>
                 Müşteri İsmi: {item.Müşteri[0]?.name}{' '}
-                {item.Müşteri[0]?.surname}
+                {orderData.Müşteri[0]?.surname}
               </li>
               <li className=''>
-                Firma İsmi: {item.Müşteri[0]?.company_name}
+                Firma İsmi: {orderData.Müşteri[0]?.company_name}
               </li>
-              <li className=''>Ürün Adedi: {item.Orders.length}</li>
+              <li className=''>Ürün Adedi: {orderData.Orders.length}</li>
               <li className=''>
                 Fiyat:{' '}
-                {item.Orders.reduce((total, order) => {
+                {orderData.Orders.reduce((total, order) => {
                   return (
                       total +
                       (order.productPrice + order.productFeaturePrice) *
@@ -128,7 +142,7 @@ const MainLayout = ({ children }) => {
               <li>
                 Durum:{' '}
                 <span className='text-xs font-medium rounded-full bg-blue-900 text-blue-300'>
-                        {item.Orders[0].ordersStatus}
+                        {orderData.Orders[0].ordersStatus}
                       </span>
               </li>
             </ul>
