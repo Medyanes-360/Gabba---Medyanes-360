@@ -51,7 +51,7 @@ const MainLayout = ({ children }) => {
           id: '6',
           label: 'Gümrük',
           path: `/stepbystep/${id}/6`,
-
+          roles: ['company_manager', 'logistic']
         },
         {
           id: '7',
