@@ -81,7 +81,7 @@ const MainLayout = ({ children }) => {
               id: '8.1',
               label: '8.1 Adım',
               path: `/stepbystep/${id}/8.1`,
-              roles: ['company_manager', 'logistic']
+              roles: ['company_manager', 'logistic', "manager", "personal"]
             }
           ]
         },
@@ -89,7 +89,7 @@ const MainLayout = ({ children }) => {
           id: '9',
           label: '9. Adım',
           path: `/stepbystep/${id}/9`,
-          roles: ['company_manager', 'logistic']
+          roles: ['company_manager', 'logistic', "manager", "personal"]
         },
       ],
     },
