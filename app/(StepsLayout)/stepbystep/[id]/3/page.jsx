@@ -34,7 +34,7 @@ const StepPage = () => {
             <Label>Her Ürün İçin Tarih Giriniz.</Label>
             <Label className={'text-muted-foreground text-xs m-0'}>Ürünler:</Label>
 
-            {data && data?.Ürünler?.map((item) => <div key={item.id} className={'flex flex-col w-fit border shadow-sm rounded p-2 gap-2'}>
+            {data && data?.Ürünler?.map((item) => <div key={item.id} className={'flex flex-col w-full border shadow-sm rounded p-2 gap-2'}>
                 <div className={'flex items-center gap-2 [&_span]:text-sm mx-auto w-fit'}>
                     <span>{item.selectedCategoryValues}</span>
                     -
