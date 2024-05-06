@@ -18,7 +18,7 @@ const StepPage = () => {
               d="M7 12.1429V20H11.8889C15.8162 20 19 16.8162 19 12.8889V12M7 12.1429V8.14286M7 12.1429L5 13M7 12.1429L12 10M7 8.14286V4M7 8.14286L5 9M7 8.14286L12 6"
               stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <Input type={'number'} placeholder={'0 TL'}/>
+        <Input type={'number'} placeholder={'0'}/>
       </div>
       <Button>Cariye işle</Button>
     </div>

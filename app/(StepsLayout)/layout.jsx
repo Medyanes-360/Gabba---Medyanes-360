@@ -79,7 +79,7 @@ const MainLayout = ({ children }) => {
           childs: [
             {
               id: '8.1',
-              label: '8.1 Adım',
+              label: 'Cari Kontrol',
               path: `/stepbystep/${id}/8.1`,
               roles: ['company_manager', 'logistic', "manager", "personal"]
             }
@@ -87,7 +87,7 @@ const MainLayout = ({ children }) => {
         },
         {
           id: '9',
-          label: '9. Adım',
+          label: 'İşlem Sonu Cari Kontrol',
           path: `/stepbystep/${id}/9`,
           roles: ['company_manager', 'logistic', "manager", "personal"]
         },
@@ -114,8 +114,8 @@ const MainLayout = ({ children }) => {
         {/* <Navbar /> */}
 
         <div className='flex flex-col flex-1 h-screen overflow-auto bg-background rounded-lg'>
-          <div className="w-full flex py-2 px-4">
-            <ul className='divide-x flex items-center gap-4 divide-gray-700 text-gray-300'>
+          <div className="w-full flex p-2 border-b border-r border-l shadow-md">
+            <ul className='flex items-center justify-around w-full text-gray-600 py-2'>
               <li className=''>
                 Oluşturma Tarihi:{' '}
                 {orderData && orderData?.Orders && orderData?.Orders?.map(
@@ -128,15 +128,15 @@ const MainLayout = ({ children }) => {
                             .join('.')
                 )}
               </li>
-              <li className=''>
+              <li className='underline'>
                 Müşteri İsmi: {orderData && orderData.Müşteri && orderData.Müşteri[0]?.name}{' '}
                 {orderData && orderData?.Müşteri && orderData.Müşteri[0]?.surname}
               </li>
-              <li className=''>
+              <li className='underline'>
                 Firma İsmi: {orderData && orderData?.Müşteri && orderData.Müşteri[0]?.company_name}
               </li>
-              <li className=''>Ürün Adedi: {orderData && orderData?.Orders && orderData.Orders.length}</li>
-              <li className=''>
+              <li className='underline'>Ürün Adedi: {orderData && orderData?.Orders && orderData.Orders.length}</li>
+              <li className='underline'>
                 Fiyat:{' '}
                 {orderData && orderData?.Orders && orderData.Orders.reduce((total, order) => {
                   return (
@@ -148,7 +148,7 @@ const MainLayout = ({ children }) => {
               </li>
               <li>
                 Durum:{' '}
-                <span className='text-xs font-medium rounded-full bg-blue-900 text-blue-300'>
+                <span className='text-xs px-3 py-1.5 rounded-full bg-blue-900 text-blue-100 font-semibold'>
                         {orderData && orderData?.Orders && orderData.Orders[0].ordersStatus}
                       </span>
               </li>

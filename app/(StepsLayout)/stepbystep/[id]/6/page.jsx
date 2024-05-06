@@ -39,7 +39,7 @@ const StepPage = () => {
                       -
                       <span>{item.productName}</span>
                       -
-                      <span>{item.productPrice} TL</span>
+                      <span>{item.productPrice}</span>
                   </div>
               </div>)}
               <Button onClick={() => {

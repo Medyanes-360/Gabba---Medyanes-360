@@ -41,7 +41,7 @@ const StepPage = () => {
                         -
                         <span>{item.productName}</span>
                         -
-                        <span>{item.productPrice} TL</span>
+                        <span>{item.productPrice}</span>
                     </div>
 
                     <Popover>
@@ -68,7 +68,7 @@ const StepPage = () => {
                     </Popover>
 
                     <div className="flex gap-2 items-center">
-                        <Input value={maliyet[index] ?? ""} onChange={(e) => setMaliyet((prev) => ({...prev, [index]: e.target.value}))} type={'number'} placeholder={'0 TL'}/>
+                        <Input value={maliyet[index] ?? ""} onChange={(e) => setMaliyet((prev) => ({...prev, [index]: e.target.value}))} type={'number'} placeholder={'0'}/>
                     </div>
                 </div>)}
 

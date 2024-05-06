@@ -45,7 +45,7 @@ const StepPage = () => {
                     updatedExtras[i] = { ...updatedExtras[i], price: e.target.value };
                     return updatedExtras;
                   })}
-                  placeholder={'0 TL'}
+                  placeholder={'0'}
               />
 
             </div>
