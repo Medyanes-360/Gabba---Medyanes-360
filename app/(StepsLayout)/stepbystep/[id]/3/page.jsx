@@ -34,7 +34,7 @@ const StepPage = () => {
             <Label>Her Ürün İçin Tarih Giriniz.</Label>
             <Label className={'text-muted-foreground text-xs m-0'}>Ürünler:</Label>
 
-            {data && data?.Ürünler?.map((item) => <div key={item.id} className={'flex flex-col w-full border shadow-sm rounded p-2 gap-2'}>
+            {data && data?.Ürünler?.map((item, index) => <div key={item.id} className={'flex flex-col w-full border shadow-sm rounded p-2 gap-2'}>
                 <div className={'flex items-center gap-2 [&_span]:text-sm mx-auto w-fit'}>
                     <span>{item.selectedCategoryValues}</span>
                     -
@@ -49,18 +49,18 @@ const StepPage = () => {
                             variant={"outline"}
                             className={cn(
                                 "w-full justify-start text-left font-normal",
-                                !date && "text-muted-foreground"
+                                !date[index] && "text-muted-foreground"
                             )}
                         >
                             <CalendarIcon className="mr-2 h-4 w-4" />
-                            {date ? format(date, "PPP") : <span>Pick a date</span>}
+                            {date[index] ? format(date[index], "PPP") : <span>Pick a date</span>}
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-full p-0">
                         <Calendar
                             mode="single"
-                            selected={date}
-                            onSelect={setDate}
+                            selected={date[index]}
+                            onSelect={(newDate) => setDate((prev) => ({...prev, [index]: newDate}))}
                             initialFocus
                         />
                     </PopoverContent>
