@@ -76,6 +76,7 @@ const handler = async (req, res) => {
       const result = await handleDelete(req);
       return res.status(200).json(result);
     } else if (req.method === 'POST') {
+      req.body.newData.status = false;
       const financialManagementSpecial = await createNewData('Company', {
         ...req.body.newData,
       });

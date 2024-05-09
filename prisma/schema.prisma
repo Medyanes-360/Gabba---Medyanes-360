@@ -315,7 +315,7 @@ model OfferBasket {
   productPrice        Float
   productFeaturePrice Float
 
-  user   User    @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
   userId String @db.ObjectId
 
   createdAt DateTime @default(now())
@@ -462,6 +462,8 @@ model Company {
   ekstra3English   String?
   ekstra3Ukrainian String?
   ekstra3Turkish   String?
+
+  status Boolean
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

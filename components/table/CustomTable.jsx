@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -8,9 +8,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -19,9 +19,9 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { toast } from "react-toastify";
-import { TableFunctions } from "@/lib/table/table";
+} from '@/components/ui/select';
+import { toast } from 'react-toastify';
+import { TableFunctions } from '@/lib/table/table';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,7 +32,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 import {
   Dialog,
   DialogContent,
@@ -42,9 +42,9 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogClose,
-} from "@/components/ui/dialog";
-import ThemeToggle from "@/components/table/ThemeToggle";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/dialog';
+import ThemeToggle from '@/components/table/ThemeToggle';
+import { Label } from '@/components/ui/label';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -53,18 +53,24 @@ import {
   DropdownMenuTrigger,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import { ArrowDownIcon, ArrowDownUp, ArrowUpIcon, Plus, Trash } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { DotsHorizontalIcon } from "@radix-ui/react-icons";
-import { getAPI, postAPI } from "@/services/fetchAPI";
-import { useSession } from "next-auth/react";
+} from '@/components/ui/dropdown-menu';
+import {
+  ArrowDownIcon,
+  ArrowDownUp,
+  ArrowUpIcon,
+  Plus,
+  Trash,
+} from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { DotsHorizontalIcon } from '@radix-ui/react-icons';
+import { getAPI, postAPI } from '@/services/fetchAPI';
+import { useSession } from 'next-auth/react';
 
 const CustomTable = ({
   api_route,
   columns,
   perPage = 10,
-  paginationType = "page",
+  paginationType = 'page',
   pagination = true,
   langs,
   defaultLang,
@@ -81,7 +87,7 @@ const CustomTable = ({
 }) => {
   // next-auth kurulunca güncellenecek
   const { data: session } = useSession();
-  const role = session?.user?.role ?? "company_manager";
+  const role = session?.user?.role ?? 'company_manager';
   {
     /* Stateler */
   }
@@ -91,7 +97,7 @@ const CustomTable = ({
     pageIndex: 0,
   });
   const [filters, setFilters] = useState({
-    global: "" /* Filtreleme inputunun değerini tutar */,
+    global: '' /* Filtreleme inputunun değerini tutar */,
     columns: [] /* Column filterlarının değerlerini tutar  */,
   });
   const [visible, setVisible] = useState({});
@@ -193,11 +199,11 @@ const CustomTable = ({
       const response = await getAPI(api_route);
 
       if (!response) {
-        throw new Error("Veri çekilemedi 2");
+        throw new Error('Veri çekilemedi 2');
       }
 
-      if (response.status !== "success") {
-        throw new Error("Veri çekilemedi 3");
+      if (response.status !== 'success') {
+        throw new Error('Veri çekilemedi 3');
       }
 
       setData(response.data);
@@ -209,18 +215,18 @@ const CustomTable = ({
 
   const deleteOne = async (id) => {
     try {
-      const response = await postAPI(api_route, { id, type: "one" }, "DELETE");
+      const response = await postAPI(api_route, { id, type: 'one' }, 'DELETE');
 
       if (!response) {
-        throw new Error("Veri Silinemedi (table)");
+        throw new Error('Veri Silinemedi (table)');
       }
 
-      if (response.status !== "success") {
-        throw new Error("Veri Silinmesi başarılı olmadı (table)");
+      if (response.status !== 'success') {
+        throw new Error('Veri Silinmesi başarılı olmadı (table)');
       }
 
       setSelection({});
-      setFilters({ global: "", columns: [] });
+      setFilters({ global: '', columns: [] });
 
       toast.warning(`Deleted Data`);
       getData().then(() => {
@@ -236,24 +242,24 @@ const CustomTable = ({
     try {
       const response = await postAPI(
         api_route,
-        { ids, type: "selected" },
-        "DELETE"
+        { ids, type: 'selected' },
+        'DELETE'
       );
 
       console.log(ids);
 
       if (!response) {
-        throw new Error("Veri Silinemedi (table)");
+        throw new Error('Veri Silinemedi (table)');
       }
 
-      if (response.status !== "success") {
-        throw new Error("Veri Silinmesi başarılı olmadı (table)");
+      if (response.status !== 'success') {
+        throw new Error('Veri Silinmesi başarılı olmadı (table)');
       }
 
       setSelection({});
-      setFilters({ global: "", columns: [] });
+      setFilters({ global: '', columns: [] });
 
-      toast.warning("Deleted Selected Data");
+      toast.warning('Deleted Selected Data');
       getData().then(() => {
         toast.success(`Data GÜncellendi`);
       });
@@ -265,8 +271,8 @@ const CustomTable = ({
 
   useEffect(() => {
     columns.map(async (column) => {
-      if (column?.engine === "prisma") {
-        const responseData = await postAPI("/prisma/findMany", column?.table);
+      if (column?.engine === 'prisma') {
+        const responseData = await postAPI('/prisma/findMany', column?.table);
         setEngineDatas((prev) => ({
           ...prev,
           [column?.table]: responseData,
@@ -277,20 +283,20 @@ const CustomTable = ({
 
   const handleDeleteAll = async () => {
     try {
-      const response = await postAPI(api_route, { type: "all" }, "DELETE");
+      const response = await postAPI(api_route, { type: 'all' }, 'DELETE');
 
       if (!response) {
-        throw new Error("Veri Silinemedi (table)");
+        throw new Error('Veri Silinemedi (table)');
       }
 
-      if (response.status !== "success") {
-        throw new Error("Veri Silinmesi başarılı olmadı (table)");
+      if (response.status !== 'success') {
+        throw new Error('Veri Silinmesi başarılı olmadı (table)');
       }
 
       setSelection({});
-      setFilters({ global: "", columns: [] });
+      setFilters({ global: '', columns: [] });
 
-      toast.warning("Deleted All Data");
+      toast.warning('Deleted All Data');
       getData().then(() => {
         toast.success(`Data GÜncellendi`);
       });
@@ -302,14 +308,14 @@ const CustomTable = ({
 
   const updateData = async (id, newData) => {
     try {
-      const response = await postAPI(api_route, { id, newData }, "PUT");
+      const response = await postAPI(api_route, { id, newData }, 'PUT');
 
       if (!response) {
-        throw new Error("Veri güncellemesi (table)");
+        throw new Error('Veri güncellemesi (table)');
       }
 
-      if (response.status !== "success") {
-        throw new Error("Veri Güncellemesi başarılı olmadı (table)");
+      if (response.status !== 'success') {
+        throw new Error('Veri Güncellemesi başarılı olmadı (table)');
       }
 
       // Reset state variables
@@ -330,7 +336,7 @@ const CustomTable = ({
       let response;
 
       if (
-        typeof engineDatas === "object" &&
+        typeof engineDatas === 'object' &&
         Object?.keys(engineDatas)?.length > 0
       ) {
         const connections = Object?.keys(newData)?.filter((key) =>
@@ -360,7 +366,7 @@ const CustomTable = ({
           {
             newData: result,
           },
-          "POST"
+          'POST'
         );
       } else {
         response = await postAPI(
@@ -368,23 +374,23 @@ const CustomTable = ({
           {
             newData: newData,
           },
-          "POST"
+          'POST'
         );
       }
 
       if (!response) {
-        throw new Error("Veri Eklemesi (table)");
+        throw new Error('Veri Eklemesi (table)');
       }
 
-      if (response.status !== "success") {
-        throw new Error("Veri Eklemesi başarılı olmadı (table)");
+      if (response.status !== 'success') {
+        throw new Error('Veri Eklemesi başarılı olmadı (table)');
       }
 
       // Reset state variables
       setAddModalLang(null);
       setAddModalState({});
       setOpenAddModal(false);
-      toast.success("Successfully added new data");
+      toast.success('Successfully added new data');
       await getData();
     } catch (error) {
       toast.error(error.message);
@@ -397,9 +403,9 @@ const CustomTable = ({
   }, []);
 
   return (
-    <div className=" h-full flex flex-col gap-4">
+    <div className=' h-full flex flex-col gap-4'>
       {/* TABLE-TOP */}
-      <div className="flex flex-wrap items-center w-full gap-4">
+      <div className='flex flex-wrap items-center w-full gap-4'>
         {/* GLOBAL FİLTER START */}
         {/* global filter'ın inputu burada */}
         {searchTable && (
@@ -411,8 +417,8 @@ const CustomTable = ({
                 global: e.target.value,
               }))
             }
-            placeholder="Search in data table."
-            className="w-screen max-w-sm !outline-none !ring-muted-foreground"
+            placeholder='Search in data table.'
+            className='w-screen max-w-sm !outline-none !ring-muted-foreground'
           />
         )}
         {/* GLOBAL FİLTER END */}
@@ -421,14 +427,14 @@ const CustomTable = ({
         {/* header (başlık) yani column'ların visible statini buradan kontrol ediyoruz burada bir dropdownmenu çalışıyor */}
         {changeVisible && (
           <DropdownMenu>
-            <DropdownMenuTrigger className="">
-              <Button variant="outline" className="">
+            <DropdownMenuTrigger className=''>
+              <Button variant='outline' className=''>
                 Columns
-                <ArrowDownIcon className="w-3.5 h-3.5 ml-2" />
+                <ArrowDownIcon className='w-3.5 h-3.5 ml-2' />
               </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="start">
+            <DropdownMenuContent align='start'>
               {columns
                 .filter((col) => !col.hide)
                 .map((column) => (
@@ -441,7 +447,7 @@ const CustomTable = ({
                     }}
                     checked={visible[column.dt_name] ?? true}
                     key={column.dt_name}
-                    className="capitalize"
+                    className='capitalize'
                   >
                     {column.header}
                   </DropdownMenuCheckboxItem>
@@ -455,16 +461,16 @@ const CustomTable = ({
         {/* lang (language) statini buradan kontrol ediyoruz burada bir dropdownmenu çalışıyor */}
         {setLanguage && (
           <DropdownMenu>
-            <DropdownMenuTrigger className="!ring-0" asChild>
+            <DropdownMenuTrigger className='!ring-0' asChild>
               {lang ? (
-                <Button variant="outline">
-                  <img alt={lang?.name} className="w-8" src={lang?.image} />
+                <Button variant='outline'>
+                  <img alt={lang?.name} className='w-8' src={lang?.image} />
                 </Button>
               ) : (
-                <Button variant="outline">Deafult</Button>
+                <Button variant='outline'>Deafult</Button>
               )}
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
+            <DropdownMenuContent align='start'>
               <DropdownMenuItem onClick={() => setLang(null)}>
                 Default
               </DropdownMenuItem>
@@ -478,7 +484,7 @@ const CustomTable = ({
         )}
         {/* SET LANGUAGE END */}
 
-        <div className="ml-auto flex items-center gap-4">
+        <div className='ml-auto flex items-center gap-4'>
           {/* Theme Toggle Butonu sistemde hali hazırda olan bir component. */}
           {false && <ThemeToggle />}
 
@@ -487,10 +493,12 @@ const CustomTable = ({
           {selectedDelete && (
             <AlertDialog>
               <AlertDialogTrigger
-                disabled={Object.values(selection).filter((e) => e).length === 0}
-                className="ml-0 2xl:ml-auto disabled:pointer-events-none disabled:opacity-50"
+                disabled={
+                  Object.values(selection).filter((e) => e).length === 0
+                }
+                className='ml-0 2xl:ml-auto disabled:pointer-events-none disabled:opacity-50'
               >
-                <Button variant="outline">Delete Selected Row's</Button>
+                <Button variant='outline'>Delete Selected Row's</Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -525,14 +533,19 @@ const CustomTable = ({
             <AlertDialog>
               <AlertDialogTrigger
                 disabled={data.length === 0}
-                className="disabled:pointer-events-none disabled:opacity-50"
+                className='disabled:pointer-events-none disabled:opacity-50'
               >
-                <button className="bg-red-500 flex items-center p-2 rounded gap-2 text-white font-medium text-sm"><Trash size={14} />Delete All <Trash size={16} /></button>
+                <button className='bg-red-500 flex items-center p-2 rounded gap-2 text-white font-medium text-sm'>
+                  <Trash size={14} />
+                  Delete All <Trash size={16} />
+                </button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>Delete all rows</AlertDialogDescription>
+                  <AlertDialogDescription>
+                    Delete all rows
+                  </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -554,21 +567,21 @@ const CustomTable = ({
             <Dialog open={openAddModal} onOpenChange={setOpenAddModal}>
               {/* Modal'ı tetikleyen buton */}
               <DialogTrigger asChild>
-                <button className="p-2 bg-green-300 rounded-full">
-                  <Plus color="#000" />
+                <button className='p-2 bg-green-300 rounded-full'>
+                  <Plus color='#000' />
                 </button>
               </DialogTrigger>
 
               {/* Modal içeriği */}
-              <DialogContent className="lg:max-w-screen-lg overflow-y-scroll max-h-screen">
+              <DialogContent className='lg:max-w-screen-lg overflow-y-scroll max-h-screen'>
                 <form
-                  className="outline-none rounded-md py-4"
+                  className='outline-none rounded-md py-4'
                   onSubmit={(e) => {
                     // form tetiklenir (submit) ise dataya modal'daki inputların tutulduğu state'i ve id: datanın uzunluğu + 1 ekle
                     e.preventDefault();
 
                     const filtered = Object.keys(addModalState)
-                      .filter((objKey) => objKey !== "id")
+                      .filter((objKey) => objKey !== 'id')
                       .reduce((newObj, key) => {
                         newObj[key] = addModalState[key];
                         return newObj;
@@ -577,7 +590,7 @@ const CustomTable = ({
                     handleAddData(filtered);
                   }}
                 >
-                  <div className="w-full flex items-start pr-8">
+                  <div className='w-full flex items-start pr-8'>
                     <DialogHeader>
                       <DialogTitle>Add Data</DialogTitle>
                       <DialogDescription>
@@ -587,20 +600,20 @@ const CustomTable = ({
 
                     <DropdownMenu>
                       {/* Data ekleme modalındaki lang (language)'in tutulduğu ve kontrol edildiği kısım */}
-                      <DropdownMenuTrigger className="!ring-0 ml-auto" asChild>
+                      <DropdownMenuTrigger className='!ring-0 ml-auto' asChild>
                         {addModalLang ? (
-                          <Button variant="outline">
+                          <Button variant='outline'>
                             <img
                               alt={addModalLang?.name}
-                              className="w-8"
+                              className='w-8'
                               src={addModalLang?.image}
                             />
                           </Button>
                         ) : (
-                          <Button variant="outline">Deafult</Button>
+                          <Button variant='outline'>Deafult</Button>
                         )}
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start">
+                      <DropdownMenuContent align='start'>
                         <DropdownMenuItem onClick={() => setAddModalLang(null)}>
                           Default
                         </DropdownMenuItem>
@@ -622,12 +635,13 @@ const CustomTable = ({
                   </div>
 
                   {/* DATA EKLMEK İÇİN İNPUTLAR */}
-                  <div className="flex flex-col gap-5 py-6">
+                  <div className='flex flex-col gap-5 py-6'>
                     {columns
                       // eğerki bu header (başlık) yani column'umun enableForm değeri true ise ve modal'da tuttuğum lang (language) data null ise veya column'umun translate değeri true ise filterdan geçir.
                       .filter(
                         (x) =>
-                          x?.enableForm && (addModalLang === null || x?.translate)
+                          x?.enableForm &&
+                          (addModalLang === null || x?.translate)
                       )
                       // filterlanmış columns datamı maple ve bir input döndür
                       .map((column, col_index) => {
@@ -639,12 +653,12 @@ const CustomTable = ({
 
                         return (
                           <div
-                            className="grid grid-col-4 items-center gap-4"
+                            className='grid grid-col-4 items-center gap-4'
                             key={col_index + columnKey}
                           >
-                            {column?.engine === "prisma" ? (
+                            {column?.engine === 'prisma' ? (
                               <>
-                                <Label className="text-left w-full capitalize">
+                                <Label className='text-left w-full capitalize'>
                                   {column?.header}
                                 </Label>
 
@@ -652,11 +666,13 @@ const CustomTable = ({
                                   value={
                                     addModalState[column?.table] &&
                                     addModalState[column?.table][
-                                    column.selectableField
+                                      column.selectableField
                                     ]
                                   }
                                   onValueChange={(newval) => {
-                                    const val = engineDatas[column?.table].filter(
+                                    const val = engineDatas[
+                                      column?.table
+                                    ].filter(
                                       (item) =>
                                         item[column.selectableField] === newval
                                     );
@@ -670,18 +686,22 @@ const CustomTable = ({
                                   }}
                                 >
                                   <SelectTrigger>
-                                    <SelectValue placeholder="" />
+                                    <SelectValue placeholder='' />
                                   </SelectTrigger>
 
                                   <SelectContent>
                                     <SelectGroup>
-                                      <SelectLabel>{column?.header}</SelectLabel>
+                                      <SelectLabel>
+                                        {column?.header}
+                                      </SelectLabel>
                                       {engineDatas &&
                                         engineDatas[column?.table] &&
                                         engineDatas[column?.table]?.map(
                                           (item) => (
                                             <SelectItem
-                                              value={item[column.selectableField]}
+                                              value={
+                                                item[column.selectableField]
+                                              }
                                             >
                                               {item[column.selectableField]}
                                             </SelectItem>
@@ -695,7 +715,7 @@ const CustomTable = ({
                               <>
                                 {column?.type === `enum` ? (
                                   <>
-                                    <Label className="text-left w-full capitalize">
+                                    <Label className='text-left w-full capitalize'>
                                       {column?.header}
                                     </Label>
 
@@ -708,7 +728,7 @@ const CustomTable = ({
                                       }}
                                     >
                                       <SelectTrigger>
-                                        <SelectValue placeholder="" />
+                                        <SelectValue placeholder='' />
                                       </SelectTrigger>
 
                                       <SelectContent>
@@ -731,7 +751,7 @@ const CustomTable = ({
                                   </>
                                 ) : (
                                   <>
-                                    <Label className="text-left w-full capitalize">
+                                    <Label className='text-left w-full capitalize'>
                                       {column?.header}
                                     </Label>
                                     <Input
@@ -747,8 +767,8 @@ const CustomTable = ({
                                       id={columnKey}
                                       placeholder={
                                         (addModalLang
-                                          ? addModalLang?.code + " "
-                                          : "") + column?.header
+                                          ? addModalLang?.code + ' '
+                                          : '') + column?.header
                                       }
                                     />
                                   </>
@@ -763,13 +783,13 @@ const CustomTable = ({
                   <DialogFooter>
                     <DialogClose
                       onClick={() => setAddModalState({})}
-                      className="mr-4"
+                      className='mr-4'
                     >
-                      <Button variant="secondary" type="reset">
+                      <Button variant='secondary' type='reset'>
                         Close
                       </Button>
                     </DialogClose>
-                    <Button type="submit" variant="destructive">
+                    <Button type='submit' variant='destructive'>
                       Add Data
                     </Button>
                   </DialogFooter>
@@ -793,7 +813,7 @@ const CustomTable = ({
                 /* sorting state'ini sıfırla */
                 setSorting({});
               }}
-              variant="destructive"
+              variant='destructive'
             >
               Clear Filters
             </Button>
@@ -802,7 +822,7 @@ const CustomTable = ({
       </div>
 
       {/* TABLE MAİN BLOCK -> div */}
-      <div className="rounded border ">
+      <div className='rounded border '>
         {/* Table -> table */}
         <Table>
           {/* TABLE HEADER -> thead */}
@@ -817,12 +837,12 @@ const CustomTable = ({
             {table
               .getHeaders()
               .map((column, idx /* Tablo başlığı -> tr : th */) => (
-                <TableHead key={idx} className="!w-fit whitespace-nowrap">
+                <TableHead key={idx} className='!w-fit whitespace-nowrap'>
                   {
                     // eğer ki başlığın columnFilter değeri true ise bir string değil bir select box render et
                     column.columnFilter ? (
                       <Select
-                        defaultValue="all"
+                        defaultValue='all'
                         onValueChange={(newVal) =>
                           table.changeFilter(
                             column.dt_name,
@@ -830,11 +850,11 @@ const CustomTable = ({
                           )
                         }
                       >
-                        <SelectTrigger className="px-2 w-[125px] !ring-transparent capitalize">
-                          <SelectValue placeholder="All" />
+                        <SelectTrigger className='px-2 w-[125px] !ring-transparent capitalize'>
+                          <SelectValue placeholder='All' />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem defaultChecked={true} value="all">
+                          <SelectItem defaultChecked={true} value='all'>
                             All
                           </SelectItem>
                           {table
@@ -846,7 +866,7 @@ const CustomTable = ({
                               <SelectItem
                                 key={idx}
                                 value={val}
-                                className="capitalize"
+                                className='capitalize'
                               >
                                 {val}
                               </SelectItem>
@@ -856,17 +876,17 @@ const CustomTable = ({
                     ) : column.sortable ? (
                       <div
                         onClick={() => table.changeSorting(column)}
-                        className="w-fit border-b border-muted-foreground cursor-pointer flex items-center gap-2"
+                        className='w-fit border-b border-muted-foreground cursor-pointer flex items-center gap-2'
                       >
                         {column.header}
                         {column.header !== sorting?.id && (
-                          <ArrowDownUp className="w-4 h-4" />
+                          <ArrowDownUp className='w-4 h-4' />
                         )}
                         {column.header === sorting?.id ? (
-                          sorting?.value === "asc" ? (
-                            <ArrowDownIcon className="w-4 h-4" />
+                          sorting?.value === 'asc' ? (
+                            <ArrowDownIcon className='w-4 h-4' />
                           ) : (
-                            <ArrowUpIcon className="w-4 h-4" />
+                            <ArrowUpIcon className='w-4 h-4' />
                           )
                         ) : null}
                       </div>
@@ -882,7 +902,7 @@ const CustomTable = ({
           {/* TableBody -> tbody */}
           <TableBody>
             {table.getRows().map((dt, dt_idx) => {
-              console.log(dt)
+              console.log(dt);
               return (
                 /* TableRow -> tr */
                 <TableRow key={dt_idx}>
@@ -902,12 +922,16 @@ const CustomTable = ({
                   {table.getHeaders().map((col, col_idx) => {
                     const CustomComponent = col?.cell ?? null;
                     return (
-                      <TableCell className="whitespace-nowrap" key={col_idx}>
-                        {col?.engine === "prisma" ? (
+                      <TableCell className='whitespace-nowrap' key={col_idx}>
+                        {col?.engine === 'prisma' ? (
                           <>
-                            {
-                              dt[col?.table?.toLowerCase()] && dt[col?.table?.toLowerCase()][col?.selectableField] && dt[col?.table?.toLowerCase()][col?.selectableField]
-                            }
+                            {dt[col?.table?.toLowerCase()] &&
+                              dt[col?.table?.toLowerCase()][
+                                col?.selectableField
+                              ] &&
+                              dt[col?.table?.toLowerCase()][
+                                col?.selectableField
+                              ]}
                           </>
                         ) : (
                           <>
@@ -916,9 +940,11 @@ const CustomTable = ({
                                 {...col}
                                 {...dt}
                                 setData={setData}
+                                getData={getData}
+                                toast={toast}
                               />
                             ) : (
-                              dt[col.dt_name + lang?.code ?? ""] ??
+                              dt[col.dt_name + lang?.code ?? ''] ??
                               dt[col.dt_name]
                             )}
                           </>
@@ -930,9 +956,9 @@ const CustomTable = ({
                     <Dialog onOpenChange={setUpdateModal} open={updateModal}>
                       <DropdownMenu>
                         <DropdownMenuTrigger>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <DotsHorizontalIcon className="h-4 w-4" />
+                          <Button variant='ghost' className='h-8 w-8 p-0'>
+                            <span className='sr-only'>Open menu</span>
+                            <DotsHorizontalIcon className='h-4 w-4' />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
@@ -951,7 +977,7 @@ const CustomTable = ({
                                 console.log(dt);
                                 setUpdateDataState(dt);
                               }}
-                              className="w-full"
+                              className='w-full'
                             >
                               <DropdownMenuItem>Update</DropdownMenuItem>
                             </DialogTrigger>
@@ -959,13 +985,13 @@ const CustomTable = ({
                         </DropdownMenuContent>
                       </DropdownMenu>
 
-                      <DialogContent className="lg:max-w-screen-lg overflow-y-scroll max-h-screen">
+                      <DialogContent className='lg:max-w-screen-lg overflow-y-scroll max-h-screen'>
                         <form
-                          className="outline-none rounded-md py-4"
+                          className='outline-none rounded-md py-4'
                           onSubmit={(e) => {
                             e.preventDefault();
                             const filtered = Object.keys(updateDataState)
-                              .filter((objKey) => objKey !== "id")
+                              .filter((objKey) => objKey !== 'id')
                               .reduce((newObj, key) => {
                                 newObj[key] = updateDataState[key];
                                 return newObj;
@@ -974,7 +1000,7 @@ const CustomTable = ({
                             updateData(dt.id, filtered);
                           }}
                         >
-                          <div className="w-full flex items-start pr-8">
+                          <div className='w-full flex items-start pr-8'>
                             <DialogHeader>
                               <DialogTitle>Update Data</DialogTitle>
                               <DialogDescription>
@@ -985,22 +1011,22 @@ const CustomTable = ({
                             <DropdownMenu>
                               {/* Data ekleme modalındaki lang (language)'in tutulduğu ve kontrol edildiği kısım */}
                               <DropdownMenuTrigger
-                                className="!ring-0 ml-auto"
+                                className='!ring-0 ml-auto'
                                 asChild
                               >
                                 {addModalLang ? (
-                                  <Button variant="outline">
+                                  <Button variant='outline'>
                                     <img
                                       alt={addModalLang?.name}
-                                      className="w-8"
+                                      className='w-8'
                                       src={addModalLang?.image}
                                     />
                                   </Button>
                                 ) : (
-                                  <Button variant="outline">Deafult</Button>
+                                  <Button variant='outline'>Deafult</Button>
                                 )}
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="start">
+                              <DropdownMenuContent align='start'>
                                 <DropdownMenuItem
                                   onClick={() => setAddModalLang(null)}
                                 >
@@ -1024,7 +1050,7 @@ const CustomTable = ({
                           </div>
 
                           {/* DATA Guncellemek İÇİN İNPUTLAR */}
-                          <div className="flex flex-col gap-5 py-6">
+                          <div className='flex flex-col gap-5 py-6'>
                             {columns
                               // eğerki bu header (başlık) yani column'umun enableForm değeri true ise ve modal'da tuttuğum lang (language) data null ise veya column'umun translate değeri true ise filterdan geçir.
                               .filter(
@@ -1042,12 +1068,12 @@ const CustomTable = ({
 
                                 return (
                                   <div
-                                    className="grid grid-col-4 items-center gap-4"
+                                    className='grid grid-col-4 items-center gap-4'
                                     key={col_index + columnKey}
                                   >
-                                    {column?.engine === "prisma" ? (
+                                    {column?.engine === 'prisma' ? (
                                       <>
-                                        <Label className="text-left w-full capitalize">
+                                        <Label className='text-left w-full capitalize'>
                                           {column?.header}
                                         </Label>
 
@@ -1055,13 +1081,13 @@ const CustomTable = ({
                                           value={
                                             (updateDataState[column?.table] &&
                                               updateDataState[column?.table][
-                                              column?.selectableField
+                                                column?.selectableField
                                               ]) ??
                                             (updateDataState[
                                               column?.table?.toLowerCase()
                                             ] &&
                                               updateDataState[
-                                              column?.table?.toLowerCase()
+                                                column?.table?.toLowerCase()
                                               ][column?.selectableField])
                                           }
                                           onValueChange={(newval) => {
@@ -1084,7 +1110,7 @@ const CustomTable = ({
                                           }}
                                         >
                                           <SelectTrigger>
-                                            <SelectValue placeholder="" />
+                                            <SelectValue placeholder='' />
                                           </SelectTrigger>
 
                                           <SelectContent>
@@ -1099,13 +1125,13 @@ const CustomTable = ({
                                                     <SelectItem
                                                       value={
                                                         item[
-                                                        column.selectableField
+                                                          column.selectableField
                                                         ]
                                                       }
                                                     >
                                                       {
                                                         item[
-                                                        column.selectableField
+                                                          column.selectableField
                                                         ]
                                                       }
                                                     </SelectItem>
@@ -1119,13 +1145,13 @@ const CustomTable = ({
                                       <>
                                         {column?.type === `enum` ? (
                                           <>
-                                            <Label className="text-left w-full capitalize">
+                                            <Label className='text-left w-full capitalize'>
                                               {column?.header}
                                             </Label>
 
                                             <Select
                                               value={
-                                                updateDataState[columnKey] ?? ""
+                                                updateDataState[columnKey] ?? ''
                                               }
                                               onValueChange={(newval) => {
                                                 setUpdateDataState(
@@ -1137,7 +1163,7 @@ const CustomTable = ({
                                               }}
                                             >
                                               <SelectTrigger>
-                                                <SelectValue placeholder="" />
+                                                <SelectValue placeholder='' />
                                               </SelectTrigger>
 
                                               <SelectContent>
@@ -1162,7 +1188,7 @@ const CustomTable = ({
                                           </>
                                         ) : (
                                           <>
-                                            <Label className="text-left w-full capitalize">
+                                            <Label className='text-left w-full capitalize'>
                                               {column?.header}
                                             </Label>
                                             <Input
@@ -1181,8 +1207,8 @@ const CustomTable = ({
                                               id={crypto.randomUUID()}
                                               placeholder={
                                                 (addModalLang
-                                                  ? addModalLang?.code + " "
-                                                  : "") + column?.header
+                                                  ? addModalLang?.code + ' '
+                                                  : '') + column?.header
                                               }
                                             />
                                           </>
@@ -1200,13 +1226,13 @@ const CustomTable = ({
                                 setUpdateDataState({});
                                 setAddModalLang(null);
                               }}
-                              className="mr-4"
+                              className='mr-4'
                             >
-                              <Button variant="secondary" type="reset">
+                              <Button variant='secondary' type='reset'>
                                 Close
                               </Button>
                             </DialogClose>
-                            <Button type="submit" variant="destructive">
+                            <Button type='submit' variant='destructive'>
                               Update Data
                             </Button>
                           </DialogFooter>
@@ -1225,7 +1251,7 @@ const CustomTable = ({
          1.buton load => her tıklandığında aşağı doğru perPage değeri kadar daha veri ekler
          2.buton page => next ve previous butonu ile sayfalar arası geçiş sağlar
          */}
-      {paginationType === "load" && data.length > 0 && (
+      {paginationType === 'load' && data.length > 0 && (
         <Button
           disabled={data.length <= (page.pageIndex + 1) * perPage}
           onClick={() =>
@@ -1234,17 +1260,17 @@ const CustomTable = ({
               pageIndex: 0,
             }))
           }
-          variant="link"
+          variant='link'
         >
           Load more...
         </Button>
       )}
-      {paginationType === "page" && data.length > 0 && (
-        <div className="mr-auto flex gap-3 items-center">
+      {paginationType === 'page' && data.length > 0 && (
+        <div className='mr-auto flex gap-3 items-center'>
           <Button
             disabled={canPreviousPage()}
             onClick={handlePrevious}
-            variant="outline"
+            variant='outline'
           >
             Previous
           </Button>
@@ -1252,7 +1278,7 @@ const CustomTable = ({
           <Button
             disabled={canNextPage()}
             onClick={handleNext}
-            variant="outline"
+            variant='outline'
           >
             Next
           </Button>
