@@ -16,11 +16,18 @@ const StepPage = () => {
     const [data, setData] = useState([])
     const [date, setDate] = useState()
 
+    const initializeDateState = (length) => {
+        const initialDates = new Array(length).fill(undefined);
+        setDate(initialDates);
+    };
+
     const getAllOrderData = async () => {
         const response = await getAPI("/createOrder/order");
         const filtered = response.data?.filter((fl) => fl.orderCode === id)[0];
         setData(filtered);
+        initializeDateState(filtered?.Ürünler?.length || 0);
     };
+
     useEffect(() => {
         getAllOrderData();
     }, []);
