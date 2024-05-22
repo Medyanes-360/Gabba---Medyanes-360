@@ -60,7 +60,7 @@ const MainLayout = ({ children }) => {
           childs: [
             {
               id: '7.1',
-              label: 'Otomatik Teslim Tutanağı',
+              label: 'Teslim Tutanağı',
               path: `/stepbystep/${id}/7.1`,
               roles: ['company_manager', 'logistic'],
             },
