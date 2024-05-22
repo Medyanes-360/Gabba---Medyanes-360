@@ -1,11 +1,11 @@
 'use client';
 import Sidebar from '@/components/dashboard/Sidebar';
 import { useParams } from 'next/navigation';
-import {getAPI} from "@/services/fetchAPI";
-import {useState, useEffect} from 'react'
+import { getAPI } from '@/services/fetchAPI';
+import { useState, useEffect } from 'react';
 
 const MainLayout = ({ children }) => {
-  const { id } = useParams()
+  const { id } = useParams();
 
   const buttons = [
     {
@@ -26,32 +26,32 @@ const MainLayout = ({ children }) => {
               id: '1.2',
               label: 'Ön Ödeme Miktarı',
               path: `/stepbystep/${id}/1.2`,
-            }
-          ]
+            },
+          ],
         },
         {
           id: '2',
           label: 'Tedarikçi Seç',
           path: `/stepbystep/${id}/2`,
-          roles: ['company_manager']
+          roles: ['company_manager'],
         },
         {
           id: '3',
-          label: 'Ürünler İçin Tarih Gir',
+          label: 'Tedarikçi Yükleme Tarihi',
           path: `/stepbystep/${id}/3`,
-          roles: ['company_manager']
+          roles: ['company_manager'],
         },
         {
           id: '5',
           label: 'Ürün maliyeti ve Çıkış tarihi',
           path: `/stepbystep/${id}/5`,
-          roles: ['company_manager']
+          roles: ['company_manager'],
         },
         {
           id: '6',
           label: 'Gümrük',
           path: `/stepbystep/${id}/6`,
-          roles: ['company_manager', 'logistic']
+          roles: ['company_manager', 'logistic'],
         },
         {
           id: '7',
@@ -62,15 +62,15 @@ const MainLayout = ({ children }) => {
               id: '7.1',
               label: 'Otomatik Teslim Tutanağı',
               path: `/stepbystep/${id}/7.1`,
-              roles: ['company_manager', 'logistic']
+              roles: ['company_manager', 'logistic'],
             },
             {
               id: '7.2',
               label: 'Ek ücret',
               path: `/stepbystep/${id}/7.2`,
-              roles: ['company_manager', 'logistic']
-            }
-          ]
+              roles: ['company_manager', 'logistic'],
+            },
+          ],
         },
         {
           id: '8',
@@ -81,15 +81,15 @@ const MainLayout = ({ children }) => {
               id: '8.1',
               label: 'Cari Kontrol',
               path: `/stepbystep/${id}/8.1`,
-              roles: ['company_manager', 'logistic', "manager", "personal"]
-            }
-          ]
+              roles: ['company_manager', 'logistic', 'manager', 'personal'],
+            },
+          ],
         },
         {
           id: '9',
           label: 'İşlem Sonu Cari Kontrol',
           path: `/stepbystep/${id}/9`,
-          roles: ['company_manager', 'logistic', "manager", "personal"]
+          roles: ['company_manager', 'logistic', 'manager', 'personal'],
         },
       ],
     },
@@ -103,7 +103,7 @@ const MainLayout = ({ children }) => {
   };
 
   useEffect(() => {
-    getAllOrderData()
+    getAllOrderData();
   }, []);
 
   return (
@@ -114,43 +114,58 @@ const MainLayout = ({ children }) => {
         {/* <Navbar /> */}
 
         <div className='flex flex-col flex-1 h-screen overflow-auto bg-background rounded-lg'>
-          <div className="w-full flex p-2 border-b border-r border-l shadow-md">
+          <div className='w-full flex p-2 border-b border-r border-l shadow-md'>
             <ul className='flex items-center justify-around w-full text-gray-600 py-2'>
               <li className=''>
                 Oluşturma Tarihi:{' '}
-                {orderData && orderData?.Orders && orderData?.Orders?.map(
+                {orderData &&
+                  orderData?.Orders &&
+                  orderData?.Orders?.map(
                     (orders, index) =>
-                        index == 0 &&
-                        orders.createdAt
-                            .split('T')[0]
-                            .split('-')
-                            .reverse()
-                            .join('.')
-                )}
+                      index == 0 &&
+                      orders.createdAt
+                        .split('T')[0]
+                        .split('-')
+                        .reverse()
+                        .join('.')
+                  )}
               </li>
               <li className='underline'>
-                Müşteri İsmi: {orderData && orderData.Müşteri && orderData.Müşteri[0]?.name}{' '}
-                {orderData && orderData?.Müşteri && orderData.Müşteri[0]?.surname}
+                Müşteri İsmi:{' '}
+                {orderData && orderData.Müşteri && orderData.Müşteri[0]?.name}{' '}
+                {orderData &&
+                  orderData?.Müşteri &&
+                  orderData.Müşteri[0]?.surname}
               </li>
               <li className='underline'>
-                Firma İsmi: {orderData && orderData?.Müşteri && orderData.Müşteri[0]?.company_name}
+                Firma İsmi:{' '}
+                {orderData &&
+                  orderData?.Müşteri &&
+                  orderData.Müşteri[0]?.company_name}
               </li>
-              <li className='underline'>Ürün Adedi: {orderData && orderData?.Orders && orderData.Orders.length}</li>
+              <li className='underline'>
+                Ürün Adedi:{' '}
+                {orderData && orderData?.Orders && orderData.Orders.length}
+              </li>
               <li className='underline'>
                 Fiyat:{' '}
-                {orderData && orderData?.Orders && orderData.Orders.reduce((total, order) => {
-                  return (
+                {orderData &&
+                  orderData?.Orders &&
+                  orderData.Orders.reduce((total, order) => {
+                    return (
                       total +
                       (order.productPrice + order.productFeaturePrice) *
-                      order.stock
-                  );
-                }, 0)}
+                        order.stock
+                    );
+                  }, 0)}
               </li>
               <li>
                 Durum:{' '}
                 <span className='text-xs px-3 py-1.5 rounded-full bg-blue-900 text-blue-100 font-semibold'>
-                        {orderData && orderData?.Orders && orderData.Orders[0].ordersStatus}
-                      </span>
+                  {orderData &&
+                    orderData?.Orders &&
+                    orderData.Orders[0].ordersStatus}
+                </span>
               </li>
             </ul>
           </div>
