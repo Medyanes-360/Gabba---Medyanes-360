@@ -348,7 +348,7 @@ const Modal = ({
                       {stores &&
                         stores.map((store) => (
                           <option key={store.id} value={store.id}>
-                            {store.company_name}
+                            {store.name}
                           </option>
                         ))}
                     </select>
