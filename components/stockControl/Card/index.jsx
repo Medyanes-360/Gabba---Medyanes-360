@@ -6,7 +6,7 @@ import { LiaEdit } from 'react-icons/lia';
 import { postAPI } from '@/services/fetchAPI';
 import { BiCalendarCheck } from 'react-icons/bi';
 import { IoPricetagsOutline } from 'react-icons/io5';
-import { FaBoxes } from 'react-icons/fa';
+import { FaBoxes, FaStoreAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 
 const StockControlCard = ({
@@ -140,6 +140,16 @@ const StockControlCard = ({
                       <p className='font-semibold text-muted-foreground'>
                         {(stock.ProductPrice + stock.ProductFeaturePrice) *
                           stock.Stock}
+                      </p>
+                    </div>
+                    <div className='flex gap-1 items-center bg-gray-100 w-full p-1 border-2 pl-4'>
+                      <FaStoreAlt
+                        size={20}
+                        className='text-muted-foreground'
+                        title='Mağaza İsmi'
+                      />
+                      <p className='font-semibold text-muted-foreground'>
+                        {stock.StoreName}
                       </p>
                     </div>
                     <div className='flex gap-1 items-center bg-gray-100 w-full p-1 pl-4'>
