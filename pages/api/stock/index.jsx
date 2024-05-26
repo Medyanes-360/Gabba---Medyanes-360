@@ -281,6 +281,7 @@ const handler = async (req, res) => {
           );
 
           const storeId = matchingStore.map((item) => item.id);
+          const storeName = matchingStore.map((item) => item.name);
 
           const combinedItem = {
             id: Stock.id,
@@ -296,6 +297,7 @@ const handler = async (req, res) => {
             Metaller: dataMetal,
             CreatedDate: Stock.createdAt,
             StoreId: storeId,
+            StoreName: storeName,
           };
 
           // Toplu veriler dizisine ekle
