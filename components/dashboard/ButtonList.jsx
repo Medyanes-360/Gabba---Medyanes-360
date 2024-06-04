@@ -6,8 +6,8 @@ import NavigationButton from '@/components/dashboard/NavigationButton';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSession } from 'next-auth/react';
 
-const ButtonList = ({ buttons, level = 0, child = false }) => {
-  const { data } = useSession()
+const ButtonList = ({ buttons, level = 0, child = false, stepByStepData }) => {
+  const { data } = useSession();
   const pathname = usePathname();
   const router = useRouter();
   const [expanded, setExpanded] = useState({});
@@ -26,7 +26,9 @@ const ButtonList = ({ buttons, level = 0, child = false }) => {
   return (
     <div className='flex flex-col gap-4 relative'>
       {buttons
-        .filter((btn) => btn.roles ? btn?.roles?.includes(data.user?.role) : true)
+        .filter((btn) =>
+          btn.roles ? btn?.roles?.includes(data.user?.role) : true
+        )
         .map((button) => (
           <div
             key={button.id}
@@ -37,15 +39,17 @@ const ButtonList = ({ buttons, level = 0, child = false }) => {
           >
             <NavigationButton
               child={child}
-              id={button.id}
+              buttonId={button.id}
               onClick={() => onRedirect(button.path)}
               label={button.label}
               icon={button.icon || null}
               active={pathname === button.path}
+              stepByStepData={stepByStepData}
               level={level}
               onExpand={() => onExpand(button.path)}
               expanded={expanded[button.path]}
               isChilds={button?.childs && button?.childs?.length > 0}
+              buttonList={button?.childs}
             />
             <AnimatePresence>
               {expanded[button.path] && (
@@ -63,6 +67,8 @@ const ButtonList = ({ buttons, level = 0, child = false }) => {
                     child={true}
                     buttons={button.childs}
                     level={level + 1}
+                    buttonList={button?.childs}
+                    stepByStepData={stepByStepData}
                   />
                 </motion.div>
               )}
