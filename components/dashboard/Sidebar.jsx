@@ -9,7 +9,7 @@ import BurgerIcon from '@/assets/icons/BurgerIcon';
 import { useMediaQuery } from '@/lib/table/useMediaQuery';
 import { signOut, useSession } from 'next-auth/react';
 
-const Sidebar = ({ buttons }) => {
+const Sidebar = ({ buttons, stepByStepData }) => {
   const pathname = usePathname();
   const isMobile = useMediaQuery(768);
   const isResizingRef = useRef(false);
@@ -91,7 +91,7 @@ const Sidebar = ({ buttons }) => {
     }
   };
 
-  const { data } = useSession()
+  const { data } = useSession();
 
   return (
     <>
@@ -124,47 +124,62 @@ const Sidebar = ({ buttons }) => {
             !isCollapsed ? ' p-4 flex flex-col gap-2' : 'hidden'
           )}
         >
-          {data?.user && buttons.filter((btn) => btn?.roles ? btn?.roles?.includes(data.user.role) : true).map(({ buttons: x, title }, key) => (
-            <div
-              key={key}
-              className='flex flex-col gap-4 py-5 border-b-2 border-white/20'
-            >
-              {!isMobile && (
-                <span className='text-sm font-semibold text-muted-foreground'>
-                  {title}
-                </span>
-              )}
-              <ButtonList buttons={x} level={1} />
-            </div>
-          ))}
+          {data?.user &&
+            buttons
+              .filter((btn) =>
+                btn?.roles ? btn?.roles?.includes(data.user.role) : true
+              )
+              .map(({ buttons: x, title }, key) => (
+                <div
+                  key={key}
+                  className='flex flex-col gap-4 py-5 border-b-2 border-white/20'
+                >
+                  {!isMobile && (
+                    <span className='text-sm font-semibold text-muted-foreground'>
+                      {title}
+                    </span>
+                  )}
+                  <ButtonList
+                    buttons={x}
+                    level={1}
+                    stepByStepData={stepByStepData}
+                  />
+                </div>
+              ))}
 
           {data?.user && (
             <div
-              className={classNames("flex flex-col p-4 h-fit gap-4 rounded fixed bottom-4 right-4 text-sm font-medium bg-muted-foreground", "cursor-pointer group", "transition-all duration-200 ease-in-out")}
+              className={classNames(
+                'flex flex-col p-4 h-fit gap-4 rounded fixed bottom-4 right-4 text-sm font-medium bg-muted-foreground',
+                'cursor-pointer group',
+                'transition-all duration-200 ease-in-out'
+              )}
             >
-              <div className="flex items-end border-b border-muted/50 gap-2">
-                <span className={classNames("text-muted/80 text-sm font-bold")}>
+              <div className='flex items-end border-b border-muted/50 gap-2'>
+                <span className={classNames('text-muted/80 text-sm font-bold')}>
                   Name:
                 </span>
-                <span className={classNames("text-muted/90 text-sm font-medium")}>
-                  {data.user.name}
-                  {" "}
-                  {data.user.surname}
+                <span
+                  className={classNames('text-muted/90 text-sm font-medium')}
+                >
+                  {data.user.name} {data.user.surname}
                 </span>
               </div>
-              <div className="flex items-end border-b border-muted/50 gap-2">
-                <span className={classNames("text-muted/80 text-sm font-bold")}>
+              <div className='flex items-end border-b border-muted/50 gap-2'>
+                <span className={classNames('text-muted/80 text-sm font-bold')}>
                   Role:
                 </span>
-                <span className={classNames("text-muted/90 text-sm font-medium")}>
+                <span
+                  className={classNames('text-muted/90 text-sm font-medium')}
+                >
                   {data.user.role}
                 </span>
               </div>
 
               <button
                 onClick={() => signOut()}
-                className="py-3 px-4 rounded-md bg-slate-800 text-white"
-                type="button"
+                className='py-3 px-4 rounded-md bg-slate-800 text-white'
+                type='button'
               >
                 Çıkış Yap
               </button>
