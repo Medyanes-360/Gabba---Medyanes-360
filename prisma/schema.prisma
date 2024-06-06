@@ -601,3 +601,15 @@ model Supplier {
   sirkettel   String?
   sirketemail String?
 }
+
+model StepByStep {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  step              Int
+  stepName          String
+  onOdemeMiktari    Int
+  orderId           String   @unique
+  tedarikciAciklama String
+  tedarikciId       String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
