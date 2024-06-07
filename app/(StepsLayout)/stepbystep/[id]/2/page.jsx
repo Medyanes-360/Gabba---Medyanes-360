@@ -58,7 +58,7 @@ const StepPage = () => {
   }, []);
 
   useEffect(() => {
-    const stepData = stepByStepData.find((data) => data.orderId === id);
+    const stepData = stepByStepData.find((data) => data.orderCode === id);
     if (stepByStepData?.length > 0) {
       const filtered = data.filter((dt) => dt.id === stepData.tedarikciId);
       if (filtered.length > 0) {
@@ -114,7 +114,7 @@ const StepPage = () => {
             return setIsLoading(false);
           } else {
             toast.success(response.message);
-            const response2 = await getAPI(`/stepByStep?orderId=${id}`);
+            const response2 = await getAPI(`/stepByStep?orderCode=${id}`);
             setStepByStepData(response2.data);
             router.push(`/stepbystep/${id}/3`);
             return setIsLoading(false);
