@@ -11,7 +11,7 @@ const handler = async (req, res) => {
       const response = await updateDataByMany(
         'StepByStep',
         {
-          orderId: id,
+          orderCode: id,
         },
         {
           tedarikciId: tedarikciId,
