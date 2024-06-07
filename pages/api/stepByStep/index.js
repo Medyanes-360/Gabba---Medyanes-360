@@ -3,10 +3,10 @@ import { deleteDataAll, getDataByMany } from '@/services/serviceOperations';
 const handler = async (req, res) => {
   try {
     if (req.method === 'GET') {
-      const orderId = req?.query?.orderId;
-      if (orderId || (orderId != null && orderId?.length > 0)) {
+      const orderCode = req?.query?.orderCode;
+      if (orderCode || (orderCode != null && orderCode?.length > 0)) {
         const response = await getDataByMany('StepByStep', {
-          orderId: orderId,
+          orderCode: orderCode,
         });
         if (response?.length <= 0) {
           return res.status(200).json({
