@@ -109,7 +109,7 @@ const StepsLayout = ({ children }) => {
     setIsLoading(true);
 
     const response1 = getAPI('/createOrder/order');
-    const response2 = getAPI(`/stepByStep?orderId=${id}`);
+    const response2 = getAPI(`/stepByStep?orderCode=${id}`);
 
     const [responseOrderData, responseStepByStepData] = await Promise.all([
       response1,
