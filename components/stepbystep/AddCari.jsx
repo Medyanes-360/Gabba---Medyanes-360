@@ -21,7 +21,7 @@ const AddCari = () => {
     useStepByStepDataContext();
   const [initialValues, setInitialValues] = useState({
     onOdemeMiktari: '',
-    orderId: id,
+    orderCode: id,
     step: 2,
     stepName: 'Tedarikçi Seç',
     tedarikciAciklama: '',
@@ -30,14 +30,15 @@ const AddCari = () => {
 
   useEffect(() => {
     if (stepByStepData?.length > 0) {
-      const data = stepByStepData.find((data) => data.orderId === id);
+      const data = stepByStepData.find((data) => data.orderCode === id);
       if (data) {
         setInitialValues({
           onOdemeMiktari: data.onOdemeMiktari,
-          orderId: id,
+          orderCode: id,
           step: 2,
-          stepName: 'Tedarikçi Yükleme Tarihi',
+          stepName: 'Tedarikçi Seç',
           tedarikciAciklama: '',
+          tedarikciId: '',
         });
       }
     }
@@ -49,6 +50,7 @@ const AddCari = () => {
       enableReinitialize={true}
       onSubmit={async (values) => {
         values.productCount = orderData.Ürünler.length;
+        values.orderData = orderData.Orders;
         if (values.onOdemeMiktari <= 0) {
           return toast.error(
             'Cariye işlenecek ön ödeme miktarı 0 veya negatif değer olamaz!'
@@ -62,7 +64,7 @@ const AddCari = () => {
           return setIsLoading(false);
         } else {
           toast.success(response.message);
-          const response2 = await getAPI(`/stepByStep?orderId=${id}`);
+          const response2 = await getAPI(`/stepByStep?orderCode=${id}`);
           setStepByStepData(response2.data);
           router.push(`/stepbystep/${id}/2`);
           return setIsLoading(false);
