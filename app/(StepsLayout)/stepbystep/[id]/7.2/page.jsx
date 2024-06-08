@@ -43,6 +43,7 @@ const StepPage = () => {
               <Input
                 type={'number'}
                 value={extra.price}
+                min='1'
                 onChange={(e) =>
                   setExtras((prev) => {
                     const updatedExtras = [...prev];
