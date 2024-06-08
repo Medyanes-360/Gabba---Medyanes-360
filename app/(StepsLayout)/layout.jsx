@@ -1,5 +1,5 @@
 'use client';
-import Sidebar from '@/components/dashboard/Sidebar';
+import Sidebar from '@/components/stepByStepDashboard/Sidebar';
 import { useParams } from 'next/navigation';
 import { getAPI } from '@/services/fetchAPI';
 import { useState, useEffect, createContext, useContext } from 'react';
