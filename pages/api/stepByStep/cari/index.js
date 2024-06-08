@@ -6,10 +6,11 @@ import {
 
 const handler = async (req, res) => {
   // Ürün verilerini dinamik olarak oluşturma fonksiyonu
-  function generateProductData(count, commonData) {
+  function generateProductData(count, commonData, orderData) {
     const productDataArray = [];
 
     for (let i = 0; i < count; i++) {
+      commonData.orderId = orderData[i].id;
       productDataArray.push({ ...commonData });
     }
 
@@ -20,31 +21,36 @@ const handler = async (req, res) => {
     if (req.method === 'POST') {
       const {
         onOdemeMiktari,
-        orderId,
+        orderCode,
         step,
         stepName,
         productCount,
         tedarikciAciklama,
         tedarikciId,
+        orderData,
       } = req.body;
 
       // Daha önce bu teklife ait veri eklenmiş mi bir bakıyoruz.
       const isExist = await getDataByUnique('StepByStep', {
-        orderId: orderId,
+        orderCode: orderCode,
       });
 
       if (!isExist || isExist == null) {
         // Daha önce bu teklif ile ilgili veri eklenmediyse oluşturuyoruz.
 
         // Ürün verilerini oluştur
-        const products = generateProductData(productCount, {
-          onOdemeMiktari,
-          orderId,
-          step,
-          stepName,
-          tedarikciAciklama,
-          tedarikciId,
-        });
+        const products = generateProductData(
+          productCount,
+          {
+            onOdemeMiktari,
+            orderCode,
+            step,
+            stepName,
+            tedarikciAciklama,
+            tedarikciId,
+          },
+          orderData
+        );
 
         const response = await createNewDataMany('StepByStep', products);
 
