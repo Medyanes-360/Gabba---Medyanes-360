@@ -18,6 +18,9 @@ const StepPage = () => {
   const { id } = useParams();
   const router = useRouter();
 
+  const { loading, setIsLoading } = useLoadingContext();
+  const { stepByStepData, setStepByStepData } = useStepByStepDataContext();
+
   const [data, setData] = useState([]);
   const [checked, setChecked] = useState({});
 
