@@ -23,16 +23,39 @@ const NavigationButton = ({
   };
   const { id } = useParams();
 
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState([]);
 
   useEffect(() => {
     if (stepByStepData?.length > 0) {
-      const data = stepByStepData.find((data) => data.orderId === id);
+      const data = stepByStepData.filter((data) => data.orderCode === id);
       if (data) {
-        setStep(data.step);
+        console.log(data);
+        setStep(data);
       }
     }
   }, [stepByStepData]);
+
+  // Adım renklerini belirleyen fonksiyon
+  const getStepColor = (steps, buttonId) => {
+    let hasPassedStep = false;
+    let hasNotPassedStep = false;
+
+    steps.forEach((data) => {
+      if (data.step > buttonId) {
+        hasPassedStep = true;
+      } else if (data.step <= buttonId) {
+        hasNotPassedStep = true;
+      }
+    });
+
+    if (hasNotPassedStep && hasPassedStep) {
+      return 'bg-orange-600 !text-white';
+    } else if (hasPassedStep) {
+      return 'bg-green-600 !text-white';
+    } else {
+      return 'bg-muted-foreground';
+    }
+  };
 
   return (
     <div
@@ -58,11 +81,7 @@ const NavigationButton = ({
         'flex items-center h-fit gap-4 rounded-lg py-3 relative px-4 text-sm font-medium',
         'cursor-pointer group',
         'transition-all duration-200 ease-in-out',
-        {
-          'bg-green-600 !text-white': step > buttonId,
-          'bg-muted-foreground': step < buttonId,
-          'bg-orange-600 !text-white': step == buttonId,
-        }
+        getStepColor(step, buttonId)
       )}
     >
       {level > 1 && !active && (
