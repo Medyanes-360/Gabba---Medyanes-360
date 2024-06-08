@@ -1,12 +1,13 @@
-"use client";
+'use client';
 
-import SendDocument from "@/components/stepbystep/SendDocument"
-import { useParams } from "next/navigation";
-import {Input} from "@/components/ui/input";
-import {Label} from "@/components/ui/label";
-import {Button} from "@/components/ui/button";
-import {useState} from "react";
-import {PlusCircle} from "lucide-react";
+import SendDocument from '@/components/stepbystep/SendDocument';
+import { useParams } from 'next/navigation';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { PlusCircle } from 'lucide-react';
+import { GoTrash } from 'react-icons/go';
 
 const StepPage = () => {
   const { id } = useParams();
@@ -14,63 +15,97 @@ const StepPage = () => {
     {
       price: '',
       description: '',
-    }
+    },
   ]);
 
   const handleAddExtras = () => {
-    setExtras((prev) => [...prev, {
-      price: '',
-      description: '',
-    }])
-  }
+    setExtras((prev) => [
+      ...prev,
+      {
+        price: '',
+        description: '',
+      },
+    ]);
+  };
 
-  return <div className={'h-full w-full flex items-center justify-center'}>
-    <div className="max-w-lg w-full flex flex-col gap-4">
-      <Label>Cariye İşlenecek Ekstra Ücretleri Giriniz.</Label>
+  const handleRemoveExtra = (index) => {
+    setExtras((prev) => prev.filter((_, i) => i !== index));
+  };
 
-      {extras.map((extra, i) => (
-          <div className="flex items-center w-full gap-2">
-            <div className="flex items-center">
+  return (
+    <div className={'h-full w-full flex items-center justify-center'}>
+      <div className='max-w-lg w-full flex flex-col gap-4'>
+        <Label>Cariye İşlenecek Ekstra Ücretleri Giriniz.</Label>
+
+        {extras.map((extra, i) => (
+          <div key={i} className='flex items-center w-full gap-2'>
+            <div className='flex items-center'>
               <Input
-                  type={'number'}
-                  value={extra.price}
-                  onChange={(e) => setExtras(prev => {
+                type={'number'}
+                value={extra.price}
+                onChange={(e) =>
+                  setExtras((prev) => {
                     const updatedExtras = [...prev];
-                    updatedExtras[i] = { ...updatedExtras[i], price: e.target.value };
+                    updatedExtras[i] = {
+                      ...updatedExtras[i],
+                      price: e.target.value,
+                    };
                     return updatedExtras;
-                  })}
-                  placeholder={'0'}
+                  })
+                }
+                placeholder={'0'}
               />
-
             </div>
 
             <Input
-                type={'text'}
-                value={extra.description}
-                onChange={(e) => setExtras(prev => {
+              type={'text'}
+              value={extra.description}
+              onChange={(e) =>
+                setExtras((prev) => {
                   const updatedExtras = [...prev];
-                  updatedExtras[i] = { ...updatedExtras[i], description: e.target.value };
+                  updatedExtras[i] = {
+                    ...updatedExtras[i],
+                    description: e.target.value,
+                  };
                   return updatedExtras;
-                })}
-                placeholder={'Ek ücret için açıklama giriniz.'}
+                })
+              }
+              placeholder={'Ek ücret için açıklama giriniz.'}
             />
+            {i > 0 && (
+              <button
+                className={
+                  'w-full rounded bg-red-600/90 hover:bg-red-600/70 transition-all duration-200 ease-in-out py-3 flex items-center justify-center text-white text-sm gap-2 font-medium'
+                }
+                onClick={() => handleRemoveExtra(i)}
+              >
+                <GoTrash size={20} />
+                Sil
+              </button>
+            )}
           </div>
-      ))}
+        ))}
 
-      <button
-          className={'w-full rounded bg-[#dedede]/20 hover:bg-[#dedede]/40 transition-all duration-200 ease-in-out py-3 flex items-center justify-center text-black text-sm gap-2 font-medium'}
-          onClick={handleAddExtras}>
-        <PlusCircle size={20}/>
-        Ekstra Ekle
-      </button>
+        <button
+          className={
+            'w-full rounded bg-[#dedede]/20 hover:bg-[#dedede]/40 transition-all duration-200 ease-in-out py-3 flex items-center justify-center text-black text-sm gap-2 font-medium'
+          }
+          onClick={handleAddExtras}
+        >
+          <PlusCircle size={20} />
+          Ekstra Ekle
+        </button>
 
-      <Button onClick={() => {
-        console.log(extras)
-      }}>
-        Cariye İşle
-      </Button>
+        <Button
+          onClick={() => {
+            console.log(extras);
+          }}
+        >
+          Cariye İşle
+        </Button>
+      </div>
     </div>
-  </div>;
+  );
 };
 
 export default StepPage;
