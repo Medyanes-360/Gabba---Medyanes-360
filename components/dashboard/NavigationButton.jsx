@@ -1,9 +1,7 @@
 'use client';
 import classNames from 'classnames';
-import React, { useEffect, useState } from 'react';
 import ChevronsRight from '@/assets/icons/ChevronsRight';
 import { useParams } from 'next/navigation';
-import { toast } from 'react-toastify';
 
 const NavigationButton = ({
   onClick,
@@ -15,47 +13,12 @@ const NavigationButton = ({
   expanded,
   isChilds,
   buttonId,
-  stepByStepData,
 }) => {
   const handleExpand = (event) => {
     event.stopPropagation();
     onExpand?.();
   };
   const { id } = useParams();
-
-  const [step, setStep] = useState([]);
-
-  useEffect(() => {
-    if (stepByStepData?.length > 0) {
-      const data = stepByStepData.filter((data) => data.orderCode === id);
-      if (data) {
-        console.log(data);
-        setStep(data);
-      }
-    }
-  }, [stepByStepData]);
-
-  // Adım renklerini belirleyen fonksiyon
-  const getStepColor = (steps, buttonId) => {
-    let hasPassedStep = false;
-    let hasNotPassedStep = false;
-
-    steps.forEach((data) => {
-      if (data.step > buttonId) {
-        hasPassedStep = true;
-      } else if (data.step <= buttonId) {
-        hasNotPassedStep = true;
-      }
-    });
-
-    if (hasNotPassedStep && hasPassedStep) {
-      return 'bg-orange-600 !text-white';
-    } else if (hasPassedStep) {
-      return 'bg-green-600 !text-white';
-    } else {
-      return 'bg-muted-foreground';
-    }
-  };
 
   return (
     <div
@@ -65,23 +28,14 @@ const NavigationButton = ({
         if (isChilds && !!buttonId) {
           handleExpand(e);
         } else {
-          if (
-            step >= buttonId ||
-            buttonId == 1 ||
-            buttonId == 1.1 ||
-            buttonId == 1.2
-          ) {
-            onClick();
-          } else {
-            toast.warning('Lütfen ilk önceki adımı tamamlayın!');
-          }
+          onClick();
         }
       }}
       className={classNames(
         'flex items-center h-fit gap-4 rounded-lg py-3 relative px-4 text-sm font-medium',
         'cursor-pointer group',
         'transition-all duration-200 ease-in-out',
-        getStepColor(step, buttonId)
+        active ? '!bg-muted-foreground' : 'bg-muted hover:bg-trans-purple'
       )}
     >
       {level > 1 && !active && (
@@ -98,10 +52,7 @@ const NavigationButton = ({
         <span
           className={classNames(
             'text-muted-foreground font-semibold',
-            active && '!text-muted',
-            step < Number(buttonId) && '!text-white',
-            step > buttonId && '!text-white',
-            step == buttonId && '!text-white'
+            active && '!text-muted'
           )}
         >
           {label}

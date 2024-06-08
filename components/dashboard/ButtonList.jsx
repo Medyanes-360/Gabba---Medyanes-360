@@ -6,7 +6,7 @@ import NavigationButton from '@/components/dashboard/NavigationButton';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSession } from 'next-auth/react';
 
-const ButtonList = ({ buttons, level = 0, child = false, stepByStepData }) => {
+const ButtonList = ({ buttons, level = 0, child = false }) => {
   const { data } = useSession();
   const pathname = usePathname();
   const router = useRouter();
@@ -44,7 +44,6 @@ const ButtonList = ({ buttons, level = 0, child = false, stepByStepData }) => {
               label={button.label}
               icon={button.icon || null}
               active={pathname === button.path}
-              stepByStepData={stepByStepData}
               level={level}
               onExpand={() => onExpand(button.path)}
               expanded={expanded[button.path]}
@@ -68,7 +67,6 @@ const ButtonList = ({ buttons, level = 0, child = false, stepByStepData }) => {
                     buttons={button.childs}
                     level={level + 1}
                     buttonList={button?.childs}
-                    stepByStepData={stepByStepData}
                   />
                 </motion.div>
               )}

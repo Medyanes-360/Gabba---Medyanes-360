@@ -9,7 +9,7 @@ import BurgerIcon from '@/assets/icons/BurgerIcon';
 import { useMediaQuery } from '@/lib/table/useMediaQuery';
 import { signOut, useSession } from 'next-auth/react';
 
-const Sidebar = ({ buttons, stepByStepData }) => {
+const Sidebar = ({ buttons }) => {
   const pathname = usePathname();
   const isMobile = useMediaQuery(768);
   const isResizingRef = useRef(false);
@@ -139,11 +139,7 @@ const Sidebar = ({ buttons, stepByStepData }) => {
                       {title}
                     </span>
                   )}
-                  <ButtonList
-                    buttons={x}
-                    level={1}
-                    stepByStepData={stepByStepData}
-                  />
+                  <ButtonList buttons={x} level={1} />
                 </div>
               ))}
 
