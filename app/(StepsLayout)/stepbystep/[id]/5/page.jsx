@@ -42,10 +42,12 @@ const StepPage = () => {
   };
 
   const getAllOrderData = async () => {
+    setIsLoading(true);
     const response = await getAPI('/createOrder/order');
     const filtered = response.data?.filter((fl) => fl.orderCode === id)[0];
     setData(filtered);
     initializeDateState(filtered?.Ürünler?.length || 0);
+    setIsLoading(false);
   };
 
   useEffect(() => {
