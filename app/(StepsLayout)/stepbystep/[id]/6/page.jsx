@@ -25,9 +25,11 @@ const StepPage = () => {
   const [checked, setChecked] = useState({});
 
   const getAllOrderData = async () => {
+    setIsLoading(true);
     const response = await getAPI('/createOrder/order');
     const filtered = response.data?.filter((fl) => fl.orderCode === id)[0];
     setData(filtered);
+    setIsLoading(false);
   };
   useEffect(() => {
     getAllOrderData();
