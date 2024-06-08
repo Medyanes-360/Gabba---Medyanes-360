@@ -49,8 +49,10 @@ const StepPage = () => {
   };
 
   const getData = async () => {
+    setIsLoading(true);
     const dt = await getAPI('/suplier');
     setData(dt.data);
+    setIsLoading(false);
   };
 
   useEffect(() => {
