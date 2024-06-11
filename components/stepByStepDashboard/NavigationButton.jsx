@@ -1,4 +1,3 @@
-'use client';
 import classNames from 'classnames';
 import React, { useEffect, useState } from 'react';
 import ChevronsRight from '@/assets/icons/ChevronsRight';
@@ -35,26 +34,25 @@ const NavigationButton = ({
     }
   }, [stepByStepData]);
 
-  // Adım renklerini belirleyen fonksiyon
   const getStepColor = (steps, buttonId) => {
-    let hasPassedStep = false;
-    let hasNotPassedStep = false;
-
-    steps.forEach((data) => {
-      if (data.step > buttonId) {
-        hasPassedStep = true;
-      } else if (data.step <= buttonId) {
-        hasNotPassedStep = true;
-      }
-    });
-
-    if (hasNotPassedStep && hasPassedStep) {
-      return 'bg-orange-600 !text-white';
-    } else if (hasPassedStep) {
-      return 'bg-green-600 !text-white';
-    } else {
-      return 'bg-muted-foreground';
+    if (!steps || steps.length === 0) {
+      return 'bg-gray-500'; // Default renk gri
     }
+
+    const allSteps = steps.map((step) => step.step);
+
+    const allGreaterThanButtonId = allSteps.every((step) => step > buttonId);
+    const allLessThanButtonId = allSteps.every((step) => step < buttonId);
+
+    if (allGreaterThanButtonId) {
+      return 'bg-green-500'; // Tüm step'ler buttonId'den büyükse yeşil
+    }
+
+    if (allLessThanButtonId) {
+      return 'bg-gray-500'; // Tüm step'ler buttonId'den küçükse gri
+    }
+
+    return 'bg-orange-500'; // Diğer durumlarda turuncu
   };
 
   return (
@@ -81,7 +79,7 @@ const NavigationButton = ({
         'flex items-center h-fit gap-4 rounded-lg py-3 relative px-4 text-sm font-medium',
         'cursor-pointer group',
         'transition-all duration-200 ease-in-out',
-        getStepColor(step, buttonId)
+        getStepColor(step, buttonId) // Bu kısımda rengi belirliyoruz
       )}
     >
       {level > 1 && !active && (
