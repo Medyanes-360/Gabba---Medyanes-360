@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -66,6 +66,8 @@ import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import { getAPI, postAPI } from '@/services/fetchAPI';
 import { useSession } from 'next-auth/react';
 
+import { useLoadingContext } from '@/app/(DashboardLayout)/layout';
+
 const CustomTable = ({
   api_route,
   columns,
@@ -85,6 +87,7 @@ const CustomTable = ({
     update: true,
   },
 }) => {
+  const { isLoading, setIsLoading } = useLoadingContext();
   // next-auth kurulunca güncellenecek
   const { data: session } = useSession();
   const role = session?.user?.role ?? 'company_manager';
@@ -196,6 +199,7 @@ const CustomTable = ({
 
   const getData = async () => {
     try {
+      setIsLoading(true);
       const response = await getAPI(api_route);
 
       if (!response) {
@@ -207,7 +211,9 @@ const CustomTable = ({
       }
 
       setData(response.data);
+      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       toast.error(error.message);
       console.log(error);
     }
@@ -215,6 +221,7 @@ const CustomTable = ({
 
   const deleteOne = async (id) => {
     try {
+      setIsLoading(true);
       const response = await postAPI(api_route, { id, type: 'one' }, 'DELETE');
 
       if (!response) {
@@ -232,7 +239,9 @@ const CustomTable = ({
       getData().then(() => {
         toast.success(`Data GÜncellendi`);
       });
+      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       toast.error(error.message);
       console.log(error);
     }
@@ -240,6 +249,7 @@ const CustomTable = ({
 
   const deleteSelected = async (ids) => {
     try {
+      setIsLoading(true);
       const response = await postAPI(
         api_route,
         { ids, type: 'selected' },
@@ -263,7 +273,10 @@ const CustomTable = ({
       getData().then(() => {
         toast.success(`Data GÜncellendi`);
       });
+      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
+
       toast.error(error.message);
       console.log(error);
     }
@@ -283,6 +296,7 @@ const CustomTable = ({
 
   const handleDeleteAll = async () => {
     try {
+      setIsLoading(true);
       const response = await postAPI(api_route, { type: 'all' }, 'DELETE');
 
       if (!response) {
@@ -300,7 +314,10 @@ const CustomTable = ({
       getData().then(() => {
         toast.success(`Data GÜncellendi`);
       });
+      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
+
       toast.error(error.message);
       console.log(error);
     }
@@ -308,6 +325,7 @@ const CustomTable = ({
 
   const updateData = async (id, newData) => {
     try {
+      setIsLoading(true);
       const response = await postAPI(api_route, { id, newData }, 'PUT');
 
       if (!response) {
@@ -325,7 +343,10 @@ const CustomTable = ({
       setUpdateModal(false);
       toast.success(`Data Güncellendi Data`);
       await getData();
+      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
+
       toast.error(error.message);
       console.log(error);
     }
@@ -333,6 +354,8 @@ const CustomTable = ({
 
   const handleAddData = async (newData) => {
     try {
+      setIsLoading(true);
+
       let response;
 
       if (
@@ -379,10 +402,14 @@ const CustomTable = ({
       }
 
       if (!response) {
+        setIsLoading(false);
+
         throw new Error('Veri Eklemesi (table)');
       }
 
       if (response.status !== 'success') {
+        setIsLoading(false);
+
         throw new Error('Veri Eklemesi başarılı olmadı (table)');
       }
 
@@ -392,7 +419,10 @@ const CustomTable = ({
       setOpenAddModal(false);
       toast.success('Successfully added new data');
       await getData();
+      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
+
       toast.error(error.message);
       console.log(error);
     }
