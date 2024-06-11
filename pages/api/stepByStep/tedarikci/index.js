@@ -1,8 +1,4 @@
-import {
-  createNewDataMany,
-  getDataByUnique,
-  updateDataByMany,
-} from '@/services/serviceOperations';
+import { updateDataByMany } from '@/services/serviceOperations';
 
 const handler = async (req, res) => {
   try {
@@ -20,8 +16,6 @@ const handler = async (req, res) => {
           step: step,
         }
       );
-
-      console.log(response);
 
       if (response.error || response == null) {
         throw new Error(
