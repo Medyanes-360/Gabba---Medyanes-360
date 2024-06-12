@@ -6,6 +6,8 @@ import { IoCloseOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import { postAPI } from '@/services/fetchAPI';
 
+import classNames from 'classnames';
+
 const Card = ({
   orderData,
   setOrderData,
@@ -156,7 +158,18 @@ const Card = ({
                 </li>
                 <li>
                   Durum:{' '}
-                  <span className='text-xs font-medium me-2 px-2.5 py-0.5 rounded-full bg-blue-900 text-blue-300'>
+                  <span
+                    className={classNames(
+                      item.Orders[0]?.ordersStatus == 'Onay Bekliyor' &&
+                        'text-xs font-medium me-2 px-2.5 py-0.5 rounded-full bg-blue-900 text-blue-300',
+                      item.Orders[0]?.ordersStatus == 'Beklemede' &&
+                        'text-xs font-medium me-2 px-2.5 py-0.5 rounded-full bg-yellow-900 text-yellow-300',
+                      item.Orders[0]?.ordersStatus == 'İptal Edildi' &&
+                        'text-xs font-medium me-2 px-2.5 py-0.5 rounded-full bg-red-900 text-red-300',
+                      item.Orders[0]?.ordersStatus == 'Sipariş Tamamlandı' &&
+                        'text-xs font-medium me-2 px-2.5 py-0.5 rounded-full bg-green-900 text-green-300'
+                    )}
+                  >
                     {item.Orders[0]?.ordersStatus}
                   </span>
                 </li>
