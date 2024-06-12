@@ -97,6 +97,17 @@ const StepsLayout = ({ children }) => {
         },
       ],
     },
+    {
+      title: 'Siparişinizin Durumunu Değiştirin',
+      buttons: [
+        {
+          id: '99',
+          label: 'Sipariş Durumu',
+          path: `/stepbystep/${id}/siparis-durumu`,
+          roles: ['company_manager', 'logistic', 'manager', 'personal'],
+        },
+      ],
+    },
   ];
 
   //Tekliflerin datasını bu state tutar.
