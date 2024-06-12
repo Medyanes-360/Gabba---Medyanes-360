@@ -35,9 +35,8 @@ const handler = async (req, res) => {
         orderCode: orderCode,
       });
 
-      if (!isExist || isExist == null) {
+      if (!isExist || isExist == null || isExist?.length == 0) {
         // Daha önce bu teklif ile ilgili veri eklenmediyse oluşturuyoruz.
-
         // Ürün verilerini oluştur
         const products = generateProductData(
           productCount,
