@@ -8,6 +8,7 @@ import {
   getDataByUniqueMany,
   deleteDataByAny,
   deleteDataByMany,
+  updateDataByAny,
 } from '@/services/serviceOperations';
 
 function generateOrderCode(customerName) {
@@ -495,6 +496,26 @@ const handler = async (req, res) => {
           message: 'Siparişler başarıyla getirildi.',
         });
       }
+    }
+
+    if (req.method === 'PUT') {
+      const { orderCode, ordersStatus } = req.body;
+
+      const updated = await updateDataByAny(
+        'OfferOrder',
+        {
+          orderCode: orderCode,
+        },
+        {
+          ordersStatus: ordersStatus,
+        }
+      );
+
+      console.log(updated);
+
+      return res
+        .status(200)
+        .json({ status: 'success', message: 'Güncelleme başarılı!' });
     }
   } catch (error) {
     return res
