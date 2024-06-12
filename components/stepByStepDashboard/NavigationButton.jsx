@@ -27,7 +27,7 @@ const NavigationButton = ({
   useEffect(() => {
     if (stepByStepData?.length > 0) {
       const data = stepByStepData.filter((data) => data.orderCode === id);
-      if (data) {
+      if (data.length > 0) {
         console.log(data);
         setStep(data);
       }
@@ -63,8 +63,9 @@ const NavigationButton = ({
         if (isChilds && !!buttonId) {
           handleExpand(e);
         } else {
+          const isStepValid = step.some((s) => s.step >= buttonId);
           if (
-            step >= buttonId ||
+            isStepValid ||
             buttonId == 1 ||
             buttonId == 1.1 ||
             buttonId == 1.2
