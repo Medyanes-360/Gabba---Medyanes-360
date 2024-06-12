@@ -326,7 +326,7 @@ model OfferOrder {
   id                  String   @id @default(auto()) @map("_id") @db.ObjectId
   customerId          String
   personelId          String
-  orderCode           String
+  orderCode           String   @unique
   invalidDate         DateTime
   stock               Int
   orderNote           String?
