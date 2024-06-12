@@ -68,7 +68,8 @@ const NavigationButton = ({
             isStepValid ||
             buttonId == 1 ||
             buttonId == 1.1 ||
-            buttonId == 1.2
+            buttonId == 1.2 ||
+            buttonId == '99'
           ) {
             onClick();
           } else {
