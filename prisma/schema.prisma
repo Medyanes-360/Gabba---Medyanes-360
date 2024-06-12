@@ -604,7 +604,7 @@ model Supplier {
 
 model StepByStep {
   id                     String    @id @default(auto()) @map("_id") @db.ObjectId
-  step                   Int
+  step                   Float
   stepName               String
   onOdemeMiktari         Int
   orderCode              String    @unique
