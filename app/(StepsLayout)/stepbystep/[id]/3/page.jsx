@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getAPI, postAPI } from '@/services/fetchAPI';
+
 import { useParams } from 'next/navigation';
 import { Label } from '@/components/ui/label';
 import {
@@ -31,17 +32,18 @@ const StepPage = () => {
   const { loading, setIsLoading } = useLoadingContext();
   const { stepByStepData, setStepByStepData } = useStepByStepDataContext();
 
-  const initializeDateState = (length) => {
-    const initialDates = new Array(length).fill(undefined);
-    setDate(initialDates);
-  };
+  const [initialValues, setInitialValues] = useState({
+    dates: [],
+    step: 5,
+    stepName: 'Ürün Maliyeti ve Çıkış Tarihi',
+    orderCode: id,
+  });
 
   const getAllOrderData = async () => {
     setIsLoading(true);
     const response = await getAPI('/createOrder/order');
     const filtered = response.data?.filter((fl) => fl.orderCode === id)[0];
     setData(filtered);
-    initializeDateState(filtered?.Ürünler?.length || 0);
     setIsLoading(false);
   };
 
@@ -49,19 +51,47 @@ const StepPage = () => {
     getAllOrderData();
   }, []);
 
+  useEffect(() => {
+    if (stepByStepData?.length > 0) {
+      const stepData = stepByStepData.filter((data) => data.orderCode === id);
+      if (stepData) {
+        const updatedDates = stepData.map((item) => ({
+          selectedDate: item.tedarikciYuklemeTarihi
+            ? new Date(item.tedarikciYuklemeTarihi)
+            : undefined,
+          selectedOrdersId: item.tedarikciYuklemeTarihi
+            ? item.orderId
+            : undefined, // orderId alanını ekliyoruz
+        }));
+        setInitialValues({
+          dates: updatedDates,
+          step: 5,
+          stepName: 'Ürün Maliyeti ve Çıkış Tarihi',
+          orderCode: id,
+        });
+      }
+    }
+  }, [stepByStepData]);
+
   return (
     <div className={'flex h-full w-full items-center justify-center'}>
       <Formik
-        initialValues={{
-          dates: [],
-          step: 5,
-          stepName: 'Ürün Maliyeti ve Çıkış Tarihi',
-        }}
+        enableReinitialize={true}
+        initialValues={initialValues}
         onSubmit={async (values) => {
+          const hasDate = values.dates.some(
+            (date) => date.selectedDate !== undefined
+          );
+          if (!hasDate) {
+            toast.warning('Lütfen en az bir tarih seçin!');
+            return;
+          }
+
           const response = await postAPI(
             '/stepByStep/tedarikciYuklemeTarihi',
             values
           );
+
           if (response.error || !response) {
             toast.error(response.message);
             return setIsLoading(false);
@@ -113,12 +143,13 @@ const StepPage = () => {
                         variant={'outline'}
                         className={cn(
                           'w-full justify-start text-left font-normal',
-                          !date[index] && 'text-muted-foreground'
+                          !props.values.dates[item.id] &&
+                            'text-muted-foreground'
                         )}
                       >
                         <CalendarIcon className='mr-2 h-4 w-4' />
-                        {date[index] ? (
-                          format(date[index], 'PPP')
+                        {props.values.dates[index]?.selectedDate ? (
+                          format(props.values.dates[index].selectedDate, 'PPP')
                         ) : (
                           <span>Pick a date</span>
                         )}
@@ -126,14 +157,12 @@ const StepPage = () => {
                     </PopoverTrigger>
                     <PopoverContent className='w-full p-0'>
                       <Calendar
-                        name={`dates.${item.id}`}
+                        name={`dates.${index}`}
                         mode='single'
-                        selected={date[index]}
+                        selected={props.values.dates[index]?.selectedDate}
                         onSelect={(newDate) => {
-                          setDate((prev) => ({ ...prev, [index]: newDate }));
-                          const dateStr = newDate ? newDate.toISOString() : '';
                           props.setFieldValue(`dates.${index}`, {
-                            selectedDate: dateStr,
+                            selectedDate: newDate,
                             selectedOrdersId: item.id,
                           });
                         }}
