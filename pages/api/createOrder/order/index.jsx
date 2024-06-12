@@ -67,7 +67,17 @@ const handler = async (req, res) => {
         if (!findOrderCode || findOrderCode.error) {
           throw findOrderCode.error;
         }
-        console.log(findOrderCode);
+
+        const deleteStepByStep = await deleteDataByMany('StepByStep', {
+          orderCode: deletedOrderCode,
+        });
+
+        const deleteStepByStepEkstralar = await deleteDataByMany(
+          'StepByStepEkstralar',
+          {
+            orderCode: deletedOrderCode,
+          }
+        );
 
         const result = await Promise.all(
           findOrderCode.map(async (item) => {
@@ -474,7 +484,7 @@ const handler = async (req, res) => {
               Ürünler: Products,
               Müşteri: Customer,
               Personel: Personel,
-              Date: OfferOrdersResult.createdAt
+              Date: OfferOrdersResult.createdAt,
             });
           })
         );
