@@ -603,16 +603,16 @@ model Supplier {
 }
 
 model StepByStep {
-  id                     String   @id @default(auto()) @map("_id") @db.ObjectId
+  id                     String    @id @default(auto()) @map("_id") @db.ObjectId
   step                   Int
   stepName               String
   onOdemeMiktari         Int
-  orderCode              String   @unique
-  orderId                String   @unique
+  orderCode              String    @unique
+  orderId                String    @unique
   tedarikciAciklama      String
-  tedarikciYuklemeTarihi DateTime @default(now())
-  urunCikisTarihi        DateTime @default(now())
-  tedarikciMaliyeti      Float    @default(0.0)
+  tedarikciYuklemeTarihi DateTime?
+  urunCikisTarihi        DateTime?
+  tedarikciMaliyeti      Float     @default(0.0)
 
   tedarikciId String
   createdAt   DateTime @default(now())
