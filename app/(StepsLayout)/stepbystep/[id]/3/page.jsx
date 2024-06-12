@@ -86,6 +86,7 @@ const StepPage = () => {
             toast.warning('Lütfen en az bir tarih seçin!');
             return;
           }
+          setIsLoading(true);
 
           const response = await postAPI(
             '/stepByStep/tedarikciYuklemeTarihi',
