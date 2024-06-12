@@ -70,8 +70,10 @@ const StepPage = () => {
   }, [data]);
 
   useEffect(() => {
+    setIsLoading(true);
+
     if (stepByStepData?.length > 0) {
-      const stepData = stepByStepData.find((data) => data.orderId === id);
+      const stepData = stepByStepData.find((data) => data.orderCode === id);
       if (stepData) {
         setInitialValues({
           onOdemeMiktari: stepData.onOdemeMiktari,
@@ -87,6 +89,7 @@ const StepPage = () => {
         }
       }
     }
+    setIsLoading(false);
   }, [stepByStepData]);
 
   return (
