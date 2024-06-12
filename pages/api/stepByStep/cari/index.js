@@ -1,6 +1,6 @@
 import {
   createNewDataMany,
-  getDataByUnique,
+  getDataByMany,
   updateDataByMany,
 } from '@/services/serviceOperations';
 
@@ -31,7 +31,7 @@ const handler = async (req, res) => {
       } = req.body;
 
       // Daha önce bu teklife ait veri eklenmiş mi bir bakıyoruz.
-      const isExist = await getDataByUnique('StepByStep', {
+      const isExist = await getDataByMany('StepByStep', {
         orderCode: orderCode,
       });
 
@@ -69,7 +69,7 @@ const handler = async (req, res) => {
 
       if (isExist) {
         // Eğer teklif zaten varsa ve cari değeri tekrar gelirse, bu veriyi güncelliyoruz.
-        const updateCari = await updateDataByMany(
+        await updateDataByMany(
           'StepByStep',
           {
             id: isExist.id,
