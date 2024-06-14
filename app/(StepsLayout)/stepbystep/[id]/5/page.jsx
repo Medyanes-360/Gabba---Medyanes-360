@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import { getAPI, postAPI } from '@/services/fetchAPI';
 import { useParams } from 'next/navigation';
@@ -28,8 +27,8 @@ const StepPage = () => {
   const router = useRouter();
 
   const [data, setData] = useState([]);
-  const [date, setDate] = useState();
-  const [maliyet, setMaliyet] = useState({});
+  const [date, setDate] = useState([]);
+  const [maliyet, setMaliyet] = useState([]);
 
   const { loading, setIsLoading } = useLoadingContext();
   const { stepByStepData, setStepByStepData } = useStepByStepDataContext();
@@ -42,8 +41,14 @@ const StepPage = () => {
   });
 
   const initializeDateState = (length) => {
-    const initialDates = new Array(length).fill(undefined);
-    const initialMaliyet = new Array(length).fill(0);
+    const initialDates = new Array(length).fill({
+      selectedDate: undefined,
+      selectedOrdersId: undefined,
+    });
+    const initialMaliyet = new Array(length).fill({
+      tedarikciMaliyeti: 0,
+      selectedOrdersId: undefined,
+    });
     setMaliyet(initialMaliyet);
     setDate(initialDates);
   };
@@ -65,12 +70,15 @@ const StepPage = () => {
     if (stepByStepData?.length > 0) {
       const stepData = stepByStepData.filter((data) => data.orderCode === id);
       if (stepData) {
-        const updatedDates = stepData.map((item) => ({
-          selectedDate: item.urunCikisTarihi
-            ? new Date(item.urunCikisTarihi)
-            : undefined,
-          selectedOrdersId: item.urunCikisTarihi ? item.orderId : undefined, // orderId alanını ekliyoruz
-        }));
+        const updatedDates = stepData.reduce((acc, item) => {
+          acc[item.orderId] = {
+            selectedDate: item.urunCikisTarihi
+              ? new Date(item.urunCikisTarihi)
+              : undefined,
+            selectedOrdersId: item.urunCikisTarihi ? item.orderId : undefined,
+          };
+          return acc;
+        }, {});
 
         const updatedTedarikci = stepData.map((item) => ({
           tedarikciMaliyeti: item.step >= 5 ? item.tedarikciMaliyeti : null,
@@ -78,10 +86,8 @@ const StepPage = () => {
         }));
 
         setInitialValues({
+          ...initialValues,
           dates: updatedDates,
-          step: 6,
-          stepName: 'Gümrük',
-          orderCode: id,
           tedarikciMaliyet: updatedTedarikci,
         });
       }
@@ -94,27 +100,33 @@ const StepPage = () => {
         enableReinitialize={true}
         initialValues={initialValues}
         onSubmit={async (values) => {
-          const hasDate = values.dates.some(
+          const hasDate = Array.from(Object.values(values.dates)).some(
             (date) => date.selectedDate !== undefined
           );
+
           if (!hasDate) {
             toast.warning('Lütfen en az bir tarih seçin!');
             return;
           }
 
-          const isInvalid = values.tedarikciMaliyet.some(
-            (maliyet) => maliyet.tedarikciMaliyeti > 0
-          );
+          const formattedDates = Object.values(values.dates).map((item) => {
+            const isoDate = item.selectedDate
+              ? new Date(item.selectedDate).toISOString()
+              : undefined;
+            return {
+              selectedDate: isoDate,
+              selectedOrdersId: item.selectedOrdersId,
+            };
+          });
 
-          if (!isInvalid) {
-            return toast.warning(
-              "Tedarikçi maliyeti 0 veya 0'dan küçük olamaz!"
-            );
-          }
-
+          setIsLoading(true);
+          values.orderCode = id;
           const response = await postAPI(
             '/stepByStep/urunMaliyetiVeCikisTarihi',
-            values
+            {
+              ...values,
+              dates: formattedDates,
+            }
           );
 
           if (response.error || !response) {
@@ -141,7 +153,6 @@ const StepPage = () => {
 
             {data &&
               data?.Orders?.map((item, index) => {
-                // stepByStepData'daki orderId ve step değerlerini kontrol et
                 const matchingStepData = stepByStepData.find(
                   (stepItem) =>
                     stepItem.orderId === item.id && stepItem.step >= 5
@@ -160,10 +171,13 @@ const StepPage = () => {
                         }
                       >
                         <span>
-                          {data?.Ürünler[index].selectedCategoryValues}
+                          {data?.Ürünler[index]?.selectedCategoryValues}
                         </span>
-                        -<span>{data?.Ürünler[index].productName}</span>-
-                        <span>{data?.Ürünler[index].productPrice}</span>
+                        -<span>{data?.Ürünler[index]?.productName}</span>-
+                        <span>
+                          {(item.productPrice + item.productFeaturePrice) *
+                            item.stock}
+                        </span>
                       </div>
 
                       <Popover>
@@ -177,9 +191,9 @@ const StepPage = () => {
                             )}
                           >
                             <CalendarIcon className='mr-2 h-4 w-4' />
-                            {props.values.dates[index]?.selectedDate ? (
+                            {props.values.dates[item.id]?.selectedDate ? (
                               format(
-                                props.values.dates[index].selectedDate,
+                                props.values.dates[item.id].selectedDate,
                                 'PPP'
                               )
                             ) : (
@@ -189,11 +203,11 @@ const StepPage = () => {
                         </PopoverTrigger>
                         <PopoverContent className='w-full p-0'>
                           <Calendar
-                            name={`dates.${item.id}`}
+                            name={`dates.${item.id}`} // Formik içindeki path'i doğru şekilde belirtin
                             mode='single'
-                            selected={props.values.dates[index]?.selectedDate}
+                            selected={props.values.dates[item.id]?.selectedDate}
                             onSelect={(newDate) => {
-                              props.setFieldValue(`dates.${index}`, {
+                              props.setFieldValue(`dates.${item.id}`, {
                                 selectedDate: newDate,
                                 selectedOrdersId: item.id,
                               });
@@ -205,17 +219,27 @@ const StepPage = () => {
 
                       <div className='flex gap-2 items-center'>
                         <Input
-                          name={`tedarikciMaliyet.${item.index}`}
+                          name={`tedarikciMaliyet.${item.id}`}
                           value={
-                            props.values.tedarikciMaliyet[index]
-                              ?.tedarikciMaliyeti
+                            props.values.tedarikciMaliyet.find(
+                              (m) => m.selectedOrdersId === item.id
+                            )?.tedarikciMaliyeti || ''
                           }
                           onChange={(e) => {
                             const value = e.target.value;
-                            props.setFieldValue(`tedarikciMaliyet.${index}`, {
-                              tedarikciMaliyeti: value,
-                              selectedOrdersId: item.id,
-                            });
+                            const updatedMaliyet =
+                              props.values.tedarikciMaliyet.map((m) =>
+                                m.selectedOrdersId === item.id
+                                  ? {
+                                      tedarikciMaliyeti: value,
+                                      selectedOrdersId: item.id,
+                                    }
+                                  : m
+                              );
+                            props.setFieldValue(
+                              'tedarikciMaliyet',
+                              updatedMaliyet
+                            );
                           }}
                           type='number'
                           placeholder='1'
@@ -244,16 +268,19 @@ const StepPage = () => {
                         }
                       >
                         <span>
-                          {data?.Ürünler[index].selectedCategoryValues}
+                          {data?.Ürünler[index]?.selectedCategoryValues}
                         </span>
-                        -<span>{data?.Ürünler[index].productName}</span>-
-                        <span>{data?.Ürünler[index].productPrice}</span>
+                        -<span>{data?.Ürünler[index]?.productName}</span>-
+                        <span>
+                          {(item.productPrice + item.productFeaturePrice) *
+                            item.stock}
+                        </span>
                       </div>
 
                       <p>
                         Bu ürün {''}
                         <span className='bg-gray-500 p-1 text-white rounded'>
-                          {stepByStepData[index]?.stepName}
+                          {doesntMatchData.stepName}
                         </span>{' '}
                         kısmında kalmıştır.
                       </p>
