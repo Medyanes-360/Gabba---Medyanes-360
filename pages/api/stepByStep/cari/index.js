@@ -2,7 +2,9 @@ import {
   createNewDataMany,
   getDataByMany,
   updateDataByMany,
+  createNewData,
 } from '@/services/serviceOperations';
+import { getToken } from 'next-auth/jwt';
 
 const handler = async (req, res) => {
   // Ürün verilerini dinamik olarak oluşturma fonksiyonu
@@ -29,6 +31,13 @@ const handler = async (req, res) => {
         tedarikciId,
         orderData,
       } = req.body;
+
+      const token = await getToken({
+        req,
+        secret: process.env.NEXTAUTH_SECRET,
+      });
+      const userRole = token && token?.user?.role;
+      const userId = token && token?.user?.id;
 
       // Daha önce bu teklife ait veri eklenmiş mi bir bakıyoruz.
       const isExist = await getDataByMany('StepByStep', {
@@ -60,6 +69,14 @@ const handler = async (req, res) => {
           );
         }
 
+        const responseLog = await createNewData('Logs', {
+          role: userRole,
+          userId: userId,
+          step: 1.2,
+          stepName: 'Ön Ödeme Miktarı',
+          orderCode: orderCode,
+        });
+
         return res.status(200).json({
           message: 'Ön ödeme miktarınız başarıyla kaydedildi!',
           status: 'success',
@@ -77,6 +94,14 @@ const handler = async (req, res) => {
             onOdemeMiktari: onOdemeMiktari,
           }
         );
+
+        const responseLog = await createNewData('Logs', {
+          role: userRole,
+          userId: userId,
+          step: 1.2,
+          stepName: 'Ön Ödeme Miktarı',
+          orderCode: orderCode,
+        });
 
         return res.status(200).json({
           message: 'Ön ödeme miktari güncellenmiştir.',
