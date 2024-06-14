@@ -27,6 +27,7 @@ const SendDocument = ({ id, lang }) => {
       // await postAPI('/mail', { email: email, url: `${process.env.NEXT_PUBLIC_URL}/document?id=${id}&lang=tr` })
       await postAPI('/mail', {
         email: email,
+        orderCode: id,
         url: `https://gabba-medyanes-360.vercel.app/document?id=${id}&lang=${lang}`,
       });
     } catch (error) {
