@@ -104,6 +104,41 @@ const StepPage = () => {
                     </div>
                   );
                 }
+
+                const doesntMatchData = stepByStepData.find(
+                  (stepItem) =>
+                    stepItem.orderId === item.id && stepItem.step < 6
+                );
+
+                if (doesntMatchData) {
+                  return (
+                    <div
+                      key={item.id}
+                      className='flex flex-col w-full bg-gray-800 text-white
+                       transition-all duration-200 ease-in-out border shadow-sm rounded p-2 gap-2'
+                    >
+                      <div
+                        className={
+                          'flex items-center gap-2 [&_span]:text-sm w-full w-fit'
+                        }
+                      >
+                        <Checkbox className={'mr-4'} disabled='true' />
+                        <span>
+                          {data?.Ürünler[index].selectedCategoryValues}
+                        </span>
+                        -<span>{data?.Ürünler[index].productName}</span>-
+                        <span>{data?.Ürünler[index].productPrice}</span>
+                      </div>
+                      <p>
+                        Bu ürün {''}
+                        <span className='bg-gray-500 p-1 text-white rounded'>
+                          {stepByStepData[index]?.stepName}
+                        </span>{' '}
+                        kısmında kalmıştır.
+                      </p>
+                    </div>
+                  );
+                }
               })}
             <Button type='submit'>Mağaza Stoklarına Ekle</Button>
           </Form>
