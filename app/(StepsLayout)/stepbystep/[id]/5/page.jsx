@@ -225,6 +225,41 @@ const StepPage = () => {
                     </div>
                   );
                 }
+
+                const doesntMatchData = stepByStepData.find(
+                  (stepItem) =>
+                    stepItem.orderId === item.id && stepItem.step < 5
+                );
+                if (doesntMatchData) {
+                  return (
+                    <div
+                      key={item.id}
+                      className={
+                        'flex flex-col w-full border shadow-sm rounded p-2 gap-2 bg-gray-800 text-white'
+                      }
+                    >
+                      <div
+                        className={
+                          'flex items-center gap-2 [&_span]:text-sm mx-auto w-fit'
+                        }
+                      >
+                        <span>
+                          {data?.Ürünler[index].selectedCategoryValues}
+                        </span>
+                        -<span>{data?.Ürünler[index].productName}</span>-
+                        <span>{data?.Ürünler[index].productPrice}</span>
+                      </div>
+
+                      <p>
+                        Bu ürün {''}
+                        <span className='bg-gray-500 p-1 text-white rounded'>
+                          {stepByStepData[index]?.stepName}
+                        </span>{' '}
+                        kısmında kalmıştır.
+                      </p>
+                    </div>
+                  );
+                }
               })}
 
             <Button className='w-full' type='submit'>
