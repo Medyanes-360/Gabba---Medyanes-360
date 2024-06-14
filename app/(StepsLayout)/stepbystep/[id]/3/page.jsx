@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { getAPI, postAPI } from '@/services/fetchAPI';
-
 import { useParams } from 'next/navigation';
 import { Label } from '@/components/ui/label';
 import {
@@ -55,14 +54,17 @@ const StepPage = () => {
     if (stepByStepData?.length > 0) {
       const stepData = stepByStepData.filter((data) => data.orderCode === id);
       if (stepData) {
-        const updatedDates = stepData.map((item) => ({
-          selectedDate: item.tedarikciYuklemeTarihi
-            ? new Date(item.tedarikciYuklemeTarihi)
-            : undefined,
-          selectedOrdersId: item.tedarikciYuklemeTarihi
-            ? item.orderId
-            : undefined, // orderId alanını ekliyoruz
-        }));
+        const updatedDates = stepData.reduce((acc, item) => {
+          acc[item.orderId] = {
+            selectedDate: item.tedarikciYuklemeTarihi
+              ? new Date(item.tedarikciYuklemeTarihi)
+              : undefined,
+            selectedOrdersId: item.tedarikciYuklemeTarihi
+              ? item.orderId
+              : undefined,
+          };
+          return acc;
+        }, {});
         setInitialValues({
           dates: updatedDates,
           step: 5,
@@ -79,19 +81,30 @@ const StepPage = () => {
         enableReinitialize={true}
         initialValues={initialValues}
         onSubmit={async (values) => {
-          const hasDate = values.dates.some(
+          const hasDate = Object.values(values.dates).some(
             (date) => date.selectedDate !== undefined
           );
           if (!hasDate) {
             toast.warning('Lütfen en az bir tarih seçin!');
             return;
           }
+
+          const formattedDates = Object.values(values.dates).map((item) => {
+            const isoDate = item.selectedDate
+              ? new Date(item.selectedDate).toISOString()
+              : undefined;
+            return {
+              selectedDate: isoDate,
+              selectedOrdersId: item.selectedOrdersId,
+            };
+          });
+
           setIsLoading(true);
 
-          const response = await postAPI(
-            '/stepByStep/tedarikciYuklemeTarihi',
-            values
-          );
+          const response = await postAPI('/stepByStep/tedarikciYuklemeTarihi', {
+            ...values,
+            dates: formattedDates,
+          });
 
           if (response.error || !response) {
             toast.error(response.message);
@@ -149,8 +162,11 @@ const StepPage = () => {
                         )}
                       >
                         <CalendarIcon className='mr-2 h-4 w-4' />
-                        {props.values.dates[index]?.selectedDate ? (
-                          format(props.values.dates[index].selectedDate, 'PPP')
+                        {props.values.dates[item.id]?.selectedDate ? (
+                          format(
+                            props.values.dates[item.id].selectedDate,
+                            'PPP'
+                          )
                         ) : (
                           <span>Pick a date</span>
                         )}
@@ -158,11 +174,11 @@ const StepPage = () => {
                     </PopoverTrigger>
                     <PopoverContent className='w-full p-0'>
                       <Calendar
-                        name={`dates.${index}`}
+                        name={`dates.${item.id}`}
                         mode='single'
-                        selected={props.values.dates[index]?.selectedDate}
+                        selected={props.values.dates[item.id]?.selectedDate}
                         onSelect={(newDate) => {
-                          props.setFieldValue(`dates.${index}`, {
+                          props.setFieldValue(`dates.${item.id}`, {
                             selectedDate: newDate,
                             selectedOrdersId: item.id,
                           });
