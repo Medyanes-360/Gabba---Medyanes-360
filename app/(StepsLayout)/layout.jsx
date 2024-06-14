@@ -116,6 +116,8 @@ const StepsLayout = ({ children }) => {
   // Context'de kullanacağımız stepbystep datasını aktarıyoruz.
   const [stepByStepData, setStepByStepData] = useState([]);
 
+  const [totalOrderAmount, setTotalOrderAmount] = useState(0);
+
   const getAllOrderData = async () => {
     setIsLoading(true);
 
@@ -127,10 +129,22 @@ const StepsLayout = ({ children }) => {
       response2,
     ]);
 
-    setStepByStepData(responseStepByStepData.data);
     setOrderData(
       responseOrderData.data.filter((ord) => id === ord.orderCode)[0]
     );
+    setStepByStepData(responseStepByStepData.data);
+    const orders = responseOrderData.data.filter(
+      (ord) => id === ord.orderCode
+    )[0];
+
+    const totalOrderAmounts = orders.Orders.reduce((total, order) => {
+      return (
+        total + (order.productPrice + order.productFeaturePrice) * order.stock
+      );
+    }, 0);
+    console.log('stepByStepData: ', stepByStepData);
+
+    setTotalOrderAmount(totalOrderAmounts);
     setIsLoading(false);
   };
 
@@ -209,7 +223,51 @@ const StepsLayout = ({ children }) => {
                   </li>
                 </ul>
               </div>
-
+              {/* Müşterinin Bilgileri */}
+              <div className='w-full flex p-2 border-b border-r border-l shadow-md mt-2'>
+                <ul className='flex items-center justify-around w-full text-gray-600 py-2'>
+                  <li className=''>
+                    Müşterinin Ödediği Tutar:{' '}
+                    {stepByStepData && (stepByStepData[0]?.onOdemeMiktari ?? 0)}
+                  </li>
+                  <li>
+                    Müşterinin Kalan Borcu:{' '}
+                    {orderData ? (
+                      <>
+                        {stepByStepData ? (
+                          <>
+                            {(() => {
+                              const totalAmount = orderData.Orders?.reduce(
+                                (total, order) => {
+                                  return (
+                                    total +
+                                    (order.productPrice +
+                                      order.productFeaturePrice) *
+                                      order.stock
+                                  );
+                                },
+                                0
+                              );
+                              const paidAmount =
+                                stepByStepData[0]?.onOdemeMiktari ?? 0;
+                              return totalAmount - paidAmount;
+                            })()}
+                          </>
+                        ) : (
+                          'Step by step data bulunamadı.'
+                        )}
+                      </>
+                    ) : (
+                      'Order data bulunamadı.'
+                    )}
+                  </li>
+                  <li>
+                    Bekleyen Ürün Sayısı:{' '}
+                    {orderData && orderData?.Orders && orderData.Orders.length}
+                  </li>
+                  <li>Teslim Edilen Ürün Sayısı: 0</li>
+                </ul>
+              </div>
               <div className='py-6 h-full w-full pl-6 md:pl-0'>{children}</div>
             </div>
           </div>
