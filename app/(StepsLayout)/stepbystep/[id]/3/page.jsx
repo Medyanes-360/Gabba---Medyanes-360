@@ -148,7 +148,10 @@ const StepPage = () => {
                   >
                     <span>{data?.Ürünler[index]?.selectedCategoryValues}</span>-
                     <span>{data?.Ürünler[index]?.productName}</span>-
-                    <span>{data?.Ürünler[index]?.productPrice} </span>
+                    <span>
+                      {(item.productPrice + item.productFeaturePrice) *
+                        item.stock}
+                    </span>
                   </div>
 
                   <Popover>
