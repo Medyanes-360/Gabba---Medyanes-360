@@ -37,6 +37,7 @@ const handler = async (req, res) => {
               {
                 tedarikciYuklemeTarihi: new Date(selectedDate),
                 step: item.step > step ? item.step : step,
+                tedarikciMaliyeti: 0,
                 stepName:
                   item.step > 3
                     ? item.stepName
@@ -53,8 +54,9 @@ const handler = async (req, res) => {
               'StepByStep',
               { orderId: item.orderId },
               {
-                tedarikciYuklemeTarihi: null,
+                tedarikciYuklemeTarihi: 0,
                 urunCikisTarihi: null,
+                tedarikciMaliyeti: null,
                 step: item.step >= 3 ? 3 : item.step,
                 stepName: stepName,
               }
@@ -72,6 +74,8 @@ const handler = async (req, res) => {
             {
               tedarikciYuklemeTarihi: null,
               urunCikisTarihi: null,
+              tedarikciMaliyeti: 0,
+
               step: item.step >= 3 ? 3 : item.step,
               stepName: stepName,
             }
