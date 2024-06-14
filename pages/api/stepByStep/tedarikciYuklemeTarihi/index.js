@@ -1,21 +1,24 @@
-import { getDataByMany, updateDataByAny } from '@/services/serviceOperations';
+import {
+  getDataByMany,
+  updateDataByAny,
+  createNewData,
+} from '@/services/serviceOperations';
+import { getToken } from 'next-auth/jwt';
 
 const handler = async (req, res) => {
   try {
     if (req.method === 'POST') {
       const { dates, step, stepName, orderCode } = req.body;
+
+      const token = await getToken({
+        req,
+        secret: process.env.NEXTAUTH_SECRET,
+      });
+      const userRole = token && token?.user?.role;
+      const userId = token && token?.user?.id;
+
       const allStepBySteps = await getDataByMany('StepByStep', {
         orderCode: orderCode,
-      });
-
-      dates.map((item) => {
-        const isoDate = item.selectedDate
-          ? new Date(item.selectedDate).toISOString()
-          : undefined;
-        return {
-          selectedDate: isoDate,
-          selectedOrdersId: item.selectedOrdersId,
-        };
       });
 
       // Tüm güncelleme işlemlerini bir dizi içinde topla
@@ -78,6 +81,15 @@ const handler = async (req, res) => {
 
       // Tüm güncellemeleri paralel olarak gerçekleştirmek için Promise.all kullan
       await Promise.all(updatePromises);
+
+      const responseLog = await createNewData('Logs', {
+        role: userRole,
+        userId: userId,
+        step: 3,
+        stepName: 'Tedarikçi Yükleme Tarihi',
+        orderCode: orderCode,
+      });
+
       return res.status(200).json({
         message: 'İşlem başarıyla gerçekleştirildi!',
         status: 'success',
