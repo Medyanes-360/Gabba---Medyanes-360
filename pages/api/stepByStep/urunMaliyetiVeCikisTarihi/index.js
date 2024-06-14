@@ -1,4 +1,9 @@
-import { updateDataByAny, getDataByMany } from '@/services/serviceOperations';
+import {
+  updateDataByAny,
+  getDataByMany,
+  createNewData,
+} from '@/services/serviceOperations';
+import { getToken } from 'next-auth/jwt';
 
 const handler = async (req, res) => {
   try {
@@ -8,27 +13,30 @@ const handler = async (req, res) => {
         orderCode: orderCode,
       });
 
-      dates.map((item) => {
-        const isoDate = item.selectedDate
-          ? new Date(item.selectedDate).toISOString()
-          : undefined;
-        return {
-          selectedDate: isoDate,
-          selectedOrdersId: item.selectedOrdersId,
-        };
-      });
+      console.log(
+        'tedarikciMaliyet[0]: ',
+        tedarikciMaliyet[0].selectedOrdersId
+      );
 
+      const token = await getToken({
+        req,
+        secret: process.env.NEXTAUTH_SECRET,
+      });
+      const userRole = token && token?.user?.role;
+      const userId = token && token?.user?.id;
       // Tüm güncelleme işlemlerini bir dizi içinde topla
+
       const updatePromises = allStepBySteps.map((item, index) => {
         const matchedDate = dates.find(
           (dateItem) => dateItem?.selectedOrdersId === item.orderId
         );
 
         if (matchedDate) {
+          console.log('matchedDate: ', matchedDate);
           // Eğer `dates` array'inde tarih varsa, bu değerle güncelle
           const { selectedDate } = matchedDate;
           if (selectedDate != undefined) {
-            return updateDataByAny(
+            const response = updateDataByAny(
               'StepByStep',
               { orderId: item.orderId },
               {
@@ -36,10 +44,14 @@ const handler = async (req, res) => {
                 step: item.step > step ? item.step : step,
                 stepName: item.step > 5 ? item.stepName : 'Gümrük',
                 tedarikciMaliyeti: parseFloat(
-                  tedarikciMaliyet[index].tedarikciMaliyeti
+                  tedarikciMaliyet[index].selectedOrdersId ==
+                    matchedDate.selectedOrdersId
+                    ? tedarikciMaliyet[index].tedarikciMaliyeti
+                    : 0
                 ),
               }
             );
+            return response;
           } else {
             // Eğer `dates` array'inde tarih yoksa, tarih alanını sıfırla
             let stepName = '';
@@ -52,6 +64,7 @@ const handler = async (req, res) => {
               {
                 urunCikisTarihi: null,
                 step: item.step >= 5 ? 5 : item.step,
+                tedarikciMaliyeti: parseFloat(0),
                 stepName: stepName,
               }
             );
@@ -69,7 +82,7 @@ const handler = async (req, res) => {
               urunCikisTarihi: null,
               step: item.step >= 5 ? 5 : item.step,
               stepName: stepName,
-              tedarikciMaliyeti: parseFloat(1),
+              tedarikciMaliyeti: parseFloat(0),
             }
           );
         }
@@ -77,6 +90,15 @@ const handler = async (req, res) => {
 
       // Tüm güncellemeleri paralel olarak gerçekleştirmek için Promise.all kullan
       await Promise.all(updatePromises);
+
+      const responseLog = await createNewData('Logs', {
+        role: userRole,
+        userId: userId,
+        step: 5,
+        stepName: 'Ürün Maliyeti ve Çıkış Tarihi',
+        orderCode: orderCode,
+      });
+
       return res.status(200).json({
         message: 'İşlem başarıyla gerçekleştirildi!',
         status: 'success',
