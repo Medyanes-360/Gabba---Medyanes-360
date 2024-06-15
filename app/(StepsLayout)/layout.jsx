@@ -121,30 +121,35 @@ const StepsLayout = ({ children }) => {
   const getAllOrderData = async () => {
     setIsLoading(true);
 
-    const response1 = getAPI('/createOrder/order');
-    const response2 = getAPI(`/stepByStep?orderCode=${id}`);
+    try {
+      const response1 = await getAPI('/createOrder/order');
+      const response2 = await getAPI(`/stepByStep?orderCode=${id}`);
 
-    const [responseOrderData, responseStepByStepData] = await Promise.all([
-      response1,
-      response2,
-    ]);
+      const responseOrderData = response1.data;
+      const responseStepByStepData = response2.data;
 
-    setOrderData(
-      responseOrderData.data.filter((ord) => id === ord.orderCode)[0]
-    );
-    setStepByStepData(responseStepByStepData.data);
-    const orders = responseOrderData.data.filter(
-      (ord) => id === ord.orderCode
-    )[0];
+      const order = responseOrderData.find((ord) => id === ord.orderCode);
 
-    const totalOrderAmounts = orders.Orders.reduce((total, order) => {
-      return (
-        total + (order.productPrice + order.productFeaturePrice) * order.stock
-      );
-    }, 0);
-    console.log('stepByStepData: ', stepByStepData);
+      if (order) {
+        setOrderData(order);
+        setStepByStepData(responseStepByStepData);
 
-    setTotalOrderAmount(totalOrderAmounts);
+        const totalOrderAmounts = order.Orders.reduce((total, order) => {
+          return (
+            total +
+            (order.productPrice + order.productFeaturePrice) * order.stock
+          );
+        }, 0);
+
+        setTotalOrderAmount(totalOrderAmounts);
+      } else {
+        // handle case where order is not found
+        console.error('Order not found');
+      }
+    } catch (error) {
+      console.error('Failed to fetch order data:', error);
+    }
+
     setIsLoading(false);
   };
 
