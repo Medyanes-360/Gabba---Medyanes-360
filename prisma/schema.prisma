@@ -614,10 +614,10 @@ model StepByStep {
   urunCikisTarihi        DateTime?
   tedarikciMaliyeti      Float     @default(0.0)
   ekstraUcretTotal       Float     @default(0.0)
-
-  tedarikciId String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  gumruk                 Boolean?  @default(false)
+  tedarikciId            String
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 }
 
 model StepByStepEkstralar {
@@ -627,4 +627,15 @@ model StepByStepEkstralar {
   description String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Logs {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  role      String
+  userId    String
+  step      Float
+  stepName  String
+  orderCode String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
