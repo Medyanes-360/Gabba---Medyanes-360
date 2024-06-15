@@ -57,6 +57,7 @@ const handler = async (req, res) => {
               { orderId: item.orderId },
               {
                 urunCikisTarihi: null,
+                gumruk: false,
                 step: item.step >= 5 ? 5 : item.step,
                 tedarikciMaliyeti: parseFloat(0),
                 stepName: stepName,
@@ -74,6 +75,7 @@ const handler = async (req, res) => {
             { orderId: item.orderId },
             {
               urunCikisTarihi: null,
+              gumruk: false,
               step: item.step >= 5 ? 5 : item.step,
               stepName: stepName,
               tedarikciMaliyeti: parseFloat(0),
