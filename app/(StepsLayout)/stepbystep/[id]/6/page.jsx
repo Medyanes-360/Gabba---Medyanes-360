@@ -6,6 +6,9 @@ import { getAPI, postAPI } from '@/services/fetchAPI';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
+import { IoCloseOutline } from 'react-icons/io5';
+
 import {
   useLoadingContext,
   useStepByStepDataContext,
@@ -13,6 +16,7 @@ import {
 import { Formik, Form } from 'formik';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
+import classNames from 'classnames';
 
 const StepPage = () => {
   const { id } = useParams();
@@ -20,9 +24,13 @@ const StepPage = () => {
 
   const { loading, setIsLoading } = useLoadingContext();
   const { stepByStepData, setStepByStepData } = useStepByStepDataContext();
+  const [initialValues, setInitialValues] = useState({
+    step: 7,
+    stepName: 'Teslim Tutanağı',
+    checked: {}, // checkbox başlangıç değerleri
+  });
 
   const [data, setData] = useState([]);
-  const [checked, setChecked] = useState({});
 
   const getAllOrderData = async () => {
     setIsLoading(true);
@@ -31,21 +39,48 @@ const StepPage = () => {
     setData(filtered);
     setIsLoading(false);
   };
+
+  const deleteGumruk = async (item) => {
+    setIsLoading(true);
+    const response = await postAPI('/stepByStep/gumruk', item, 'PUT');
+    const response2 = await getAPI(`/stepByStep?orderCode=${item.orderCode}`);
+    setStepByStepData(response2.data);
+    setIsLoading(false);
+    toast.success('Gümrük veriniz silindi!');
+  };
+
   useEffect(() => {
     getAllOrderData();
   }, []);
 
+  useEffect(() => {
+    setIsLoading(true);
+
+    if (stepByStepData?.length > 0) {
+      const stepData = stepByStepData.find((data) => data.orderCode === id);
+      console.log('stepData: ', stepData);
+      if (stepData) {
+        const checkeds = {}; // Boş bir nesne oluşturun
+        checkeds[stepData.orderId] = stepData.gumruk || false; // gumruk alanını başlangıç değeri olarak kullan
+        setInitialValues({
+          step: 7.1,
+          stepName: 'Teslim Tutanağı',
+          checked: checkeds,
+        });
+      }
+    }
+
+    setIsLoading(false);
+  }, [stepByStepData, id]);
+
   return (
     <div className={'flex h-full w-full items-center justify-center'}>
       <Formik
-        initialValues={{
-          step: 7,
-          stepName: 'Teslim Tutanağı',
-        }}
+        enableReinitialize={true}
+        initialValues={initialValues}
         onSubmit={async (values) => {
           values.orderCode = id;
           const response = await postAPI('/stepByStep/gumruk', values);
-          console.log(response);
           if (response.error || !response) {
             toast.error(response.message);
             return setIsLoading(false);
@@ -60,7 +95,7 @@ const StepPage = () => {
       >
         {(props) => (
           <Form
-            className='max-w-sm w-full flex flex-col gap-2'
+            className='max-w-lg w-full flex flex-col gap-2'
             onSubmit={props.handleSubmit}
           >
             <Label>Stoklara eklenecek ürünleri seçiniz.</Label>
@@ -78,28 +113,64 @@ const StepPage = () => {
                 if (matchingStepData) {
                   return (
                     <div
+                      className='flex gap-3 justify-center items-center'
                       key={item.id}
-                      className={`flex flex-col w-full ${
-                        checked[index] ?? false ? 'bg-[#dedede]/50' : ''
-                      } transition-all duration-200 ease-in-out border shadow-sm rounded p-2 gap-2`}
                     >
                       <div
-                        className={
-                          'flex items-center gap-2 [&_span]:text-sm w-full w-fit'
-                        }
+                        className={classNames(
+                          'flex flex-col w-full transition-all duration-200 ease-in-out border shadow-sm rounded p-2 gap-2',
+                          props.values.checked[item.id] ?? false
+                            ? 'bg-[#dedede]/50'
+                            : '',
+                          matchingStepData?.gumruk && 'bg-green-500 text-white'
+                        )}
                       >
-                        <Checkbox
-                          checked={checked[index] ?? false}
-                          onCheckedChange={(value) =>
-                            setChecked((prev) => ({ ...prev, [index]: value }))
+                        <div
+                          className={
+                            'flex items-center gap-2 [&_span]:text-sm w-full'
                           }
-                          className={'mr-4'}
-                        />
-                        <span>
-                          {data?.Ürünler[index].selectedCategoryValues}
-                        </span>
-                        -<span>{data?.Ürünler[index].productName}</span>-
-                        <span>{data?.Ürünler[index].productPrice}</span>
+                        >
+                          {matchingStepData?.gumruk ? (
+                            <FaCheckCircle
+                              className='text-white ml-2'
+                              size='20'
+                            />
+                          ) : (
+                            <Checkbox
+                              name={`checked.${item.id}`} // Formik path
+                              checked={props.values?.checked[item.id] ?? false}
+                              onCheckedChange={(value) =>
+                                props.setFieldValue(`checked.${item.id}`, value)
+                              }
+                              className='mr-4'
+                            />
+                          )}
+                          <span>
+                            {data?.Ürünler[index]?.selectedCategoryValues}
+                          </span>
+                          -<span>{data?.Ürünler[index]?.productName}</span>-
+                          <span>
+                            {(item.productPrice + item.productFeaturePrice) *
+                              item.stock}
+                          </span>
+                        </div>
+                        <p className='text-sm'>
+                          {matchingStepData?.gumruk &&
+                            'Ürün gümrükten geçti ve stoklara eklendi.'}
+                        </p>
+                      </div>
+                      <div>
+                        <Button
+                          type='button'
+                          onClick={() => deleteGumruk(item)}
+                          className={classNames(
+                            'bg-red-500 hover:bg-red-500/80',
+                            !matchingStepData?.gumruk && 'disabled'
+                          )}
+                          disabled={!matchingStepData?.gumruk}
+                        >
+                          Gümrükten veriyi sil
+                        </Button>
                       </div>
                     </div>
                   );
@@ -109,30 +180,39 @@ const StepPage = () => {
                   (stepItem) =>
                     stepItem.orderId === item.id && stepItem.step < 6
                 );
+                {
+                  /* Eğer kullanıcı ürünü diğer adımda kaldıysa burası çalışır*/
+                }
 
                 if (doesntMatchData) {
                   return (
                     <div
                       key={item.id}
-                      className='flex flex-col w-full bg-gray-800 text-white
-                       transition-all duration-200 ease-in-out border shadow-sm rounded p-2 gap-2'
+                      className='flex flex-col w-full  
+                       transition-all duration-200 ease-in-out border shadow-sm rounded p-2 gap-2 cursor-not-allowed bg-gray-800 text-white'
                     >
                       <div
                         className={
-                          'flex items-center gap-2 [&_span]:text-sm w-full w-fit'
+                          'flex items-center gap-2 [&_span]:text-sm w-full'
                         }
                       >
-                        <Checkbox className={'mr-4'} disabled='true' />
+                        <FaExclamationCircle
+                          className='text-orange-600 ml-2'
+                          size='20'
+                        />
                         <span>
-                          {data?.Ürünler[index].selectedCategoryValues}
+                          {data?.Ürünler[index]?.selectedCategoryValues}
                         </span>
-                        -<span>{data?.Ürünler[index].productName}</span>-
-                        <span>{data?.Ürünler[index].productPrice}</span>
+                        -<span>{data?.Ürünler[index]?.productName}</span>-
+                        <span>
+                          {(item.productPrice + item.productFeaturePrice) *
+                            item.stock}
+                        </span>
                       </div>
-                      <p>
+                      <p className='text-sm'>
                         Bu ürün {''}
-                        <span className='bg-gray-500 p-1 text-white rounded'>
-                          {stepByStepData[index]?.stepName}
+                        <span className='p-1 rounded bg-gray-500'>
+                          {doesntMatchData.stepName}
                         </span>{' '}
                         kısmında kalmıştır.
                       </p>
