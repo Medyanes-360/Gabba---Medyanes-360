@@ -1,10 +1,18 @@
 import {
   updateDataByMany,
   updateDataByAny,
+  createNewData,
 } from '@/services/serviceOperations';
+import { getToken } from 'next-auth/jwt';
 
 const handler = async (req, res) => {
   try {
+    const token = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+    const userRole = token && token?.user?.role;
+    const userId = token && token?.user?.id;
     if (req.method === 'POST') {
       const { step, stepName, orderCode, checked } = req.body;
 
@@ -39,22 +47,40 @@ const handler = async (req, res) => {
         }
       );
 
+      const responseLog = await createNewData('Logs', {
+        role: userRole,
+        userId: userId,
+        step: 6,
+        stepName: 'Gümrük',
+        orderCode: orderCode,
+      });
+
       return res.status(200).json({
         message: 'Ürün/Ürünler gümrüğe başarıyla kaydedildi!',
         status: 'success',
       });
     } else if (req.method === 'PUT') {
-      const { id } = req.body;
+      const { item, orderCode } = req.body;
       const updated = await updateDataByAny(
         'StepByStep',
         {
-          orderId: id,
+          orderId: item.id,
         },
         {
+          step: 6,
+          stepName: 'Gümrük',
           gumruk: false,
         }
       );
-      console.log(updated);
+
+      const responseLog = await createNewData('Logs', {
+        role: userRole,
+        userId: userId,
+        step: 6,
+        stepName: 'Gümrük',
+        orderCode: orderCode,
+      });
+
       return res
         .status(200)
         .json({ status: 'success', message: 'Gümrük veriniz silindi!' });
