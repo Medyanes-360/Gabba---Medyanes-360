@@ -28,7 +28,6 @@ const Card = ({
           deletedOrderCode: orderCode,
           processType: 'delete',
         });
-        console.log(response);
         if (response.status !== 'success') {
           setIsloading(false);
           throw new Error('Bir hata oluştu');

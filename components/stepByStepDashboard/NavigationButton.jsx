@@ -28,7 +28,6 @@ const NavigationButton = ({
     if (stepByStepData?.length > 0) {
       const data = stepByStepData.filter((data) => data.orderCode === id);
       if (data.length > 0) {
-        console.log(data);
         setStep(data);
       }
     }

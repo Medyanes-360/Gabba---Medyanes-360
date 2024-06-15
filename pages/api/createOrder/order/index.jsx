@@ -511,8 +511,6 @@ const handler = async (req, res) => {
         }
       );
 
-      console.log(updated);
-
       return res
         .status(200)
         .json({ status: 'success', message: 'Güncelleme başarılı!' });

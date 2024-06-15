@@ -205,7 +205,6 @@ const BasketOffer = ({
               selectedBasketData[0].ProductFeaturePrice,
           }}
           onSubmit={async (values, { resetForm }) => {
-            console.log(selectedBasketData[0]);
             setIsloading(true);
 
             // Stok adedini 0'dan büyük olmasını kontrol ediyoruz.

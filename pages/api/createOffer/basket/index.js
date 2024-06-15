@@ -262,7 +262,7 @@ const handler = async (req, res) => {
         productId: data.selectedOfferProduct,
         productPrice: parseFloat(data.selectedOfferProductPrice),
         productFeaturePrice: parseFloat(data.selectedOfferProductFeaturePrice),
-        user: { connect: { id: userId } }
+        user: { connect: { id: userId } },
       };
 
       const responseCreateBasket = await createNewData(
@@ -393,7 +393,6 @@ const handler = async (req, res) => {
 
     if (req.method === 'GET') {
       const OfferBaskets = await getAllData('OfferBasket');
-      console.log(OfferBaskets)
       const OfferBasketColors = await getAllData('OfferBasketColors');
       const OfferBasketFabrics = await getAllData('OfferBasketFabrics');
       const OfferBasketMeasurements = await getAllData(
@@ -431,108 +430,108 @@ const handler = async (req, res) => {
 
       // OfferBaskets içindeki her bir öğeyi kontrol et
 
-      console.log(OfferBaskets)
-
       await Promise.all(
-        OfferBaskets.filter((dtres) => dtres.userId === req.query.userId).map(async (offerBasket) => {
-          const offerBasketId = offerBasket.id;
+        OfferBaskets.filter((dtres) => dtres.userId === req.query.userId).map(
+          async (offerBasket) => {
+            const offerBasketId = offerBasket.id;
 
-          // OfferBasketColors içinde OfferBaskets ID'sine göre eşleşen renkleri seçme
-          const matchingColors = await OfferBasketColors.filter(
-            (color) => color.basketId === offerBasketId
-          );
+            // OfferBasketColors içinde OfferBaskets ID'sine göre eşleşen renkleri seçme
+            const matchingColors = await OfferBasketColors.filter(
+              (color) => color.basketId === offerBasketId
+            );
 
-          // OfferBasketExtra içinde OfferBaskets ID'sine göre eşleşen ekstraları seçme
-          const matchingExtras = await OfferBasketExtra.filter(
-            (extra) => extra.basketId === offerBasketId
-          );
+            // OfferBasketExtra içinde OfferBaskets ID'sine göre eşleşen ekstraları seçme
+            const matchingExtras = await OfferBasketExtra.filter(
+              (extra) => extra.basketId === offerBasketId
+            );
 
-          // OfferBasketFabrics içinde OfferBaskets ID'sine göre eşleşen kumaşları seçme
-          const matchingFabrics = await OfferBasketFabrics.filter(
-            (fabric) => fabric.basketId === offerBasketId
-          );
+            // OfferBasketFabrics içinde OfferBaskets ID'sine göre eşleşen kumaşları seçme
+            const matchingFabrics = await OfferBasketFabrics.filter(
+              (fabric) => fabric.basketId === offerBasketId
+            );
 
-          const matchingMeasurements = await OfferBasketMeasurements.filter(
-            (measurement) => measurement.basketId === offerBasketId
-          );
+            const matchingMeasurements = await OfferBasketMeasurements.filter(
+              (measurement) => measurement.basketId === offerBasketId
+            );
 
-          // OfferBasketMetals içinde OfferBaskets ID'sine göre eşleşen metalleri seçme
-          const matchingMetals = await OfferBasketMetals.filter(
-            (metal) => metal.basketId === offerBasketId
-          );
+            // OfferBasketMetals içinde OfferBaskets ID'sine göre eşleşen metalleri seçme
+            const matchingMetals = await OfferBasketMetals.filter(
+              (metal) => metal.basketId === offerBasketId
+            );
 
-          // Her bir renk için API çağrısını yaparak Renkler dizisine eklemek
-          const dataColour = await Promise.all(
-            matchingColors.map(async (color) => {
-              const colourData = await getAPI(
-                `/createProduct/colors?colourId=${color.colourId}`
-              );
-              return colourData.data;
-            })
-          );
+            // Her bir renk için API çağrısını yaparak Renkler dizisine eklemek
+            const dataColour = await Promise.all(
+              matchingColors.map(async (color) => {
+                const colourData = await getAPI(
+                  `/createProduct/colors?colourId=${color.colourId}`
+                );
+                return colourData.data;
+              })
+            );
 
-          // Her bir ölçü için API çağrısını yaparak Ölçüler dizisine eklemek
-          const dataMeasurement = await Promise.all(
-            matchingMeasurements.map(async (measurement) => {
-              const measurementData = await getAPI(
-                `/createProduct/measurements?measurementId=${measurement.measurementId}`
-              );
-              return measurementData.data;
-            })
-          );
+            // Her bir ölçü için API çağrısını yaparak Ölçüler dizisine eklemek
+            const dataMeasurement = await Promise.all(
+              matchingMeasurements.map(async (measurement) => {
+                const measurementData = await getAPI(
+                  `/createProduct/measurements?measurementId=${measurement.measurementId}`
+                );
+                return measurementData.data;
+              })
+            );
 
-          // Her bir metaller için API çağrısını yaparak Metaller dizisine eklemek
-          const dataMetal = await Promise.all(
-            matchingMetals.map(async (metal) => {
-              const metalData = await getAPI(
-                `/createProduct/metals?metalId=${metal.metalId}`
-              );
-              return metalData.data;
-            })
-          );
+            // Her bir metaller için API çağrısını yaparak Metaller dizisine eklemek
+            const dataMetal = await Promise.all(
+              matchingMetals.map(async (metal) => {
+                const metalData = await getAPI(
+                  `/createProduct/metals?metalId=${metal.metalId}`
+                );
+                return metalData.data;
+              })
+            );
 
-          // Her bir kumaş için API çağrısını yaparak Kumaşlar dizisine eklemek
-          const dataFabric = await Promise.all(
-            matchingFabrics.map(async (fabric) => {
-              const fabricData = await getAPI(
-                `/createProduct/fabrics?fabricsId=${fabric.fabricsId}`
-              );
-              return fabricData.data;
-            })
-          );
+            // Her bir kumaş için API çağrısını yaparak Kumaşlar dizisine eklemek
+            const dataFabric = await Promise.all(
+              matchingFabrics.map(async (fabric) => {
+                const fabricData = await getAPI(
+                  `/createProduct/fabrics?fabricsId=${fabric.fabricsId}`
+                );
+                return fabricData.data;
+              })
+            );
 
-          // Ürün ID'sine göre API çağrısını yaparak ürünü seçme
-          const productData = await getAPI(
-            `/createProduct/createProduct?productId=${offerBasket.productId}`
-          );
+            // Ürün ID'sine göre API çağrısını yaparak ürünü seçme
+            const productData = await getAPI(
+              `/createProduct/createProduct?productId=${offerBasket.productId}`
+            );
 
-          // Extra ID'sine göre API çağrısını yaparak ekstrayı seçme
-          const extraData = await Promise.all(
-            matchingExtras.map(async (extra) => {
-              const extraData = await getAPI(
-                `/createProduct/createProduct?extraId=${extra.extraId}`
-              );
-              return extraData.data;
-            })
-          );
+            // Extra ID'sine göre API çağrısını yaparak ekstrayı seçme
+            const extraData = await Promise.all(
+              matchingExtras.map(async (extra) => {
+                const extraData = await getAPI(
+                  `/createProduct/createProduct?extraId=${extra.extraId}`
+                );
+                return extraData.data;
+              })
+            );
 
-          const combinedItem = {
-            id: offerBasket.id,
-            Product: productData.data,
-            Stock: offerBasket.stock,
-            OrderNote: offerBasket.orderNote,
-            ProductPrice: offerBasket.productPrice,
-            ProductFeaturePrice: offerBasket.productFeaturePrice,
-            Renkler: dataColour,
-            Extralar: extraData,
-            Ölçüler: dataMeasurement,
-            Kumaşlar: dataFabric,
-            Metaller: dataMetal,
-          };
+            const combinedItem = {
+              id: offerBasket.id,
+              Product: productData.data,
+              Stock: offerBasket.stock,
+              OrderNote: offerBasket.orderNote,
+              ProductPrice: offerBasket.productPrice,
+              ProductFeaturePrice: offerBasket.productFeaturePrice,
+              Renkler: dataColour,
+              Extralar: extraData,
+              Ölçüler: dataMeasurement,
+              Kumaşlar: dataFabric,
+              Metaller: dataMetal,
+            };
 
-          // Toplu veriler dizisine ekle
-          combinedData.push(combinedItem);
-        })
+            // Toplu veriler dizisine ekle
+            combinedData.push(combinedItem);
+          }
+        )
       );
 
       return res.status(200).json({

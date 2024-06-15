@@ -13,11 +13,6 @@ const handler = async (req, res) => {
         orderCode: orderCode,
       });
 
-      console.log(
-        'tedarikciMaliyet[0]: ',
-        tedarikciMaliyet[0].selectedOrdersId
-      );
-
       const token = await getToken({
         req,
         secret: process.env.NEXTAUTH_SECRET,
@@ -32,7 +27,6 @@ const handler = async (req, res) => {
         );
 
         if (matchedDate) {
-          console.log('matchedDate: ', matchedDate);
           // Eğer `dates` array'inde tarih varsa, bu değerle güncelle
           const { selectedDate } = matchedDate;
           if (selectedDate != undefined) {

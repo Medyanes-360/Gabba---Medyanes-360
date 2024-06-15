@@ -97,7 +97,6 @@ const StepPage = () => {
               const response3 = await getAPI(
                 `/stepByStep/ekstralar?orderCode=${id}`
               );
-              console.log(response3.data);
               setStepEsktraData(response3.data);
               const response2 = await getAPI(`/stepByStep?orderCode=${id}`);
               setStepByStepData(response2.data);

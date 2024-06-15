@@ -58,7 +58,6 @@ const handler = async (req, res) => {
       return res.status(200).json(result);
     } else if (req.method === 'PUT') {
       const data = req.body;
-      console.log('data: ', data);
       const { company, companyId, ...newDataWithoutStoreProps } =
         req.body.newData;
 
@@ -73,7 +72,6 @@ const handler = async (req, res) => {
           ? { ...newDataWithoutStoreProps, companyId: company.id }
           : { ...newDataWithoutStoreProps }
       );
-      console.log('financialManagementSpecial: ', financialManagementSpecial);
 
       if (!financialManagementSpecial || financialManagementSpecial.error) {
         throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4';

@@ -87,7 +87,6 @@ const CreateOfferComponent = () => {
       setProducts(createProductResult.data.createProducts);
       setProductFeatures(createProductResult.data.productFeatures);
       setBasketData(basketResult.data);
-      console.log(basketResult.data);
       setCustomers(customerResult.data);
       setIsloading(false);
     } catch (error) {
