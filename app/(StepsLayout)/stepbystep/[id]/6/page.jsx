@@ -29,6 +29,7 @@ const StepPage = () => {
     stepName: 'Teslim Tutanağı',
     checked: {}, // checkbox başlangıç değerleri
   });
+  const [allGumrukTrue, setAllGumrukTrue] = useState(false);
 
   const [data, setData] = useState([]);
 
@@ -42,7 +43,14 @@ const StepPage = () => {
 
   const deleteGumruk = async (item) => {
     setIsLoading(true);
-    const response = await postAPI('/stepByStep/gumruk', item, 'PUT');
+    const response = await postAPI(
+      '/stepByStep/gumruk',
+      {
+        item,
+        orderCode: id,
+      },
+      'PUT'
+    );
     const response2 = await getAPI(`/stepByStep?orderCode=${item.orderCode}`);
     setStepByStepData(response2.data);
     setIsLoading(false);
@@ -57,17 +65,21 @@ const StepPage = () => {
     setIsLoading(true);
 
     if (stepByStepData?.length > 0) {
-      const stepData = stepByStepData.find((data) => data.orderCode === id);
-      console.log('stepData: ', stepData);
-      if (stepData) {
-        const checkeds = {}; // Boş bir nesne oluşturun
-        checkeds[stepData.orderId] = stepData.gumruk || false; // gumruk alanını başlangıç değeri olarak kullan
+      const stepData = stepByStepData.filter((data) => data.orderCode === id);
+      if (stepData.length > 0) {
+        const checkeds = stepData.reduce((acc, item) => {
+          acc[item.orderId] = item.gumruk || false;
+          return acc;
+        }, {});
         setInitialValues({
           step: 7.1,
           stepName: 'Teslim Tutanağı',
           checked: checkeds,
         });
       }
+      // gumruk kontrolü
+      const allTrue = stepByStepData.every((item) => item.gumruk === true);
+      setAllGumrukTrue(allTrue);
     }
 
     setIsLoading(false);
@@ -102,7 +114,11 @@ const StepPage = () => {
             <Label className={'text-muted-foreground text-xs m-0'}>
               Ürünler:
             </Label>
-
+            {allGumrukTrue && (
+              <h2 className=' bg-green-500 text-white p-2 mb-2 rounded text-center uppercase'>
+                SİPARİŞTEKİ tüm ürünler stoklara eklendi!
+              </h2>
+            )}
             {data &&
               data?.Orders?.map((item, index) => {
                 // stepByStepData'daki orderId ve step değerlerini kontrol et
@@ -110,6 +126,7 @@ const StepPage = () => {
                   (stepItem) =>
                     stepItem.orderId === item.id && stepItem.step >= 6
                 );
+
                 if (matchingStepData) {
                   return (
                     <div
