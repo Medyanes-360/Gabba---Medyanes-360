@@ -28,13 +28,25 @@ const StepPage = () => {
     orderCode: id,
   });
 
-  const [stepEkstraData, setStepEsktraData] = useState([]);
+  const [stepEkstraData, setStepEkstraData] = useState([]);
 
   async function getEkstralarData() {
     setIsLoading(true);
     const response = await getAPI(`/stepByStep/ekstralar?orderCode=${id}`);
-    setStepEsktraData(response.data);
+    setStepEkstraData(response.data);
+  }
+
+  async function deleteEkstralarAll() {
+    setIsLoading(true);
+    const response = await postAPI('/stepByStep/ekstralar', id, 'DELETE');
     setIsLoading(false);
+    setInitialValues({
+      extras: [{ price: '', description: '', orderCode: id }],
+      step: 8.1,
+      stepName: 'Ürünlerin Bir Kısmı Teslim Edildi',
+      orderCode: id,
+    });
+    toast.success(response?.message);
   }
 
   useEffect(() => {
@@ -46,6 +58,7 @@ const StepPage = () => {
         }));
       }
     }
+    setIsLoading(false);
   }, [stepByStepData]);
 
   useEffect(() => {
@@ -53,17 +66,21 @@ const StepPage = () => {
   }, []);
 
   useEffect(() => {
-    const extras = stepEkstraData.map((extra) => ({
-      price: extra.price,
-      description: extra.description,
-      orderCode: extra.orderCode,
-    }));
-    setInitialValues((prevValues) => ({
-      ...prevValues,
-      extras: extras.length
-        ? extras
-        : [{ price: '', description: '', orderCode: id }],
-    }));
+    setIsLoading(true);
+    if (stepEkstraData?.length > 0) {
+      const extras = stepEkstraData.map((extra) => ({
+        price: extra.price,
+        description: extra.description,
+        orderCode: extra.orderCode,
+      }));
+      setInitialValues((prevValues) => ({
+        ...prevValues,
+        extras: extras.length
+          ? extras
+          : [{ price: '', description: '', orderCode: id }],
+      }));
+    }
+    setIsLoading(false);
   }, [stepEkstraData]);
 
   return (
@@ -97,7 +114,7 @@ const StepPage = () => {
               const response3 = await getAPI(
                 `/stepByStep/ekstralar?orderCode=${id}`
               );
-              setStepEsktraData(response3.data);
+              setStepEkstraData(response3.data);
               const response2 = await getAPI(`/stepByStep?orderCode=${id}`);
               setStepByStepData(response2.data);
               router.push(`/stepbystep/${id}/8.1`);
@@ -139,7 +156,7 @@ const StepPage = () => {
                           onClick={() => remove(index)}
                         >
                           <GoTrash size={20} />
-                          Sil
+                          Kaldır
                         </button>
                       )}
                     </div>
@@ -157,7 +174,22 @@ const StepPage = () => {
                 </>
               )}
             />
-            <Button type='submit'>Cariye İşle</Button>
+            <div className='grid grid-cols-2 items-center gap-2'>
+              <Button
+                type='submit'
+                className='w-full rounded gap-2 font-medium'
+              >
+                Cariye İşle
+              </Button>
+              <Button
+                type='button'
+                className='w-full rounded bg-red-600/90 hover:bg-red-600/70 transition-all duration-200 ease-in-out  flex items-center justify-center text-white text-sm gap-2 font-medium'
+                onClick={() => deleteEkstralarAll()}
+              >
+                <GoTrash size={20} />
+                Ekstraların Tümünü Temizle
+              </Button>
+            </div>
           </Form>
         )}
       </Formik>
