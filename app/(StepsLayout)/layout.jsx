@@ -281,17 +281,21 @@ const StepsLayout = ({ children }) => {
                   </li>
                   <li>
                     Bekleyen Ürün Sayısı:{' '}
-                    {stepByStepData &&
+                    {(stepByStepData &&
+                      stepByStepData?.length > 0 &&
                       stepByStepData?.filter(
                         (item) => item.teslimEdildi === false
-                      ).length}
+                      ).length) ||
+                      0}
                   </li>
                   <li>
                     Teslim Edilen Ürün Sayısı:{' '}
-                    {stepByStepData &&
+                    {(stepByStepData &&
+                      stepByStepData?.length > 0 &&
                       stepByStepData?.filter(
                         (item) => item.teslimEdildi === true
-                      ).length}
+                      ).length) ||
+                      0}
                   </li>
                 </ul>
               </div>
@@ -317,11 +321,14 @@ const StepsLayout = ({ children }) => {
                           {orderData &&
                             orderData?.Orders?.map((item, index) => {
                               // stepByStepData'daki orderId ve step değerlerini kontrol et
-                              const matchingStepData = stepByStepData.find(
-                                (stepItem) =>
-                                  stepItem.orderId === item.id &&
-                                  stepItem.step >= 6
-                              );
+                              const matchingStepData =
+                                stepByStepData &&
+                                stepByStepData?.length > 0 &&
+                                stepByStepData.find(
+                                  (stepItem) =>
+                                    stepItem.orderId === item.id &&
+                                    stepItem.step >= 6
+                                );
                               if (matchingStepData) {
                                 return (
                                   <div
@@ -366,11 +373,14 @@ const StepsLayout = ({ children }) => {
                                 );
                               }
 
-                              const doesntMatchData = stepByStepData.find(
-                                (stepItem) =>
-                                  stepItem.orderId === item.id &&
-                                  stepItem.step < 6
-                              );
+                              const doesntMatchData =
+                                stepByStepData &&
+                                stepByStepData?.length > 0 &&
+                                stepByStepData.find(
+                                  (stepItem) =>
+                                    stepItem.orderId === item.id &&
+                                    stepItem.step < 6
+                                );
 
                               if (doesntMatchData) {
                                 return (
@@ -413,6 +423,14 @@ const StepsLayout = ({ children }) => {
                                       kısmında kalmıştır.
                                     </p>
                                   </div>
+                                );
+                              }
+                              if (!doesntMatchData && !matchingStepData) {
+                                return (
+                                  <p>
+                                    Ürünlerin adımları ile ilgili veri eklenmesi
+                                    bekleniyor...
+                                  </p>
                                 );
                               }
                             })}
