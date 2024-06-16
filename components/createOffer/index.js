@@ -56,11 +56,12 @@ const CreateOfferComponent = () => {
         return setIsloading(false);
       }
 
-      const createProductResult = await getAPI('/createProduct/createProduct');
-      const basketResult = await getAPI(
-        `/createOffer/basket?userId=${data?.user?.id}`
-      );
-      const customerResult = await getAPI('/customer');
+      const [createProductResult, basketResult, customerResult] =
+        await Promise.all([
+          getAPI('/createProduct/createProduct'),
+          getAPI(`/createOffer/basket?userId=${data?.user?.id}`),
+          getAPI('/customer'),
+        ]);
 
       if (!createProductResult) {
         throw new Error('Veri çekilemedi 2');
@@ -174,20 +175,6 @@ const CreateOfferComponent = () => {
           </div>
         )}
 
-        {isCustomerAndPersonel && (
-          <button
-            onClick={() => setIsCustomerAndPersonel(false)}
-            type='button'
-            className='hover:scale-105 transition-all flex justify-center items-center p-2 text-white font-semibold bg-gray-800 rounded group
-'
-          >
-            <IoChevronBackOutline
-              size={22}
-              className='text-white transform translate-x-0 group-hover:-translate-x-2 transition-transform'
-            />
-            Geri
-          </button>
-        )}
         {/* Eğer sepet butonuna basılırsa */}
         {showBasketOffer && (
           <>
