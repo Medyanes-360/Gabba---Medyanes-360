@@ -102,6 +102,15 @@ const handler = async (req, res) => {
         });
       }
       return res.status(200).json({ status: 'success', data: response });
+    } else if (req.method === 'DELETE') {
+      const id = req.body;
+      const response = await deleteDataByMany('StepByStepEkstralar', {
+        orderCode: id,
+      });
+
+      return res
+        .status(200)
+        .json({ status: 'success', message: 'Silme işleminiz başarılı!' });
     } else {
       throw new Error('Invalid Method!');
     }
