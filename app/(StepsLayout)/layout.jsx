@@ -281,9 +281,18 @@ const StepsLayout = ({ children }) => {
                   </li>
                   <li>
                     Bekleyen Ürün Sayısı:{' '}
-                    {orderData && orderData?.Orders && orderData.Orders.length}
+                    {stepByStepData &&
+                      stepByStepData?.filter(
+                        (item) => item.teslimEdildi === false
+                      ).length}
                   </li>
-                  <li>Teslim Edilen Ürün Sayısı: 0</li>
+                  <li>
+                    Teslim Edilen Ürün Sayısı:{' '}
+                    {stepByStepData &&
+                      stepByStepData?.filter(
+                        (item) => item.teslimEdildi === true
+                      ).length}
+                  </li>
                 </ul>
               </div>
               {/* Ürün Bilgilerinin Takibi */}
