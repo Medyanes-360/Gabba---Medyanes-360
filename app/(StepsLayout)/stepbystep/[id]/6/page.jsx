@@ -62,8 +62,6 @@ const StepPage = () => {
   }, []);
 
   useEffect(() => {
-    setIsLoading(true);
-
     if (stepByStepData?.length > 0) {
       const stepData = stepByStepData.filter((data) => data.orderCode === id);
       if (stepData.length > 0) {
@@ -81,8 +79,6 @@ const StepPage = () => {
       const allTrue = stepByStepData.every((item) => item.gumruk === true);
       setAllGumrukTrue(allTrue);
     }
-
-    setIsLoading(false);
   }, [stepByStepData, id]);
 
   return (
