@@ -57,6 +57,7 @@ const handler = async (req, res) => {
                 urunCikisTarihi: null,
                 tedarikciMaliyeti: 0,
                 gumruk: false,
+                teslimEdildi: false,
                 step: item.step >= 3 ? 3 : item.step,
                 stepName: stepName,
               }
@@ -76,7 +77,7 @@ const handler = async (req, res) => {
               urunCikisTarihi: null,
               gumruk: false,
               tedarikciMaliyeti: 0,
-
+              teslimEdildi: false,
               step: item.step >= 3 ? 3 : item.step,
               stepName: stepName,
             }
