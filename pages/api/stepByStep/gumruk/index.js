@@ -70,6 +70,7 @@ const handler = async (req, res) => {
           step: 6,
           stepName: 'Gümrük',
           gumruk: false,
+          teslimEdildi: false,
         }
       );
 
