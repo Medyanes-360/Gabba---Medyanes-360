@@ -35,6 +35,7 @@ const AddCari = () => {
       if (data) {
         setInitialValues({
           onOdemeMiktari: data.onOdemeMiktari,
+          onOdemeMiktariAciklamasi: data.onOdemeMiktariAciklamasi,
           orderCode: id,
           step: 2,
           stepName: 'Tedarikçi Seç',
