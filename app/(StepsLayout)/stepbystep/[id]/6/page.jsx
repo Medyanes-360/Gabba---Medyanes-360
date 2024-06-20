@@ -87,6 +87,7 @@ const StepPage = () => {
         enableReinitialize={true}
         initialValues={initialValues}
         onSubmit={async (values) => {
+          setIsLoading(true);
           values.orderCode = id;
           const response = await postAPI('/stepByStep/gumruk', values);
           if (response.error || !response) {
