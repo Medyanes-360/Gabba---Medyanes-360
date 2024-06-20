@@ -84,7 +84,7 @@ const NavigationButton = ({
       )}
     >
       {level > 1 && !active && (
-        <div className='w-1.5 h-1.5 absolute left-0 rounded-full bg-muted-foreground' />
+        <div className='w-1.5 h-1.5 absolute left-0 rounded-full bg-white ml-1' />
       )}
       {Icon && (
         <Icon
