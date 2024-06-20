@@ -23,6 +23,7 @@ const handler = async (req, res) => {
     if (req.method === 'POST') {
       const {
         onOdemeMiktari,
+        onOdemeMiktariAciklamasi,
         orderCode,
         step,
         stepName,
@@ -51,6 +52,7 @@ const handler = async (req, res) => {
           productCount,
           {
             onOdemeMiktari,
+            onOdemeMiktariAciklamasi,
             orderCode,
             step,
             stepName,
@@ -61,7 +63,6 @@ const handler = async (req, res) => {
         );
 
         const response = await createNewDataMany('StepByStep', products);
-
         // Cari eklenirken hata çıkarsa, kullanıcıyı bildiriyoruz.
         if (response.error || response == null) {
           throw new Error(
@@ -101,6 +102,8 @@ const handler = async (req, res) => {
           step: 1.2,
           stepName: 'Ön Ödeme Miktarı',
           orderCode: orderCode,
+          onOdemeMiktari: onOdemeMiktari,
+          onOdemeMiktariAciklamasi: onOdemeMiktariAciklamasi,
         });
 
         return res.status(200).json({
