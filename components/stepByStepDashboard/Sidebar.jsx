@@ -132,7 +132,7 @@ const Sidebar = ({ buttons, stepByStepData }) => {
               .map(({ buttons: x, title }, key) => (
                 <div
                   key={key}
-                  className='flex flex-col gap-4 py-5 border-b-2 border-white/20'
+                  className='flex flex-col gap-4 py-5 border-b-2 border-gray-300'
                 >
                   {!isMobile && (
                     <span className='text-sm font-semibold text-muted-foreground'>
