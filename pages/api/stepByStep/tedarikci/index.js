@@ -50,6 +50,8 @@ const handler = async (req, res) => {
         step: 2,
         stepName: 'Tedarikçi Seç',
         orderCode: id,
+        tedarikciId: tedarikciId,
+        tedarikciAciklama: tedarikciAciklama,
       });
 
       return res.status(200).json({
