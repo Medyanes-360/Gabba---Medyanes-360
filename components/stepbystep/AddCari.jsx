@@ -21,6 +21,7 @@ const AddCari = () => {
     useStepByStepDataContext();
   const [initialValues, setInitialValues] = useState({
     onOdemeMiktari: '',
+    onOdemeMiktariAciklamasi: '',
     orderCode: id,
     step: 2,
     stepName: 'Tedarikçi Seç',
@@ -56,6 +57,12 @@ const AddCari = () => {
             'Cariye işlenecek ön ödeme miktarı 0 veya negatif değer olamaz!'
           );
         }
+
+        if (values.onOdemeMiktariAciklamasi.length <= 0) {
+          return toast.error(
+            'Cariye işlenecek ön ödeme miktarı açıklaması boş olamaz.'
+          );
+        }
         setIsLoading(true);
 
         const response = await postAPI('/stepByStep/cari', values);
@@ -88,6 +95,15 @@ const AddCari = () => {
               placeholder={'0'}
               min={0}
               value={props.values.onOdemeMiktari}
+            />
+          </div>
+          <div className='flex gap-2 items-center'>
+            <Input
+              name='onOdemeMiktariAciklamasi'
+              onChange={props.handleChange}
+              type={'text'}
+              placeholder={'Açıklama Ekleyiniz...'}
+              value={props.values.onOdemeMiktariAciklamasi}
             />
           </div>
           <Button type='submit'>Cariye işle</Button>
