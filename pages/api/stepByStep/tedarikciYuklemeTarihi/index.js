@@ -88,13 +88,27 @@ const handler = async (req, res) => {
       // Tüm güncellemeleri paralel olarak gerçekleştirmek için Promise.all kullan
       await Promise.all(updatePromises);
 
-      const responseLog = await createNewData('Logs', {
-        role: userRole,
-        userId: userId,
-        step: 3,
-        stepName: 'Tedarikçi Yükleme Tarihi',
-        orderCode: orderCode,
+      const updateLogPromises = allStepBySteps.map((item) => {
+        const matchedDate = dates.find(
+          (dateItem) => dateItem?.selectedOrdersId === item.orderId
+        );
+
+        if (matchedDate) {
+          const { selectedDate } = matchedDate;
+
+          return createNewData('Logs', {
+            role: userRole,
+            userId: userId,
+            step: 3,
+            stepName: 'Tedarikçi Yükleme Tarihi',
+            orderCode: orderCode,
+            orderId: item.orderId,
+            tedarikciYuklemeTarihi: new Date(selectedDate),
+          });
+        }
       });
+
+      await Promise.all(updateLogPromises);
 
       return res.status(200).json({
         message: 'İşlem başarıyla gerçekleştirildi!',
