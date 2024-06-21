@@ -10,6 +10,7 @@ import {
   deleteDataByMany,
   updateDataByAny,
 } from '@/services/serviceOperations';
+import { getToken } from 'next-auth/jwt';
 
 function generateOrderCode(customerName) {
   const orderDate = new Date();
@@ -55,6 +56,12 @@ function generateOrderCode(customerName) {
 }
 
 const handler = async (req, res) => {
+  const token = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+  const userRole = token && token?.user?.role;
+  const userId = token && token?.user?.id;
   try {
     if (req.method === 'POST') {
       const { basketData, values, processType, deletedOrderCode } = req.body;
@@ -510,6 +517,15 @@ const handler = async (req, res) => {
           ordersStatus: ordersStatus,
         }
       );
+
+      const responseLog = await createNewData('Logs', {
+        role: userRole,
+        userId: userId,
+        step: 99,
+        stepName: 'Sipariş Durumu',
+        orderCode: orderCode,
+        ordersStatus: ordersStatus,
+      });
 
       return res
         .status(200)
