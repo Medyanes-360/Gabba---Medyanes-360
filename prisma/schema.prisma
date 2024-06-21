@@ -603,22 +603,23 @@ model Supplier {
 }
 
 model StepByStep {
-  id                     String    @id @default(auto()) @map("_id") @db.ObjectId
-  step                   Float
-  stepName               String
-  onOdemeMiktari         Int
-  orderCode              String    @unique
-  orderId                String    @unique
-  tedarikciAciklama      String
-  tedarikciYuklemeTarihi DateTime?
-  urunCikisTarihi        DateTime?
-  tedarikciMaliyeti      Float     @default(0.0)
-  ekstraUcretTotal       Float     @default(0.0)
-  gumruk                 Boolean?  @default(false)
-  teslimEdildi           Boolean?  @default(false)
-  tedarikciId            String
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt
+  id                       String    @id @default(auto()) @map("_id") @db.ObjectId
+  step                     Float
+  stepName                 String
+  onOdemeMiktari           Int
+  onOdemeMiktariAciklamasi String
+  orderCode                String    @unique
+  orderId                  String    @unique
+  tedarikciAciklama        String
+  tedarikciYuklemeTarihi   DateTime?
+  urunCikisTarihi          DateTime?
+  tedarikciMaliyeti        Float     @default(0.0)
+  ekstraUcretTotal         Float     @default(0.0)
+  gumruk                   Boolean?  @default(false)
+  teslimEdildi             Boolean?  @default(false)
+  tedarikciId              String
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
 }
 
 model StepByStepEkstralar {
@@ -631,12 +632,30 @@ model StepByStepEkstralar {
 }
 
 model Logs {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  role      String
-  userId    String
-  step      Float
-  stepName  String
-  orderCode String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                       String    @id @default(auto()) @map("_id") @db.ObjectId
+  role                     String
+  userId                   String
+  onOdemeMiktari           Int?
+  onOdemeMiktariAciklamasi String?
+  tedarikciId              String?
+  tedarikciAciklama        String?
+  orderId                  String?
+  tedarikciYuklemeTarihi   DateTime?
+  urunCikisTarihi          DateTime?
+  tedarikciMaliyeti        Float?    @default(0.0)
+  step                     Float
+  stepName                 String
+  orderCode                String    @unique
+  ordersStatus             String?
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+}
+
+model StepByStepCariPayments {
+  id                     String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderCode              String   @unique
+  odemeMiktari           Int?
+  odemeMiktariAciklamasi String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 }
