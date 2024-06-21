@@ -4,27 +4,28 @@ import { useParams } from 'next/navigation';
 import { getAPI } from '@/services/fetchAPI';
 import { useState, useEffect, createContext, useContext } from 'react';
 import LoadingScreen from '@/components/other/dashboardLoading';
-import { Button } from '@/components/ui/button';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { FaInfoCircle } from 'react-icons/fa';
+import AddCariPayment from '@/components/stepbystep/AddCariPayment';
+import ShowEachProductStep from '@/components/stepbystep/ShowEachProductStep';
 
 const LoadingContext = createContext();
 const StepByStepDataContext = createContext();
+const OrderDataContext = createContext();
 
 const StepsLayout = ({ children }) => {
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const buttons = [
+    {
+      title: 'Siparişinizin Durumunu Değiştirin',
+      buttons: [
+        {
+          id: '99',
+          label: 'Sipariş Durumu',
+          path: `/stepbystep/${id}/siparis-durumu`,
+          roles: ['company_manager', 'logistic', 'manager', 'personal'],
+        },
+      ],
+    },
     {
       title: 'Siparişinizi Tamamlayın',
       buttons: [
@@ -72,7 +73,7 @@ const StepsLayout = ({ children }) => {
         },
         {
           id: '7',
-          label: 'Cari Kontrolü',
+          label: 'Teslim Aşaması',
           path: `/stepbystep/${id}/7`,
           childs: [
             {
@@ -93,30 +94,12 @@ const StepsLayout = ({ children }) => {
           id: '8',
           label: 'Ürünlerin Bir Kısmı Teslim Edildi',
           path: `/stepbystep/${id}/8`,
-          childs: [
-            {
-              id: '8.1',
-              label: 'Cari Kontrol',
-              path: `/stepbystep/${id}/8.1`,
-              roles: ['company_manager', 'logistic', 'manager', 'personal'],
-            },
-          ],
+          roles: ['company_manager', 'logistic', 'manager', 'personal'],
         },
         {
           id: '9',
           label: 'İşlem Sonu Cari Kontrol',
           path: `/stepbystep/${id}/9`,
-          roles: ['company_manager', 'logistic', 'manager', 'personal'],
-        },
-      ],
-    },
-    {
-      title: 'Siparişinizin Durumunu Değiştirin',
-      buttons: [
-        {
-          id: '99',
-          label: 'Sipariş Durumu',
-          path: `/stepbystep/${id}/siparis-durumu`,
           roles: ['company_manager', 'logistic', 'manager', 'personal'],
         },
       ],
@@ -129,6 +112,9 @@ const StepsLayout = ({ children }) => {
   // Context'de kullanacağımız stepbystep datasını aktarıyoruz.
   const [stepByStepData, setStepByStepData] = useState([]);
 
+  const [cariPayments, setCariPayments] = useState([]);
+  const [cariPaymentTotalAmount, setCariPaymentsTotalAmount] = useState(0);
+
   const [totalOrderAmount, setTotalOrderAmount] = useState(0);
 
   const getAllOrderData = async () => {
@@ -137,10 +123,9 @@ const StepsLayout = ({ children }) => {
     try {
       const response1 = await getAPI('/createOrder/order');
       const response2 = await getAPI(`/stepByStep?orderCode=${id}`);
-
+      getCariPayments();
       const responseOrderData = response1.data;
       const responseStepByStepData = response2.data;
-
       const order = responseOrderData.find((ord) => id === ord.orderCode);
 
       if (order) {
@@ -166,288 +151,183 @@ const StepsLayout = ({ children }) => {
     setIsLoading(false);
   };
 
+  const getCariPayments = async () => {
+    const response = await getAPI(`/stepByStep/cariPayments?orderCode=${id}`);
+    setCariPayments(response.data);
+    const total = response.data.reduce(
+      (sum, item) => sum + item.odemeMiktari,
+      0
+    );
+    setCariPaymentsTotalAmount(total);
+  };
+
   useEffect(() => {
     getAllOrderData();
   }, []);
 
   return (
     <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
-      <StepByStepDataContext.Provider
-        value={{ stepByStepData, setStepByStepData, orderData }}
+      <OrderDataContext.Provider
+        value={{ orderData, setOrderData, getAllOrderData }}
       >
-        <div className='flex h-screen w-full overflow-hidden bg-background pb-4'>
-          <LoadingScreen isloading={isLoading} />
+        <StepByStepDataContext.Provider
+          value={{ stepByStepData, setStepByStepData, orderData }}
+        >
+          <div className='flex h-screen w-full overflow-hidden bg-background pb-4'>
+            <LoadingScreen isloading={isLoading} />
 
-          <Sidebar buttons={buttons} stepByStepData={stepByStepData} />
+            <Sidebar buttons={buttons} stepByStepData={stepByStepData} />
 
-          <div className='flex flex-1 w-full flex-col h-full px-4 overflow-hidden gap-2'>
-            {/* <Navbar /> */}
+            <div className='flex flex-1 w-full flex-col h-full px-4 overflow-hidden'>
+              {/* <Navbar /> */}
 
-            <div className='flex flex-col flex-1 h-screen overflow-auto bg-background rounded-lg'>
-              <div className='w-full flex p-2 border-b border-r border-l shadow-md'>
-                <ul className='flex items-center justify-around w-full text-gray-600 py-2'>
-                  <li className=''>
-                    Oluşturma Tarihi:{' '}
-                    {orderData &&
-                      orderData?.Orders &&
-                      orderData?.Orders?.map(
-                        (orders, index) =>
-                          index == 0 &&
-                          orders.createdAt
-                            .split('T')[0]
-                            .split('-')
-                            .reverse()
-                            .join('.')
-                      )}
-                  </li>
-                  <li className='underline'>
-                    Müşteri İsmi:{' '}
-                    {orderData &&
-                      orderData.Müşteri &&
-                      orderData.Müşteri[0]?.name}{' '}
-                    {orderData &&
-                      orderData?.Müşteri &&
-                      orderData.Müşteri[0]?.surname}
-                  </li>
-                  <li className='underline'>
-                    Firma İsmi:{' '}
-                    {orderData &&
-                      orderData?.Müşteri &&
-                      orderData.Müşteri[0]?.company_name}
-                  </li>
-                  <li className='underline'>
-                    Ürün Adedi:{' '}
-                    {orderData && orderData?.Orders && orderData.Orders.length}
-                  </li>
-                  <li className='underline'>
-                    Fiyat:{' '}
-                    {orderData &&
-                      orderData?.Orders &&
-                      orderData.Orders.reduce((total, order) => {
-                        return (
-                          total +
-                          (order.productPrice + order.productFeaturePrice) *
-                            order.stock
-                        );
-                      }, 0)}
-                  </li>
-                  <li>
-                    Durum:{' '}
-                    <span className='text-xs px-3 py-1.5 rounded-full bg-blue-900 text-blue-100 font-semibold'>
+              <div className='flex flex-col flex-1 h-screen overflow-auto bg-background rounded-lg'>
+                <div className='w-full flex p-2 border-b border-r border-l shadow-md'>
+                  <ul className='flex items-center justify-around w-full text-gray-600 py-2'>
+                    <li className=''>
+                      Oluşturma Tarihi:{' '}
                       {orderData &&
                         orderData?.Orders &&
-                        orderData.Orders[0].ordersStatus}
-                    </span>
-                  </li>
-                </ul>
-              </div>
-              {/* Müşterinin Bilgileri */}
-              <div className='w-full flex p-2 border-b border-r border-l shadow-md mt-2'>
-                <ul className='flex items-center justify-around w-full text-gray-600 py-2'>
-                  <li className=''>
-                    Müşterinin Ödediği Tutar:{' '}
-                    {stepByStepData && (stepByStepData[0]?.onOdemeMiktari ?? 0)}
-                  </li>
-                  <li>
-                    Müşterinin Kalan Borcu:{' '}
-                    {orderData ? (
-                      <>
-                        {stepByStepData ? (
-                          <>
-                            {(() => {
-                              const totalAmount = orderData.Orders?.reduce(
-                                (total, order) => {
-                                  return (
-                                    total +
-                                    (order.productPrice +
-                                      order.productFeaturePrice) *
-                                      order.stock
-                                  );
-                                },
-                                0
-                              );
-                              const paidAmount =
-                                stepByStepData[0]?.onOdemeMiktari ?? 0;
-                              return totalAmount - paidAmount;
-                            })()}
-                          </>
-                        ) : (
-                          'Step by step data bulunamadı.'
+                        orderData?.Orders?.map(
+                          (orders, index) =>
+                            index == 0 &&
+                            orders.createdAt
+                              .split('T')[0]
+                              .split('-')
+                              .reverse()
+                              .join('.')
                         )}
-                      </>
-                    ) : (
-                      'Order data bulunamadı.'
-                    )}
-                  </li>
-                  <li>
-                    Bekleyen Ürün Sayısı:{' '}
-                    {(stepByStepData &&
-                      stepByStepData?.length > 0 &&
-                      stepByStepData?.filter(
-                        (item) => item.teslimEdildi === false
-                      ).length) ||
-                      0}
-                  </li>
-                  <li>
-                    Teslim Edilen Ürün Sayısı:{' '}
-                    {(stepByStepData &&
-                      stepByStepData?.length > 0 &&
-                      stepByStepData?.filter(
-                        (item) => item.teslimEdildi === true
-                      ).length) ||
-                      0}
-                  </li>
-                </ul>
-              </div>
-              {/* Ürün Bilgilerinin Takibi */}
-              <div className='w-full flex p-2 mt-2'>
-                <div className='flex items-center justify-end w-full text-gray-600 py-2'>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant='outline'
-                        className='bg-slate-800 text-white hover:bg-slate-800/90 hover:text-white transition-all duration-200 ease-in-out'
-                      >
-                        Ürünler Hangi Adımda?
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle className='text-center'>
-                          Aşağıda ürünlerin hangi adımda kaldığını
-                          görebilirsiniz!
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {orderData &&
-                            orderData?.Orders?.map((item, index) => {
-                              // stepByStepData'daki orderId ve step değerlerini kontrol et
-                              const matchingStepData =
-                                stepByStepData &&
-                                stepByStepData?.length > 0 &&
-                                stepByStepData.find(
-                                  (stepItem) =>
-                                    stepItem.orderId === item.id &&
-                                    stepItem.step >= 6
-                                );
-                              if (matchingStepData) {
-                                return (
-                                  <div
-                                    key={item.id}
-                                    className='flex flex-col w-full  
-                                     transition-all duration-200 ease-in-out border shadow-sm rounded p-2 gap-2 cursor-not-allowed bg-gray-800 text-white'
-                                  >
-                                    <div
-                                      className={
-                                        'flex items-center gap-2 [&_span]:text-sm w-full'
-                                      }
-                                    >
-                                      <FaInfoCircle
-                                        className='text-blue-600 ml-2'
-                                        size='20'
-                                      />
-                                      <span>
-                                        {
-                                          orderData?.Ürünler[index]
-                                            ?.selectedCategoryValues
-                                        }
-                                      </span>
-                                      -
-                                      <span>
-                                        {orderData?.Ürünler[index]?.productName}
-                                      </span>
-                                      -
-                                      <span>
-                                        {(item.productPrice +
-                                          item.productFeaturePrice) *
-                                          item.stock}
-                                      </span>
-                                    </div>
-                                    <p className='text-sm'>
-                                      Bu ürün {''}
-                                      <span className='p-1 rounded bg-gray-500'>
-                                        {matchingStepData.stepName}
-                                      </span>{' '}
-                                      kısmında kalmıştır.
-                                    </p>
-                                  </div>
-                                );
-                              }
-
-                              const doesntMatchData =
-                                stepByStepData &&
-                                stepByStepData?.length > 0 &&
-                                stepByStepData.find(
-                                  (stepItem) =>
-                                    stepItem.orderId === item.id &&
-                                    stepItem.step < 6
+                    </li>
+                    <li className='underline'>
+                      Müşteri İsmi:{' '}
+                      {orderData &&
+                        orderData.Müşteri &&
+                        orderData.Müşteri[0]?.name}{' '}
+                      {orderData &&
+                        orderData?.Müşteri &&
+                        orderData.Müşteri[0]?.surname}
+                    </li>
+                    <li className='underline'>
+                      Firma İsmi:{' '}
+                      {orderData &&
+                        orderData?.Müşteri &&
+                        orderData.Müşteri[0]?.company_name}
+                    </li>
+                    <li className='underline'>
+                      Ürün Adedi:{' '}
+                      {orderData &&
+                        orderData?.Orders &&
+                        orderData.Orders.length}
+                    </li>
+                    <li className='underline'>
+                      Fiyat:{' '}
+                      {orderData &&
+                        orderData?.Orders &&
+                        orderData.Orders.reduce((total, order) => {
+                          return (
+                            total +
+                            (order.productPrice + order.productFeaturePrice) *
+                              order.stock
+                          );
+                        }, 0)}
+                    </li>
+                    <li>
+                      Durum:{' '}
+                      <span className='text-xs px-3 py-1.5 rounded-full bg-blue-900 text-blue-100 font-semibold'>
+                        {orderData &&
+                          orderData?.Orders &&
+                          orderData.Orders[0].ordersStatus}
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+                {/* Müşterinin Bilgileri */}
+                <div className='w-full flex p-2 border-b border-r border-l shadow-md mt-2'>
+                  <ul className='flex items-center justify-around w-full text-gray-600 py-2'>
+                    <li className=''>
+                      Müşterinin Ödediği Tutar:{' '}
+                      {stepByStepData &&
+                        (stepByStepData[0]?.onOdemeMiktari ?? 0)}
+                    </li>
+                    <li>
+                      Müşterinin Kalan Borcu:{' '}
+                      {orderData ? (
+                        <>
+                          {stepByStepData ? (
+                            <>
+                              {(() => {
+                                const totalAmount = orderData.Orders?.reduce(
+                                  (total, order) => {
+                                    return (
+                                      total +
+                                      (order.productPrice +
+                                        order.productFeaturePrice) *
+                                        order.stock
+                                    );
+                                  },
+                                  0
                                 );
 
-                              if (doesntMatchData) {
+                                const paidAmount =
+                                  stepByStepData[0]?.onOdemeMiktari ?? 0;
                                 return (
-                                  <div
-                                    key={item.id}
-                                    className='flex flex-col w-full  
-                                     transition-all duration-200 ease-in-out border shadow-sm rounded p-2 gap-2 cursor-not-allowed bg-gray-800 text-white'
-                                  >
-                                    <div
-                                      className={
-                                        'flex items-center gap-2 [&_span]:text-sm w-full'
-                                      }
-                                    >
-                                      <FaInfoCircle
-                                        className='text-blue-600 ml-2'
-                                        size='20'
-                                      />
-                                      <span>
-                                        {
-                                          orderData?.Ürünler[index]
-                                            ?.selectedCategoryValues
-                                        }
-                                      </span>
-                                      -
-                                      <span>
-                                        {orderData?.Ürünler[index]?.productName}
-                                      </span>
-                                      -
-                                      <span>
-                                        {(item.productPrice +
-                                          item.productFeaturePrice) *
-                                          item.stock}
-                                      </span>
-                                    </div>
-                                    <p className='text-sm'>
-                                      Bu ürün {''}
-                                      <span className='p-1 rounded bg-gray-500'>
-                                        {doesntMatchData.stepName}
-                                      </span>{' '}
-                                      kısmında kalmıştır.
-                                    </p>
-                                  </div>
+                                  totalAmount -
+                                  (paidAmount + cariPaymentTotalAmount)
                                 );
-                              }
-                              if (!doesntMatchData && !matchingStepData) {
-                                return (
-                                  <p>
-                                    Ürünlerin adımları ile ilgili veri eklenmesi
-                                    bekleniyor...
-                                  </p>
-                                );
-                              }
-                            })}
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Kapat</AlertDialogCancel>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                              })()}
+                            </>
+                          ) : (
+                            'Step by step data bulunamadı.'
+                          )}
+                        </>
+                      ) : (
+                        'Order data bulunamadı.'
+                      )}
+                    </li>
+                    <li>
+                      Bekleyen Ürün Sayısı:{' '}
+                      {(stepByStepData &&
+                        stepByStepData?.length > 0 &&
+                        stepByStepData?.filter(
+                          (item) => item.teslimEdildi === false
+                        ).length) ||
+                        0}
+                    </li>
+                    <li>
+                      Teslim Edilen Ürün Sayısı:{' '}
+                      {(stepByStepData &&
+                        stepByStepData?.length > 0 &&
+                        stepByStepData?.filter(
+                          (item) => item.teslimEdildi === true
+                        ).length) ||
+                        0}
+                    </li>
+                  </ul>
+                </div>
+                <div className='flex flex-row'>
+                  {/* Ürün Bilgilerinin Takibi */}
+                  <ShowEachProductStep
+                    orderData={orderData}
+                    stepByStepData={stepByStepData}
+                  />
+                  <AddCariPayment
+                    orderData={orderData}
+                    stepByStepData={stepByStepData}
+                    id={id}
+                    setCariPayments={setCariPayments}
+                    cariPayments={cariPayments}
+                    getCariPayments={getCariPayments}
+                    cariPaymentTotalAmount={cariPaymentTotalAmount}
+                  />
+                </div>
+                <div className='py-6 h-full w-full pl-6 md:pl-0'>
+                  {children}
                 </div>
               </div>
-              <div className='py-6 h-full w-full pl-6 md:pl-0'>{children}</div>
             </div>
           </div>
-        </div>
-      </StepByStepDataContext.Provider>
+        </StepByStepDataContext.Provider>
+      </OrderDataContext.Provider>
     </LoadingContext.Provider>
   );
 };
@@ -461,4 +341,8 @@ export const useLoadingContext = () => {
 
 export const useStepByStepDataContext = () => {
   return useContext(StepByStepDataContext);
+};
+
+export const useOrderDataContext = () => {
+  return useContext(OrderDataContext);
 };
