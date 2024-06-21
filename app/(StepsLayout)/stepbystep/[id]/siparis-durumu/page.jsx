@@ -5,14 +5,19 @@ import { useParams } from 'next/navigation';
 import { FaCheckCircle } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { getAPI, postAPI } from '@/services/fetchAPI';
-import { useLoadingContext } from '@/app/(StepsLayout)/layout';
+import {
+  useLoadingContext,
+  useOrderDataContext,
+} from '@/app/(StepsLayout)/layout';
 
 const StepPage = () => {
   const { id } = useParams();
   const [activeButton, setActiveButton] = useState(null);
   const { isLoading, setIsLoading } = useLoadingContext();
+  const { orderData, setOrderData, getAllOrderData } = useOrderDataContext();
 
   const handleButtonClick = async (buttonIndex, buttonText) => {
+    setIsLoading(true);
     setActiveButton(buttonIndex);
     const response = await postAPI(
       '/createOrder/order',
@@ -22,6 +27,11 @@ const StepPage = () => {
       },
       'PUT'
     );
+    const response1 = await getAPI('/createOrder/order');
+    const responseOrderData = response1.data;
+    const order = responseOrderData.find((ord) => id === ord.orderCode);
+    setOrderData(order);
+    setIsLoading(false);
     toast.success(`${buttonText} seçildi!`);
   };
 
