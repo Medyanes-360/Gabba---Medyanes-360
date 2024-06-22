@@ -24,23 +24,42 @@ const handler = async (req, res) => {
         value: checked[key].value,
       }));
 
-      const updatePromises = entries.map((item) => {
-        return updateDataByAny(
-          'StepByStep',
-          {
-            orderId: item.id,
-          },
-          {
-            step: step,
-            stepName: stepName,
+      for (const item of entries) {
+        try {
+          // Log ekleme işlemi
+          await createNewData('Logs', {
+            role: userRole,
+            userId: userId,
+            step: item.value === true ? step : 8,
             teslimEdildi: item.value,
-          }
-        );
-      });
+            orderId: item.id,
+            stepName:
+              item.value === true
+                ? stepName
+                : 'Ürünlerin Bir Kısmı Teslim Edildi',
+            orderCode: orderCode,
+          });
 
-      await Promise.all(updatePromises);
-
-      console.log(updatePromises);
+          // Güncelleme işlemi
+          await updateDataByAny(
+            'StepByStep',
+            {
+              orderId: item.id,
+            },
+            {
+              step: item.value === true ? step : 8,
+              stepName:
+                item.value === true
+                  ? stepName
+                  : 'Ürünlerin Bir Kısmı Teslim Edildi',
+              teslimEdildi: item.value,
+            }
+          );
+        } catch (error) {
+          console.error(`Error processing item ${item.id}:`, error);
+          throw error;
+        }
+      }
 
       return res
         .status(200)
