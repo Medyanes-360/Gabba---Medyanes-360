@@ -168,7 +168,12 @@ const StepsLayout = ({ children }) => {
   return (
     <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
       <OrderDataContext.Provider
-        value={{ orderData, setOrderData, getAllOrderData }}
+        value={{
+          orderData,
+          setOrderData,
+          getAllOrderData,
+          cariPaymentTotalAmount,
+        }}
       >
         <StepByStepDataContext.Provider
           value={{ stepByStepData, setStepByStepData, orderData }}
@@ -271,7 +276,8 @@ const StepsLayout = ({ children }) => {
                                 const paidAmount =
                                   stepByStepData[0]?.onOdemeMiktari ?? 0;
                                 return (
-                                  totalAmount -
+                                  totalAmount +
+                                  stepByStepData[0]?.ekstraUcretTotal -
                                   (paidAmount + cariPaymentTotalAmount)
                                 );
                               })()}
