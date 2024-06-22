@@ -643,6 +643,7 @@ model Logs {
   tedarikciYuklemeTarihi   DateTime?
   urunCikisTarihi          DateTime?
   tedarikciMaliyeti        Float?    @default(0.0)
+  teslimEdildi             Boolean?
   step                     Float
   stepName                 String
   orderCode                String    @unique
