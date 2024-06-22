@@ -35,7 +35,15 @@ const AddCariPayment = ({
     odemeMiktariAciklamasi: '',
     orderCode: id,
   });
-  console.log(cariPayments);
+
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Aylar 0-11 arası olduğu için 1 ekliyoruz
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
+  }
+
   return (
     <>
       <div className='w-full flex p-2 mt-2'>
@@ -56,7 +64,7 @@ const AddCariPayment = ({
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                   {/* Müşteri Bilgisi */}
-                  <div className='bg-white shadow p-3'>
+                  <div className='bg-slate-600 text-white shadow-lg p-5 rounded-lg mt-5'>
                     <p className='text-center mb-3 font-semibold'>
                       -{' '}
                       {orderData &&
@@ -70,14 +78,14 @@ const AddCariPayment = ({
                     <table className='w-full text-center'>
                       <thead>
                         <tr>
-                          <th>Oluşturulma Tarihi</th>
-                          <th>Firma İsmi</th>
-                          <th>Ürün Adedi</th>
-                          <th>Fiyat</th>
-                          <th>Ödenen Tutar</th>
-                          <th>Kalan Borcu</th>
-                          <th>Bekleyen Ürün</th>
-                          <th>Teslim Edilen Ürün</th>
+                          <th className='py-2 px-4'>Oluşturulma Tarihi</th>
+                          <th className='py-2 px-4'>Firma İsmi</th>
+                          <th className='py-2 px-4'>Ürün Adedi</th>
+                          <th className='py-2 px-4'>Fiyat</th>
+                          <th className='py-2 px-4'>Ödenen Tutar</th>
+                          <th className='py-2 px-4'>Kalan Borcu</th>
+                          <th className='py-2 px-4'>Bekleyen Ürün</th>
+                          <th className='py-2 px-4'>Teslim Edilen Ürün</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -143,7 +151,8 @@ const AddCariPayment = ({
                                       const paidAmount =
                                         stepByStepData[0]?.onOdemeMiktari ?? 0;
                                       return (
-                                        totalAmount -
+                                        totalAmount +
+                                        stepByStepData[0]?.ekstraUcretTotal -
                                         (paidAmount + cariPaymentTotalAmount)
                                       );
                                     })()}
@@ -173,43 +182,6 @@ const AddCariPayment = ({
                               0}
                           </td>
                         </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  {/* Ödeme İnputları */}
-                  <div className='bg-white shadow p-3 mt-3'>
-                    <table className='w-full text-center'>
-                      <thead>
-                        <tr>
-                          <th>Ödeme Yapılan Tarih</th>
-                          <th>Ödeme Ücreti</th>
-                          <th>Açıklama</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className='border-b border-t'>
-                          <td>
-                            {stepByStepData &&
-                              (stepByStepData[0]?.createdAt ?? '')}
-                          </td>
-                          <td>
-                            {stepByStepData &&
-                              (stepByStepData[0]?.onOdemeMiktari ?? 0)}
-                          </td>
-                          <td>
-                            {stepByStepData &&
-                              (stepByStepData[0]?.onOdemeMiktariAciklamasi ??
-                                '')}
-                          </td>
-                        </tr>
-                        {cariPayments &&
-                          cariPayments.map((item) => (
-                            <tr className='border-t'>
-                              <td>{item.createdAt}</td>
-                              <td>{item.odemeMiktari}</td>
-                              <td>{item.odemeMiktariAciklamasi}</td>
-                            </tr>
-                          ))}
                       </tbody>
                     </table>
                   </div>
@@ -259,7 +231,7 @@ const AddCariPayment = ({
                     {(props) => (
                       <Form
                         onSubmit={props.handleSubmit}
-                        className='flex flex-col gap-4 mt-12 justify-center items-center'
+                        className='flex flex-col gap-4 mt-12 justify-center items-center shadow p-3'
                       >
                         <Label className={'text-xs'}>
                           Açıklama: Müşteriden alınan ödeme miktarını burada
@@ -289,6 +261,53 @@ const AddCariPayment = ({
                       </Form>
                     )}
                   </Formik>
+                  {/* Ödeme İnputları */}
+                  <div className='bg-slate-600 text-white shadow-lg p-5 rounded-lg mt-5'>
+                    <h3 className='text-center mb-4 text-2xl font-semibold'>
+                      Daha Önce Yapılan Ödemeler
+                    </h3>
+                    <table className='w-full text-center table-auto'>
+                      <thead>
+                        <tr className='bg-slate-700'>
+                          <th className='py-2 px-4'>Ödeme Yapılan Tarih</th>
+                          <th className='py-2 px-4'>Ödeme Ücreti</th>
+                          <th className='py-2 px-4'>Açıklama</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className='border-b border-slate-500'>
+                          <td className='py-2 px-4'>
+                            {stepByStepData &&
+                              formatDate(stepByStepData[0]?.createdAt ?? '')}
+                          </td>
+                          <td className='py-2 px-4'>
+                            {stepByStepData &&
+                              (stepByStepData[0]?.onOdemeMiktari ?? 0)}
+                          </td>
+                          <td className='py-2 px-4'>
+                            {stepByStepData &&
+                              (stepByStepData[0]?.onOdemeMiktariAciklamasi ??
+                                '')}
+                          </td>
+                        </tr>
+                        {cariPayments &&
+                          cariPayments.map((item, index) => (
+                            <tr
+                              key={index}
+                              className='border-b border-slate-500'
+                            >
+                              <td className='py-2 px-4'>
+                                {formatDate(item.createdAt ?? '')}
+                              </td>
+                              <td className='py-2 px-4'>{item.odemeMiktari}</td>
+                              <td className='py-2 px-4'>
+                                {item.odemeMiktariAciklamasi}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
