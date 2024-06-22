@@ -30,6 +30,21 @@ const handler = async (req, res) => {
           // Eğer `dates` array'inde tarih varsa, bu değerle güncelle
           const { selectedDate } = matchedDate;
           if (selectedDate != undefined) {
+            createNewData('Logs', {
+              role: userRole,
+              userId: userId,
+              step: 5,
+              stepName: 'Ürün Maliyeti ve Çıkış Tarihi',
+              orderCode: orderCode,
+              urunCikisTarihi: new Date(selectedDate),
+              tedarikciMaliyeti: parseFloat(
+                tedarikciMaliyet[index].selectedOrdersId ==
+                  matchedDate.selectedOrdersId
+                  ? tedarikciMaliyet[index].tedarikciMaliyeti
+                  : 0
+              ),
+            });
+
             const response = updateDataByAny(
               'StepByStep',
               { orderId: item.orderId },
@@ -52,6 +67,21 @@ const handler = async (req, res) => {
             if (item.step == 5) stepName = 'Ürün Maliyeti ve Çıkış Tarihi';
             if (item.step < 5) stepName = item.stepName;
             if (item.step > 5) stepName = 'Ürün Maliyeti ve Çıkış Tarihi';
+            createNewData('Logs', {
+              role: userRole,
+              userId: userId,
+              step: 5,
+              stepName: 'Ürün Maliyeti ve Çıkış Tarihi',
+              orderCode: orderCode,
+              urunCikisTarihi: new Date(selectedDate),
+              tedarikciMaliyeti: parseFloat(
+                tedarikciMaliyet[index].selectedOrdersId ==
+                  matchedDate.selectedOrdersId
+                  ? tedarikciMaliyet[index].tedarikciMaliyeti
+                  : 0
+              ),
+            });
+
             return updateDataByAny(
               'StepByStep',
               { orderId: item.orderId },
@@ -71,6 +101,20 @@ const handler = async (req, res) => {
           if (item.step == 5) stepName = 'Ürün Maliyeti ve Çıkış Tarihi';
           if (item.step < 5) stepName = item.stepName;
           if (item.step > 5) stepName = 'Ürün Maliyeti ve Çıkış Tarihi';
+          createNewData('Logs', {
+            role: userRole,
+            userId: userId,
+            step: 5,
+            stepName: 'Ürün Maliyeti ve Çıkış Tarihi',
+            orderCode: orderCode,
+            urunCikisTarihi: new Date(selectedDate),
+            tedarikciMaliyeti: parseFloat(
+              tedarikciMaliyet[index].selectedOrdersId ==
+                matchedDate.selectedOrdersId
+                ? tedarikciMaliyet[index].tedarikciMaliyeti
+                : 0
+            ),
+          });
           return updateDataByAny(
             'StepByStep',
             { orderId: item.orderId },
@@ -88,33 +132,6 @@ const handler = async (req, res) => {
 
       // Tüm güncellemeleri paralel olarak gerçekleştirmek için Promise.all kullan
       await Promise.all(updatePromises);
-
-      const responseLogPromises = allStepBySteps.map((item, index) => {
-        const matchedDate = dates.find(
-          (dateItem) => dateItem?.selectedOrdersId === item.orderId
-        );
-
-        if (matchedDate) {
-          // Eğer `dates` array'inde tarih varsa, bu değerle güncelle
-          const { selectedDate } = matchedDate;
-          createNewData('Logs', {
-            role: userRole,
-            userId: userId,
-            step: 5,
-            stepName: 'Ürün Maliyeti ve Çıkış Tarihi',
-            orderCode: orderCode,
-            urunCikisTarihi: new Date(selectedDate),
-            tedarikciMaliyeti: parseFloat(
-              tedarikciMaliyet[index].selectedOrdersId ==
-                matchedDate.selectedOrdersId
-                ? tedarikciMaliyet[index].tedarikciMaliyeti
-                : 0
-            ),
-          });
-        }
-      });
-
-      await Promise.all(responseLogPromises);
 
       return res.status(200).json({
         message: 'İşlem başarıyla gerçekleştirildi!',
