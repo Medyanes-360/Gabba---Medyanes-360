@@ -117,7 +117,7 @@ const StepPage = () => {
               setStepEkstraData(response3.data);
               const response2 = await getAPI(`/stepByStep?orderCode=${id}`);
               setStepByStepData(response2.data);
-              router.push(`/stepbystep/${id}/8.1`);
+              router.push(`/stepbystep/${id}/8`);
               return setIsLoading(false);
             }
           }
@@ -178,6 +178,10 @@ const StepPage = () => {
               <Button
                 type='submit'
                 className='w-full rounded gap-2 font-medium'
+                disabled={
+                  props.values.extras[0].price <= 0 ||
+                  props.values.extras[0].description.length <= 0
+                }
               >
                 Cariye İşle
               </Button>
