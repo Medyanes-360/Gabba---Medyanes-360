@@ -1,14 +1,15 @@
 /* eslint-disable react/no-unescaped-entities */
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 
 import Image from 'next/image';
-// import jsPDF from "jspdf";
-// import html2canvas from "html2canvas";
 import { FaPrint } from 'react-icons/fa6';
 
-import { useReactToPrint } from 'react-to-print';
 import { useOrderDataContext } from '@/app/(StepsLayout)/layout';
 import { getAPI } from '@/services/fetchAPI';
 const langs = {
@@ -94,11 +95,13 @@ const langs = {
   },
 };
 
-const PrintTest = ({ data, lang }) => {
-  const { orderData } = useOrderDataContext();
+const PrintTest = ({ data, lang, stepByStepData }) => {
+  // const { orderData } = useOrderDataContext();
   const [companyInformation, setCompanyInformation] = useState([]);
-  const printRef = useRef(null);
 
+  const [indirimOrani, setIndirimOrani] = useState(0);
+  const [kdvliFirma, setKdvliFirma] = useState(false);
+  const [kdvOrani, setKdvOrani] = useState(0);
   const getCompany = async () => {
     const response = await getAPI('/company');
     const filteredCompany = response.data.filter(
@@ -116,12 +119,12 @@ const PrintTest = ({ data, lang }) => {
       /* Datayı başlangıç için hazırlıyoruz müşteri verileri */
     }
     const res = {
-      order_no: orderData.orderCode,
+      order_no: data.orderCode,
       musteri: {
-        name: orderData.Müşteri[0].name + ' ' + orderData.Müşteri[0].surname,
-        phone: orderData.Müşteri[0].phoneNumber,
-        adress: orderData.Müşteri[0].address,
-        email: orderData.Müşteri[0].mailAddress,
+        name: data.Müşteri[0].name + ' ' + data.Müşteri[0].surname,
+        phone: data.Müşteri[0].phoneNumber,
+        adress: data.Müşteri[0].address,
+        email: data.Müşteri[0].mailAddress,
       },
       products: [],
     };
@@ -129,7 +132,7 @@ const PrintTest = ({ data, lang }) => {
     {
       /* Data içindeki Oders ların hepsinin içinde geziyoruz */
     }
-    orderData.Orders.forEach((value) => {
+    data.Orders.forEach((value) => {
       {
         /* Orderımızın id'si */
       }
@@ -150,7 +153,7 @@ const PrintTest = ({ data, lang }) => {
       {
         /* tüm ürünler'de filter ile product id'miz ve ürün id si aynı olanların içerisinde gezip info, quantity gibi ürün bilgilerini x_d yani ürün datasına gönderiyoruz */
       }
-      orderData.Ürünler
+      data.Ürünler
         .filter((x_f) => x_f.id === pr_id)
         .forEach((x_m) => {
           x_d = {
@@ -164,14 +167,15 @@ const PrintTest = ({ data, lang }) => {
               Number(value.stock),
             id: x_m.id,
             name: x_m.productName,
+            orderId: or_id,
           };
         });
 
       {
         /* Extralar içerisinde gezip orderId product id ile eşit olanların içerisinde gezip extras yani ürün özelliklerine bu datayı gödneriyoruz */
       }
-      if (Array.isArray(orderData.Extralar) && orderData.Extralar.length > 0) {
-        orderData.Extralar?.filter((x_f) => x_f?.orderId === pr_id)?.forEach(
+      if (Array.isArray(data.Extralar) && data.Extralar.length > 0) {
+        data.Extralar?.filter((x_f) => x_f?.orderId === pr_id)?.forEach(
           (x_k) => {
             x_d = {
               ...x_d,
@@ -317,15 +321,6 @@ const PrintTest = ({ data, lang }) => {
   }
 
   {
-    /* Sayfanın print özelliğini tetikleyip yazdılacak divin referansını veriyorum content'de, ve pageStyle ile kenarlardan margin veriyoruz */
-  }
-
-  const handlePrint = useReactToPrint({
-    content: () => printRef.current,
-    pageStyle: `margin: 2.5%`,
-  });
-
-  {
     /* ücreti yani fiyatı normalize etme işlemi. */
   }
   const formatCurrency = (amount) => {
@@ -341,27 +336,57 @@ const PrintTest = ({ data, lang }) => {
      tax = kdv,
      grandTotal = kdv dahil*/
   }
-  const calculateTotals = (taxRate, products) => {
+  const calculateTotals = (products) => {
     let total = 0;
+    let indirimliTutar = 0;
     let tax = 0;
+    let kdvHaricTutar = 0;
+    details.products.map((product) => {
+      const matchedData = stepByStepData.filter(
+        (item) => item.orderId == product.orderId && item.gumruk == true
+      );
 
-    products.forEach((product) => {
-      total += product.totalPrice;
+      console.log('matchedData ******* ', matchedData.length);
+
+      if (matchedData?.length > 0) {
+        total += product.totalPrice;
+        indirimliTutar += (product.totalPrice * indirimOrani) / 100;
+      }
     });
 
-    tax = total * (taxRate / 100);
+    // products.forEach((product) => {
+    //   total += product.totalPrice;
+    //   indirimliTutar += (product.totalPrice * indirimOrani) / 100;
+    // });
 
-    const grandTotal = total + tax;
+    kdvHaricTutar = total - indirimliTutar;
 
+    tax = total * (kdvOrani / 100);
+
+    const grandTotal = kdvHaricTutar + tax;
     return {
       total: formatCurrency(total),
       tax: formatCurrency(tax),
       grandTotal: formatCurrency(grandTotal),
+      indirimliTotal: formatCurrency(indirimliTutar),
+      kdvHaricTotal: formatCurrency(kdvHaricTutar),
+    };
+  };
+
+  const calculateIndirimOrani = (product, amount) => {
+    let productTotal = product * amount;
+    let indirimTotal = 0;
+    let kdvHaric = 0;
+    indirimTotal = (productTotal * indirimOrani) / 100;
+    kdvHaric = productTotal - indirimTotal;
+    return {
+      indirimTutar: formatCurrency(indirimTotal),
+      kdvHaricTutar: formatCurrency(kdvHaric),
     };
   };
 
   const details = filterDataByOrderId();
-  const total = calculateTotals(16, details.products);
+  const total = calculateTotals(details.products);
 
   const todayDate = () => {
     const today = new Date();
@@ -376,19 +401,42 @@ const PrintTest = ({ data, lang }) => {
     return formattedDate;
   };
 
+  let count = 0;
+
   return (
     <div className='flex flex-col h-fit overflow-auto gap-6 relative m-auto w-[29.7cm]'>
-      <button
-        className='px-8 py-2 w-[29.7cm] bg-green-500 text-white font-bold rounded-md hover:opacity-75 transition-all duration-200 active:bg-green-400'
-        onClick={handlePrint}
-      >
-        <div className='flex justify-center gap-4 items-center'>
-          <span className='text-lg'>{langs.indirmeButonu[lang]}</span>{' '}
-          <FaPrint size={20} />
+      <div className='flex items-center'>
+        <div className='max-w-md mx-2'>
+          <Label>İndirim Oranını Ekleyiniz</Label>
+          <Input
+            type='number'
+            placeholder='0'
+            min='0'
+            onChange={(e) => setIndirimOrani(e.target.value)}
+          />
         </div>
-      </button>
-
-      <div ref={printRef} className='a4 overflow-y-auto'>
+        <div className='max-w-md mx-2 flex items-center gap-3'>
+          <Label>KDV'li Şirket mi?</Label>
+          <Checkbox
+            checked={kdvliFirma}
+            onCheckedChange={(value) => {
+              setKdvliFirma(value);
+            }}
+          />
+        </div>
+        {kdvliFirma && (
+          <div className='max-w-md mx-2'>
+            <Label>KDV Oranını Ekleyiniz</Label>
+            <Input
+              type='number'
+              placeholder='0'
+              min='0'
+              onChange={(e) => setKdvOrani(e.target.value)}
+            />
+          </div>
+        )}
+      </div>
+      <div className='a4 overflow-y-auto'>
         {/* Header */}
         <header className='flex items-center justify-end mb-6 px-4'>
           <Image
@@ -455,61 +503,84 @@ const PrintTest = ({ data, lang }) => {
             </tr>
           </thead>
           <tbody className='[&_tr_td]:p-[6px] [&_tr_td]:text-center [&_tr_th]:text-[#000]'>
-            {details?.products?.map((product, idx) => (
-              <tr
-                key={idx}
-                className='even:bg-[#F2F2F2] bg-white break-inside-avoid'
-              >
-                <td className='border border-black text-[13.5pt] text-[#000] font-bold'>
-                  {idx + 1}
-                </td>
-                <td className='border border-black overflow-hidden'>
-                  <div className='!max-h-fit overflow-hidden gap-2 flex flex-wrap'>
-                    <span className='px-2.5 py-1 text-[9pt] text-black border border-black rounded-md font-semibold rounded-full w-fit'>
-                      {product.name}
-                    </span>
+            {details?.products?.map((product, idx) => {
+              console.log('product: ', product);
 
-                    <span className='px-2.5 py-1 text-[9pt] text-black border border-black rounded-md font-semibold rounded-full w-fit'>
-                      {product.info}
-                    </span>
+              const matchedData = stepByStepData.find(
+                (item) => item.orderId == product.orderId && item.gumruk == true
+              );
 
-                    {product?.extras?.map((feature, idx) => (
-                      <div
-                        key={'feature-' + idx}
-                        className='px-2 py-1 text-center align-middle flex gap-1 [&_span]:text-black border border-black rounded-full [&_span]:text-[10pt] items-center'
-                      >
-                        <span>{feature.value}</span>
+              if (matchedData) {
+                count = count + 1;
+                return (
+                  <tr
+                    key={count}
+                    className='even:bg-[#F2F2F2] bg-white break-inside-avoid'
+                  >
+                    <td className='border border-black text-[13.5pt] text-[#000] font-bold'>
+                      {count}
+                    </td>
+                    <td className='border border-black overflow-hidden'>
+                      <div className='!max-h-fit overflow-hidden gap-2 flex flex-wrap'>
+                        <span className='px-2.5 py-1 text-[9pt] text-black border border-black rounded-md font-semibold rounded-full w-fit'>
+                          {product.name}
+                        </span>
+
+                        <span className='px-2.5 py-1 text-[9pt] text-black border border-black rounded-md font-semibold rounded-full w-fit'>
+                          {product.info}
+                        </span>
+
+                        {product?.extras?.map((feature, idx) => (
+                          <div
+                            key={'feature-' + idx}
+                            className='px-2 py-1 text-center align-middle flex gap-1 [&_span]:text-black border border-black rounded-full [&_span]:text-[10pt] items-center'
+                          >
+                            <span>{feature.value}</span>
+                          </div>
+                        ))}
+
+                        {product.note && product.note !== '' && (
+                          <div className='px-2 py-1 flex gap-1 [&_span]:text-black border border-black rounded-md [&_span]:text-[10pt] items-center w-full'>
+                            <span>{product.note}</span>
+                          </div>
+                        )}
                       </div>
-                    ))}
-
-                    {product.note && product.note !== '' && (
-                      <div className='px-2 py-1 flex gap-1 [&_span]:text-black border border-black rounded-md [&_span]:text-[10pt] items-center w-full'>
-                        <span>{product.note}</span>
-                      </div>
-                    )}
-                  </div>
-                </td>
-                <td className='border border-black whitespace-nowrap'>
-                  {product.quantity} грн
-                </td>
-                <td className='border border-black whitespace-nowrap '>
-                  {formatCurrency(product.price)} грн
-                </td>
-                <td className='border border-black whitespace-nowrap'>
-                  {formatCurrency(product.quantity * product.price)} грн
-                </td>
-                <td className='border border-black whitespace-nowrap'>x</td>
-                <td className='border border-black whitespace-nowrap'>y</td>
-              </tr>
-            ))}
+                    </td>
+                    <td className='border border-black whitespace-nowrap'>
+                      {product.quantity} грн
+                    </td>
+                    <td className='border border-black whitespace-nowrap '>
+                      {formatCurrency(product.price)} грн
+                    </td>
+                    <td className='border border-black whitespace-nowrap'>
+                      {formatCurrency(product.quantity * product.price)} грн
+                    </td>
+                    <td className='border border-black whitespace-nowrap'>
+                      {
+                        calculateIndirimOrani(product.quantity, product.price)
+                          .indirimTutar
+                      }
+                      грн
+                    </td>
+                    <td className='border border-black whitespace-nowrap'>
+                      {
+                        calculateIndirimOrani(product.quantity, product.price)
+                          .kdvHaricTutar
+                      }
+                      грн
+                    </td>
+                  </tr>
+                );
+              }
+            })}
             <tr>
               <td></td>
               <td></td>
               <td></td>
               <td>{langs.total[lang]} :</td>
               <td> {total.total}</td>
-              <td>fffff</td>
-              <td>ggggg</td>
+              <td>{total.indirimliTotal}</td>
+              <td>{total.kdvHaricTotal}</td>
             </tr>
           </tbody>
         </table>
@@ -553,15 +624,7 @@ const PrintTest = ({ data, lang }) => {
         </footer>
       </div>
 
-      <button
-        className='px-8 py-2 w-[29.7cm] bg-green-500 text-white font-bold rounded-md hover:opacity-75 transition-all duration-200 active:bg-green-400'
-        onClick={handlePrint}
-      >
-        <div className='flex justify-center gap-4 items-center'>
-          <span className='text-lg'>{langs.indirmeButonu[lang]}</span>{' '}
-          <FaPrint size={20} />
-        </div>
-      </button>
+      <p>Teslim Tutanağını Oluştur</p>
     </div>
   );
 };
