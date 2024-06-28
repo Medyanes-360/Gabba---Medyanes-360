@@ -37,11 +37,14 @@ const AddCariPayment = ({
   });
 
   function formatDate(dateString) {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Aylar 0-11 arası olduğu için 1 ekliyoruz
-    const year = date.getFullYear();
-    return `${day}.${month}.${year}`;
+    if (dateString?.length > 0) {
+      const date = new Date(dateString);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Aylar 0-11 arası olduğu için 1 ekliyoruz
+      const year = date.getFullYear();
+      return `${day}.${month}.${year}`;
+    }
+    return '';
   }
 
   return (
@@ -62,129 +65,131 @@ const AddCariPayment = ({
                 <AlertDialogTitle className='text-center'>
                   Cari Ek Ödeme
                 </AlertDialogTitle>
-                <AlertDialogDescription>
-                  {/* Müşteri Bilgisi */}
-                  <div className='bg-slate-600 text-white shadow-lg p-5 rounded-lg mt-5'>
-                    <p className='text-center mb-3 font-semibold'>
-                      -{' '}
-                      {orderData &&
-                        orderData.Müşteri &&
-                        orderData.Müşteri[0]?.name}{' '}
-                      {orderData &&
-                        orderData?.Müşteri &&
-                        orderData.Müşteri[0]?.surname}{' '}
-                      -
-                    </p>
-                    <table className='w-full text-center'>
-                      <thead>
-                        <tr>
-                          <th className='py-2 px-4'>Oluşturulma Tarihi</th>
-                          <th className='py-2 px-4'>Firma İsmi</th>
-                          <th className='py-2 px-4'>Ürün Adedi</th>
-                          <th className='py-2 px-4'>Fiyat</th>
-                          <th className='py-2 px-4'>Ödenen Tutar</th>
-                          <th className='py-2 px-4'>Kalan Borcu</th>
-                          <th className='py-2 px-4'>Bekleyen Ürün</th>
-                          <th className='py-2 px-4'>Teslim Edilen Ürün</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>
-                            {orderData &&
-                              orderData?.Orders &&
-                              orderData?.Orders?.map(
-                                (orders, index) =>
-                                  index == 0 &&
-                                  orders.createdAt
-                                    .split('T')[0]
-                                    .split('-')
-                                    .reverse()
-                                    .join('.')
-                              )}
-                          </td>
-                          <td>
-                            {orderData &&
-                              orderData?.Müşteri &&
-                              orderData.Müşteri[0]?.company_name}
-                          </td>
-                          <td>
-                            {orderData &&
-                              orderData?.Orders &&
-                              orderData.Orders.length}
-                          </td>
-                          <td>
-                            {orderData &&
-                              orderData?.Orders &&
-                              orderData.Orders.reduce((total, order) => {
-                                return (
-                                  total +
-                                  (order.productPrice +
-                                    order.productFeaturePrice) *
-                                    order.stock
-                                );
-                              }, 0)}
-                          </td>
-                          <td>
-                            {stepByStepData &&
-                              (stepByStepData[0]?.onOdemeMiktari ?? 0) +
-                                cariPaymentTotalAmount}
-                          </td>
-                          <td>
-                            {orderData ? (
-                              <>
-                                {stepByStepData ? (
-                                  <>
-                                    {(() => {
-                                      const totalAmount =
-                                        orderData.Orders?.reduce(
-                                          (total, order) => {
-                                            return (
-                                              total +
-                                              (order.productPrice +
-                                                order.productFeaturePrice) *
-                                                order.stock
-                                            );
-                                          },
-                                          0
-                                        );
-                                      const paidAmount =
-                                        stepByStepData[0]?.onOdemeMiktari ?? 0;
-                                      return (
-                                        totalAmount +
-                                        stepByStepData[0]?.ekstraUcretTotal -
-                                        (paidAmount + cariPaymentTotalAmount)
-                                      );
-                                    })()}
-                                  </>
-                                ) : (
-                                  'Step by step data bulunamadı.'
-                                )}
-                              </>
-                            ) : (
-                              'Order data bulunamadı.'
+                {/* Müşteri Bilgisi */}
+                <div className='bg-slate-600 text-white shadow-lg p-5 rounded-lg mt-5'>
+                  <p className='text-center mb-3 font-semibold'>
+                    -{' '}
+                    {orderData &&
+                      orderData.Müşteri &&
+                      orderData.Müşteri[0]?.name}{' '}
+                    {orderData &&
+                      orderData?.Müşteri &&
+                      orderData.Müşteri[0]?.surname}{' '}
+                    -
+                  </p>
+                  <table className='w-full text-center'>
+                    <thead>
+                      <tr>
+                        <th className='py-2 px-4'>Oluşturulma Tarihi</th>
+                        <th className='py-2 px-4'>Firma İsmi</th>
+                        <th className='py-2 px-4'>Ürün Adedi</th>
+                        <th className='py-2 px-4'>Fiyat</th>
+                        <th className='py-2 px-4'>Ödenen Tutar</th>
+                        <th className='py-2 px-4'>Kalan Borcu</th>
+                        <th className='py-2 px-4'>Bekleyen Ürün</th>
+                        <th className='py-2 px-4'>Teslim Edilen Ürün</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          {orderData &&
+                            orderData?.Orders &&
+                            orderData?.Orders?.map(
+                              (orders, index) =>
+                                index == 0 &&
+                                orders.createdAt
+                                  .split('T')[0]
+                                  .split('-')
+                                  .reverse()
+                                  .join('.')
                             )}
-                          </td>
-                          <td>
-                            {(stepByStepData &&
-                              stepByStepData?.length > 0 &&
-                              stepByStepData?.filter(
-                                (item) => item.teslimEdildi === false
-                              ).length) ||
-                              0}
-                          </td>
-                          <td>
-                            {(stepByStepData &&
-                              stepByStepData?.length > 0 &&
-                              stepByStepData?.filter(
-                                (item) => item.teslimEdildi === true
-                              ).length) ||
-                              0}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
+                        </td>
+                        <td>
+                          {orderData &&
+                            orderData?.Müşteri &&
+                            orderData.Müşteri[0]?.company_name}
+                        </td>
+                        <td>
+                          {orderData &&
+                            orderData?.Orders &&
+                            orderData.Orders.length}
+                        </td>
+                        <td>
+                          {orderData &&
+                            orderData?.Orders &&
+                            orderData.Orders.reduce((total, order) => {
+                              return (
+                                total +
+                                (order.productPrice +
+                                  order.productFeaturePrice) *
+                                  order.stock
+                              );
+                            }, 0)}
+                        </td>
+                        <td>
+                          {stepByStepData &&
+                            (stepByStepData[0]?.onOdemeMiktari ?? 0) +
+                              cariPaymentTotalAmount}
+                        </td>
+                        <td>
+                          {orderData ? (
+                            <>
+                              {stepByStepData ? (
+                                <>
+                                  {(() => {
+                                    const totalAmount =
+                                      orderData.Orders?.reduce(
+                                        (total, order) => {
+                                          return (
+                                            total +
+                                            (order.productPrice +
+                                              order.productFeaturePrice) *
+                                              order.stock
+                                          );
+                                        },
+                                        0
+                                      );
+                                    const paidAmount =
+                                      stepByStepData[0]?.onOdemeMiktari ?? 0;
+                                    const ekstraUcretTotal =
+                                      stepByStepData[0]?.ekstraUcretTotal ?? 0;
+                                    return (
+                                      totalAmount +
+                                      ekstraUcretTotal -
+                                      (paidAmount + cariPaymentTotalAmount)
+                                    );
+                                  })()}
+                                </>
+                              ) : (
+                                'Step by step data bulunamadı.'
+                              )}
+                            </>
+                          ) : (
+                            'Order data bulunamadı.'
+                          )}
+                        </td>
+                        <td>
+                          {(stepByStepData &&
+                            stepByStepData?.length > 0 &&
+                            stepByStepData?.filter(
+                              (item) => item.teslimEdildi === false
+                            ).length) ||
+                            0}
+                        </td>
+                        <td>
+                          {(stepByStepData &&
+                            stepByStepData?.length > 0 &&
+                            stepByStepData?.filter(
+                              (item) => item.teslimEdildi === true
+                            ).length) ||
+                            0}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                {stepByStepData && stepByStepData[0]?.onOdemeMiktari > 0 && (
                   <Formik
                     enableReinitialize={true}
                     initialValues={initialValues}
@@ -261,7 +266,9 @@ const AddCariPayment = ({
                       </Form>
                     )}
                   </Formik>
-                  {/* Ödeme İnputları */}
+                )}
+                {/* Ödeme İnputları */}
+                {stepByStepData && stepByStepData[0]?.onOdemeMiktari > 0 && (
                   <div className='bg-slate-600 text-white shadow-lg p-5 rounded-lg mt-5'>
                     <h3 className='text-center mb-4 text-2xl font-semibold'>
                       Daha Önce Yapılan Ödemeler
@@ -291,6 +298,7 @@ const AddCariPayment = ({
                           </td>
                         </tr>
                         {cariPayments &&
+                          cariPayments?.length > 0 &&
                           cariPayments.map((item, index) => (
                             <tr
                               key={index}
@@ -308,7 +316,7 @@ const AddCariPayment = ({
                       </tbody>
                     </table>
                   </div>
-                </AlertDialogDescription>
+                )}
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Kapat</AlertDialogCancel>
