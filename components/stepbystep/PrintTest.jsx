@@ -6,12 +6,17 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { toast } from 'react-toastify';
 
 import Image from 'next/image';
 import { FaPrint } from 'react-icons/fa6';
+import ShowEachTeslimTutanagi from './ShowEachTeslimTutanagi';
 
-import { useOrderDataContext } from '@/app/(StepsLayout)/layout';
-import { getAPI } from '@/services/fetchAPI';
+import {
+  useOrderDataContext,
+  useLoadingContext,
+} from '@/app/(StepsLayout)/layout';
+import { getAPI, postAPI } from '@/services/fetchAPI';
 const langs = {
   order: {
     tr: 'SIRA',
@@ -95,7 +100,10 @@ const langs = {
   },
 };
 
-const PrintTest = ({ data, lang, stepByStepData }) => {
+const PrintTest = ({ data, lang, stepByStepData, setStepByStepData, id }) => {
+  // CONTEXT
+  const { isLoading, setIsLoading } = useLoadingContext();
+
   // const { orderData } = useOrderDataContext();
   const [companyInformation, setCompanyInformation] = useState([]);
 
@@ -336,30 +344,30 @@ const PrintTest = ({ data, lang, stepByStepData }) => {
      tax = kdv,
      grandTotal = kdv dahil*/
   }
-  const calculateTotals = (products) => {
+  const calculateTotals = () => {
     let total = 0;
     let indirimliTutar = 0;
     let tax = 0;
     let kdvHaricTutar = 0;
     details.products.map((product) => {
       const matchedData = stepByStepData.filter(
-        (item) => item.orderId == product.orderId && item.gumruk == true
+        (item) =>
+          item.orderId == product.orderId &&
+          item.gumruk == true &&
+          item.teslimTutanagi != true
       );
 
-      console.log('matchedData ******* ', matchedData.length);
-
       if (matchedData?.length > 0) {
+        console.log('product: ', product);
         total += product.totalPrice;
+        console.log('total: ', total);
         indirimliTutar += (product.totalPrice * indirimOrani) / 100;
       }
     });
 
-    // products.forEach((product) => {
-    //   total += product.totalPrice;
-    //   indirimliTutar += (product.totalPrice * indirimOrani) / 100;
-    // });
-
     kdvHaricTutar = total - indirimliTutar;
+
+    console.log('kdv hariç tutar: ', kdvHaricTutar);
 
     tax = total * (kdvOrani / 100);
 
@@ -403,228 +411,286 @@ const PrintTest = ({ data, lang, stepByStepData }) => {
 
   let count = 0;
 
+  const addTeslimTutanagi = async () => {
+    setIsLoading(true);
+    const matchedData = [];
+    details?.products?.map((product, idx) => {
+      const matchedItem = stepByStepData.find(
+        (item) =>
+          item.orderId == product.orderId &&
+          item.gumruk == true &&
+          (item.teslimTutanagi == false || item.teslimTutanagi == undefined)
+      );
+
+      if (matchedItem) {
+        matchedData.push(matchedItem);
+      }
+    });
+
+    // İstenen formatta tarihi oluştur
+    const formattedDate = todayDate();
+
+    const response = await postAPI('/stepByStep/teslimTutanagi', {
+      matchedData: matchedData,
+      indirimOrani: indirimOrani,
+      kdvliFirma: kdvliFirma,
+      kdvOrani: kdvOrani,
+      date: formattedDate,
+    });
+
+    if (response.error || !response) {
+      toast.error(response.message);
+      return setIsLoading(false);
+    } else {
+      toast.success(response.message);
+      const response2 = await getAPI(`/stepByStep?orderCode=${id}`);
+      setStepByStepData(response2.data);
+      return setIsLoading(false);
+    }
+  };
+
+  const filtered = stepByStepData.filter(
+    (item) => item?.gumruk == true && item?.teslimTutanagi != true
+  );
+
   return (
     <div className='flex flex-col h-fit overflow-auto gap-6 relative m-auto w-[29.7cm]'>
-      <div className='flex items-center'>
-        <div className='max-w-md mx-2'>
-          <Label>İndirim Oranını Ekleyiniz</Label>
-          <Input
-            type='number'
-            placeholder='0'
-            min='0'
-            onChange={(e) => setIndirimOrani(e.target.value)}
-          />
-        </div>
-        <div className='max-w-md mx-2 flex items-center gap-3'>
-          <Label>KDV'li Şirket mi?</Label>
-          <Checkbox
-            checked={kdvliFirma}
-            onCheckedChange={(value) => {
-              setKdvliFirma(value);
-            }}
-          />
-        </div>
-        {kdvliFirma && (
-          <div className='max-w-md mx-2'>
-            <Label>KDV Oranını Ekleyiniz</Label>
-            <Input
-              type='number'
-              placeholder='0'
-              min='0'
-              onChange={(e) => setKdvOrani(e.target.value)}
-            />
-          </div>
-        )}
-      </div>
-      <div className='a4 overflow-y-auto'>
-        {/* Header */}
-        <header className='flex items-center justify-end mb-6 px-4'>
-          <Image
-            src='/Logo.png'
-            width={300}
-            height={300}
-            alt=''
-            className='mr-auto'
-          />
-
-          <div className='flex flex-col gap-1'>
-            <span className='text-[#000] text-[19.125pt] font-bold'>
-              {details.musteri.name}
-            </span>
-            <span className='text-[13.5pt] text-[#000] font-bold'>
-              {details.musteri.phone}
-            </span>
-            <span className='text-[13.5pt] text-[#000] font-bold'>
-              {details.musteri.email}
-            </span>
-            <span className='text-[13.5pt] text-[#000] font-bold'>
-              {details.musteri.adress}
-            </span>
-          </div>
-        </header>
-
-        <table className='w-full break-inside-auto'>
-          <thead className='h-[50px] w-full'>
-            <tr>
-              <th>
-                <span className='text-[10pt] text-[#000] font-bold'>
-                  {langs.teklifNo[lang]}:
-                </span>
-              </th>
-              <th>
-                <span className='text-[10pt] text-[#000] font-bold'>
-                  {details.order_no}
-                </span>
-              </th>
-              <th />
-              <th />
-              <th>
-                <span className='text-[10pt] text-[#000] font-bold'>
-                  {langs.date[lang]}:
-                </span>
-              </th>
-              <th>
-                <span className='text-[10pt] text-[#000] font-bold'>
-                  {todayDate()}
-                </span>
-              </th>
-            </tr>
-          </thead>
-
-          <thead className='border border-black [&_tr_th]:text-center  [&_tr_th]:text-black'>
-            <tr className='h-8'>
-              <th className='px-1 w-fit !font-serif'>{langs.order[lang]}</th>
-              <th className='!font-serif'>{langs.productFeatures[lang]}</th>
-              <th className='!font-serif'>{langs.quantity[lang]}</th>
-              <th className='!font-serif'>{langs.price[lang]}</th>
-              <th className='!font-serif'>{langs.total[lang]}</th>
-              <th className='!font-serif'>{langs.indirimTutari[lang]}</th>
-              <th className='!font-serif'>{langs.kdvHaric[lang]}</th>
-            </tr>
-          </thead>
-          <tbody className='[&_tr_td]:p-[6px] [&_tr_td]:text-center [&_tr_th]:text-[#000]'>
-            {details?.products?.map((product, idx) => {
-              console.log('product: ', product);
-
-              const matchedData = stepByStepData.find(
-                (item) => item.orderId == product.orderId && item.gumruk == true
-              );
-
-              if (matchedData) {
-                count = count + 1;
-                return (
-                  <tr
-                    key={count}
-                    className='even:bg-[#F2F2F2] bg-white break-inside-avoid'
-                  >
-                    <td className='border border-black text-[13.5pt] text-[#000] font-bold'>
-                      {count}
-                    </td>
-                    <td className='border border-black overflow-hidden'>
-                      <div className='!max-h-fit overflow-hidden gap-2 flex flex-wrap'>
-                        <span className='px-2.5 py-1 text-[9pt] text-black border border-black rounded-md font-semibold rounded-full w-fit'>
-                          {product.name}
-                        </span>
-
-                        <span className='px-2.5 py-1 text-[9pt] text-black border border-black rounded-md font-semibold rounded-full w-fit'>
-                          {product.info}
-                        </span>
-
-                        {product?.extras?.map((feature, idx) => (
-                          <div
-                            key={'feature-' + idx}
-                            className='px-2 py-1 text-center align-middle flex gap-1 [&_span]:text-black border border-black rounded-full [&_span]:text-[10pt] items-center'
-                          >
-                            <span>{feature.value}</span>
-                          </div>
-                        ))}
-
-                        {product.note && product.note !== '' && (
-                          <div className='px-2 py-1 flex gap-1 [&_span]:text-black border border-black rounded-md [&_span]:text-[10pt] items-center w-full'>
-                            <span>{product.note}</span>
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                    <td className='border border-black whitespace-nowrap'>
-                      {product.quantity} грн
-                    </td>
-                    <td className='border border-black whitespace-nowrap '>
-                      {formatCurrency(product.price)} грн
-                    </td>
-                    <td className='border border-black whitespace-nowrap'>
-                      {formatCurrency(product.quantity * product.price)} грн
-                    </td>
-                    <td className='border border-black whitespace-nowrap'>
-                      {
-                        calculateIndirimOrani(product.quantity, product.price)
-                          .indirimTutar
-                      }
-                      грн
-                    </td>
-                    <td className='border border-black whitespace-nowrap'>
-                      {
-                        calculateIndirimOrani(product.quantity, product.price)
-                          .kdvHaricTutar
-                      }
-                      грн
-                    </td>
-                  </tr>
-                );
-              }
-            })}
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td>{langs.total[lang]} :</td>
-              <td> {total.total}</td>
-              <td>{total.indirimliTotal}</td>
-              <td>{total.kdvHaricTotal}</td>
-            </tr>
-          </tbody>
-        </table>
-
-        {/* Footer */}
-        <footer className='flex justify-between break-inside-avoid mx-2'>
-          <div className='mt-[24px] flex flex-col h-full'>
-            <span className='text-[#000] text-[15pt] font-bold'>
-              {langs.firmaBilgileri[lang]}
-            </span>
-            <span className='text-[10pt] text-[#000] font-bold'>
-              {companyInformation && companyInformation.name}
-            </span>
-            <span className='text-[10pt] text-[#000] font-bold'>
-              {companyInformation && companyInformation.address}
-            </span>
-            <span className='text-[10pt] text-[#000] font-bold'>
-              Vergi no: {companyInformation && companyInformation.vergino}
-            </span>
-          </div>
-
-          <div className='flex flex-col items-end gap-2 mt-[24px]'>
-            <div className='flex items-center gap-6 px-1.5 w-[300px]'>
-              <span className='text-[#000] text-[13pt] font-bold'>
-                {langs.kdvTutari[lang]} :
-              </span>
-              <p className='ml-auto text-[#000] text-[12pt] font-bold'>
-                {total.tax} грн
-              </p>
+      <ShowEachTeslimTutanagi id={id} />
+      {filtered?.length > 0 ? (
+        <>
+          <div className='flex items-center'>
+            <div className='max-w-md mx-2'>
+              <Label>İndirim Oranını Ekleyiniz</Label>
+              <Input
+                type='number'
+                placeholder='0'
+                min='0'
+                onChange={(e) => setIndirimOrani(e.target.value)}
+              />
             </div>
-
-            <div className='flex items-center gap-6 w-[300px] border-b border-b-black p-1.5 rounded-sm'>
-              <span className='text-[#000] text-[13pt] font-bold'>
-                {langs.genelToplam[lang]} :
-              </span>
-              <p className='ml-auto text-[#000] text-[12pt] font-bold'>
-                {total.grandTotal} грн
-              </p>
+            <div className='max-w-md mx-2 flex items-center gap-3'>
+              <Label>KDV'li Şirket mi?</Label>
+              <Checkbox
+                checked={kdvliFirma}
+                onCheckedChange={(value) => {
+                  setKdvliFirma(value);
+                  setKdvOrani(0);
+                }}
+              />
             </div>
+            {kdvliFirma && (
+              <div className='max-w-md mx-2'>
+                <Label>KDV Oranını Ekleyiniz</Label>
+                <Input
+                  type='number'
+                  placeholder='0'
+                  min='0'
+                  onChange={(e) => setKdvOrani(e.target.value)}
+                />
+              </div>
+            )}
           </div>
-        </footer>
-      </div>
+          <div className='a4 overflow-y-auto'>
+            {/* Header */}
+            <header className='flex items-center justify-end mb-6 px-4'>
+              <Image
+                src='/Logo.png'
+                width={300}
+                height={300}
+                alt=''
+                className='mr-auto'
+              />
 
-      <p>Teslim Tutanağını Oluştur</p>
+              <div className='flex flex-col gap-1'>
+                <span className='text-[#000] text-[19.125pt] font-bold'>
+                  {details.musteri.name}
+                </span>
+                <span className='text-[13.5pt] text-[#000] font-bold'>
+                  {details.musteri.phone}
+                </span>
+                <span className='text-[13.5pt] text-[#000] font-bold'>
+                  {details.musteri.email}
+                </span>
+                <span className='text-[13.5pt] text-[#000] font-bold'>
+                  {details.musteri.adress}
+                </span>
+              </div>
+            </header>
+
+            <table className='w-full break-inside-auto'>
+              <thead className='h-[50px] w-full'>
+                <tr>
+                  <th>
+                    <span className='text-[10pt] text-[#000] font-bold'>
+                      {langs.teklifNo[lang]}:
+                    </span>
+                  </th>
+                  <th>
+                    <span className='text-[10pt] text-[#000] font-bold'>
+                      {details.order_no}
+                    </span>
+                  </th>
+                  <th />
+                  <th />
+                  <th>
+                    <span className='text-[10pt] text-[#000] font-bold'>
+                      {langs.date[lang]}:
+                    </span>
+                  </th>
+                  <th>
+                    <span className='text-[10pt] text-[#000] font-bold'>
+                      {todayDate()}
+                    </span>
+                  </th>
+                </tr>
+              </thead>
+
+              <thead className='border border-black [&_tr_th]:text-center  [&_tr_th]:text-black'>
+                <tr className='h-8'>
+                  <th className='px-1 w-fit !font-serif'>
+                    {langs.order[lang]}
+                  </th>
+                  <th className='!font-serif'>{langs.productFeatures[lang]}</th>
+                  <th className='!font-serif'>{langs.quantity[lang]}</th>
+                  <th className='!font-serif'>{langs.price[lang]}</th>
+                  <th className='!font-serif'>{langs.total[lang]}</th>
+                  <th className='!font-serif'>{langs.indirimTutari[lang]}</th>
+                  <th className='!font-serif'>{langs.kdvHaric[lang]}</th>
+                </tr>
+              </thead>
+              <tbody className='[&_tr_td]:p-[6px] [&_tr_td]:text-center [&_tr_th]:text-[#000]'>
+                {details?.products?.map((product, idx) => {
+                  const matchedData = stepByStepData.find(
+                    (item) =>
+                      item.orderId == product.orderId &&
+                      item.gumruk == true &&
+                      item.teslimTutanagi != true
+                  );
+
+                  if (matchedData) {
+                    count = count + 1;
+                    return (
+                      <tr
+                        key={count}
+                        className='even:bg-[#F2F2F2] bg-white break-inside-avoid'
+                      >
+                        <td className='border border-black text-[13.5pt] text-[#000] font-bold'>
+                          {count}
+                        </td>
+                        <td className='border border-black overflow-hidden'>
+                          <div className='!max-h-fit overflow-hidden gap-2 flex flex-wrap'>
+                            <span className='px-2.5 py-1 text-[9pt] text-black border border-black rounded-md font-semibold rounded-full w-fit'>
+                              {product.name}
+                            </span>
+
+                            <span className='px-2.5 py-1 text-[9pt] text-black border border-black rounded-md font-semibold rounded-full w-fit'>
+                              {product.info}
+                            </span>
+
+                            {product?.extras?.map((feature, idx) => (
+                              <div
+                                key={'feature-' + idx}
+                                className='px-2 py-1 text-center align-middle flex gap-1 [&_span]:text-black border border-black rounded-full [&_span]:text-[10pt] items-center'
+                              >
+                                <span>{feature.value}</span>
+                              </div>
+                            ))}
+
+                            {product.note && product.note !== '' && (
+                              <div className='px-2 py-1 flex gap-1 [&_span]:text-black border border-black rounded-md [&_span]:text-[10pt] items-center w-full'>
+                                <span>{product.note}</span>
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className='border border-black whitespace-nowrap'>
+                          {product.quantity} грн
+                        </td>
+                        <td className='border border-black whitespace-nowrap '>
+                          {formatCurrency(product.price)} грн
+                        </td>
+                        <td className='border border-black whitespace-nowrap'>
+                          {formatCurrency(product.quantity * product.price)} грн
+                        </td>
+                        <td className='border border-black whitespace-nowrap'>
+                          {
+                            calculateIndirimOrani(
+                              product.quantity,
+                              product.price
+                            ).indirimTutar
+                          }
+                          грн
+                        </td>
+                        <td className='border border-black whitespace-nowrap'>
+                          {
+                            calculateIndirimOrani(
+                              product.quantity,
+                              product.price
+                            ).kdvHaricTutar
+                          }
+                          грн
+                        </td>
+                      </tr>
+                    );
+                  }
+                })}
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td>{langs.total[lang]} :</td>
+                  <td> {total.total}</td>
+                  <td>{total.indirimliTotal}</td>
+                  <td>{total.kdvHaricTotal}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            {/* Footer */}
+            <footer className='flex justify-between break-inside-avoid mx-2'>
+              <div className='mt-[24px] flex flex-col h-full'>
+                <span className='text-[#000] text-[15pt] font-bold'>
+                  {langs.firmaBilgileri[lang]}
+                </span>
+                <span className='text-[10pt] text-[#000] font-bold'>
+                  {companyInformation && companyInformation.name}
+                </span>
+                <span className='text-[10pt] text-[#000] font-bold'>
+                  {companyInformation && companyInformation.address}
+                </span>
+                <span className='text-[10pt] text-[#000] font-bold'>
+                  Vergi no: {companyInformation && companyInformation.vergino}
+                </span>
+              </div>
+
+              <div className='flex flex-col items-end gap-2 mt-[24px]'>
+                <div className='flex items-center gap-6 px-1.5 w-[300px]'>
+                  <span className='text-[#000] text-[13pt] font-bold'>
+                    {langs.kdvTutari[lang]} :
+                  </span>
+                  <p className='ml-auto text-[#000] text-[12pt] font-bold'>
+                    {kdvliFirma ? total.tax : '0,00'} грн
+                  </p>
+                </div>
+
+                <div className='flex items-center gap-6 w-[300px] border-b border-b-black p-1.5 rounded-sm'>
+                  <span className='text-[#000] text-[13pt] font-bold'>
+                    {langs.genelToplam[lang]} :
+                  </span>
+                  <p className='ml-auto text-[#000] text-[12pt] font-bold'>
+                    {total.grandTotal} грн
+                  </p>
+                </div>
+              </div>
+            </footer>
+          </div>
+          <Button type='button' onClick={() => addTeslimTutanagi()}>
+            Teslim Tutanağını Oluştur
+          </Button>
+        </>
+      ) : (
+        <p>Gümrükten geçen herhangi bir ürününüz yoktur!</p>
+      )}
     </div>
   );
 };

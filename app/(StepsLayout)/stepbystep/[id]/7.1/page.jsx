@@ -5,10 +5,14 @@ import {
   useOrderDataContext,
   useStepByStepDataContext,
 } from '@/app/(StepsLayout)/layout';
+import { useParams } from 'next/navigation';
 
 const Page = () => {
   const { orderData } = useOrderDataContext();
-  const { stepByStepData } = useStepByStepDataContext();
+
+  const { id } = useParams();
+
+  const { stepByStepData, setStepByStepData } = useStepByStepDataContext();
   console.log('orderData: ', orderData);
   return (
     <div>
@@ -17,6 +21,8 @@ const Page = () => {
           data={orderData}
           lang={'tr'}
           stepByStepData={stepByStepData}
+          setStepByStepData={setStepByStepData}
+          id={id}
         />
       )}
     </div>
