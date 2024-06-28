@@ -12,6 +12,16 @@ import {
   useStepByStepDataContext,
 } from '@/app/(StepsLayout)/layout';
 import { useParams } from 'next/navigation';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/table/utils';
+import { tr } from 'date-fns/locale';
 
 const AddCari = () => {
   const { id } = useParams();
@@ -27,6 +37,7 @@ const AddCari = () => {
     stepName: 'Tedarikçi Seç',
     tedarikciAciklama: '',
     tedarikciId: '',
+    tahminiTeslimTarihi: '',
   });
 
   useEffect(() => {
@@ -36,6 +47,7 @@ const AddCari = () => {
         setInitialValues({
           onOdemeMiktari: data.onOdemeMiktari,
           onOdemeMiktariAciklamasi: data.onOdemeMiktariAciklamasi,
+          tahminiTeslimTarihi: data.tahminiTeslimTarihi,
           orderCode: id,
           step: 2,
           stepName: 'Tedarikçi Seç',
@@ -59,11 +71,16 @@ const AddCari = () => {
           );
         }
 
+        if (values.tahminiTeslimTarihi == undefined) {
+          return toast.error('Tahmini teslim tarihi boş bırakılamaz.');
+        }
+
         if (values.onOdemeMiktariAciklamasi.length <= 0) {
           return toast.error(
             'Cariye işlenecek ön ödeme miktarı açıklaması boş olamaz.'
           );
         }
+
         setIsLoading(true);
 
         const response = await postAPI('/stepByStep/cari', values);
@@ -98,6 +115,39 @@ const AddCari = () => {
               value={props.values.onOdemeMiktari}
             />
           </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={'outline'}
+                className={cn(
+                  'w-full justify-start text-left font-normal',
+
+                  'text-muted-foreground'
+                )}
+              >
+                <CalendarIcon className='mr-2 h-4 w-4' />
+                {props.values.tahminiTeslimTarihi ? (
+                  format(props.values.tahminiTeslimTarihi, 'PPP', {
+                    locale: tr,
+                  })
+                ) : (
+                  <span>Tahmini Teslim Tarihini Seçiniz</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className='w-full p-0'>
+              <Calendar
+                name='tahminiTeslimTarihi'
+                selected={props.values.tahminiTeslimTarihi}
+                onSelect={(newValue) =>
+                  props.setFieldValue('tahminiTeslimTarihi', newValue)
+                }
+                mode='single'
+                locale={tr}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
           <div className='flex gap-2 items-center'>
             <Input
               name='onOdemeMiktariAciklamasi'
