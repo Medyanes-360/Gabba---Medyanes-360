@@ -32,122 +32,115 @@ const ShowEachProductStep = ({ orderData, stepByStepData }) => {
                 <AlertDialogTitle className='text-center'>
                   Aşağıda ürünlerin hangi adımda kaldığını görebilirsiniz!
                 </AlertDialogTitle>
-                <AlertDialogDescription>
-                  {orderData &&
-                    orderData?.Orders?.map((item, index) => {
-                      // stepByStepData'daki orderId ve step değerlerini kontrol et
-                      const matchingStepData =
-                        stepByStepData &&
-                        stepByStepData?.length > 0 &&
-                        stepByStepData.find(
-                          (stepItem) =>
-                            stepItem.orderId === item.id && stepItem.step >= 6
-                        );
-                      if (matchingStepData) {
-                        return (
-                          <div
-                            key={item.id}
-                            className='flex flex-col w-full  
+                {orderData &&
+                  orderData?.Orders?.map((item, index) => {
+                    // stepByStepData'daki orderId ve step değerlerini kontrol et
+                    const matchingStepData =
+                      stepByStepData &&
+                      stepByStepData?.length > 0 &&
+                      stepByStepData.find(
+                        (stepItem) =>
+                          stepItem.orderId === item.id && stepItem.step >= 6
+                      );
+                    if (matchingStepData) {
+                      return (
+                        <div
+                          key={item.id}
+                          className='flex flex-col w-full  
                      transition-all duration-200 ease-in-out border shadow-sm rounded p-2 gap-2 cursor-not-allowed bg-gray-800 text-white'
-                          >
-                            <div
-                              className={
-                                'flex items-center gap-2 [&_span]:text-sm w-full'
-                              }
-                            >
-                              <FaInfoCircle
-                                className='text-blue-600 ml-2'
-                                size='20'
-                              />
-                              <span>
-                                {
-                                  orderData?.Ürünler[index]
-                                    ?.selectedCategoryValues
-                                }
-                              </span>
-                              -
-                              <span>
-                                {orderData?.Ürünler[index]?.productName}
-                              </span>
-                              -
-                              <span>
-                                {(item.productPrice +
-                                  item.productFeaturePrice) *
-                                  item.stock}
-                              </span>
-                            </div>
-                            <p className='text-sm'>
-                              Bu ürün {''}
-                              <span className='p-1 rounded bg-gray-500'>
-                                {matchingStepData.stepName}
-                              </span>{' '}
-                              kısmında kalmıştır.
-                            </p>
-                          </div>
-                        );
-                      }
-
-                      const doesntMatchData =
-                        stepByStepData &&
-                        stepByStepData?.length > 0 &&
-                        stepByStepData.find(
-                          (stepItem) =>
-                            stepItem.orderId === item.id && stepItem.step < 6
-                        );
-
-                      if (doesntMatchData) {
-                        return (
+                        >
                           <div
-                            key={item.id}
-                            className='flex flex-col w-full  
-                     transition-all duration-200 ease-in-out border shadow-sm rounded p-2 gap-2 cursor-not-allowed bg-gray-800 text-white'
+                            className={
+                              'flex items-center gap-2 [&_span]:text-sm w-full'
+                            }
                           >
-                            <div
-                              className={
-                                'flex items-center gap-2 [&_span]:text-sm w-full'
+                            <FaInfoCircle
+                              className='text-blue-600 ml-2'
+                              size='20'
+                            />
+                            <span>
+                              {
+                                orderData?.Ürünler[index]
+                                  ?.selectedCategoryValues
                               }
-                            >
-                              <FaInfoCircle
-                                className='text-blue-600 ml-2'
-                                size='20'
-                              />
-                              <span>
-                                {
-                                  orderData?.Ürünler[index]
-                                    ?.selectedCategoryValues
-                                }
-                              </span>
-                              -
-                              <span>
-                                {orderData?.Ürünler[index]?.productName}
-                              </span>
-                              -
-                              <span>
-                                {(item.productPrice +
-                                  item.productFeaturePrice) *
-                                  item.stock}
-                              </span>
-                            </div>
-                            <p className='text-sm'>
-                              Bu ürün {''}
-                              <span className='p-1 rounded bg-gray-500'>
-                                {doesntMatchData.stepName}
-                              </span>{' '}
-                              kısmında kalmıştır.
-                            </p>
+                            </span>
+                            -
+                            <span>
+                              {orderData?.Ürünler[index]?.productName}
+                            </span>
+                            -
+                            <span>
+                              {(item.productPrice + item.productFeaturePrice) *
+                                item.stock}
+                            </span>
                           </div>
-                        );
-                      }
-                      if (!doesntMatchData && !matchingStepData) {
-                        return (
-                          <p>
-                            Ürünlerin adımları ile ilgili veri eklenmesi
-                            bekleniyor...
+                          <p className='text-sm'>
+                            Bu ürün {''}
+                            <span className='p-1 rounded bg-gray-500'>
+                              {matchingStepData.stepName}
+                            </span>{' '}
+                            kısmında kalmıştır.
                           </p>
-                        );
-                      }
-                    })}
-                </AlertDialogDescription>
+                        </div>
+                      );
+                    }
+
+                    const doesntMatchData =
+                      stepByStepData &&
+                      stepByStepData?.length > 0 &&
+                      stepByStepData.find(
+                        (stepItem) =>
+                          stepItem.orderId === item.id && stepItem.step < 6
+                      );
+
+                    if (doesntMatchData) {
+                      return (
+                        <div
+                          key={item.id}
+                          className='flex flex-col w-full  
+                     transition-all duration-200 ease-in-out border shadow-sm rounded p-2 gap-2 cursor-not-allowed bg-gray-800 text-white'
+                        >
+                          <div
+                            className={
+                              'flex items-center gap-2 [&_span]:text-sm w-full'
+                            }
+                          >
+                            <FaInfoCircle
+                              className='text-blue-600 ml-2'
+                              size='20'
+                            />
+                            <span>
+                              {
+                                orderData?.Ürünler[index]
+                                  ?.selectedCategoryValues
+                              }
+                            </span>
+                            -
+                            <span>
+                              {orderData?.Ürünler[index]?.productName}
+                            </span>
+                            -
+                            <span>
+                              {(item.productPrice + item.productFeaturePrice) *
+                                item.stock}
+                            </span>
+                          </div>
+                          <p className='text-sm'>
+                            Bu ürün {''}
+                            <span className='p-1 rounded bg-gray-500'>
+                              {doesntMatchData.stepName}
+                            </span>{' '}
+                            kısmında kalmıştır.
+                          </p>
+                        </div>
+                      );
+                    }
+                  })}
+                {stepByStepData && !stepByStepData?.length > 0 && (
+                  <p>
+                    Ürünlerin adımları ile ilgili veri eklenmesi bekleniyor...
+                  </p>
+                )}
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Kapat</AlertDialogCancel>
