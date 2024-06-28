@@ -65,6 +65,16 @@ export async function getDataByMany(tableName, where) {
   }
 }
 
+// GET BY UNIQUE MANY VALUE
+export async function getDataByManyV2(tableName, query) {
+  try {
+    const data = await prisma[tableName].findMany(query);
+    return data;
+  } catch (error) {
+    return { error: error.message };
+  }
+}
+
 // UPDATE
 export async function updateDataByAny(tableName, where, newData) {
   try {
@@ -320,6 +330,7 @@ export default {
   getAllData,
 
   getDataByUniqueMany,
+  getDataByManyV2,
 
   createNewData,
 
