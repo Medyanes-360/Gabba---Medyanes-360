@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 
 import Image from 'next/image';
 import { FaPrint } from 'react-icons/fa6';
+import { useReactToPrint } from 'react-to-print';
 
 import { useOrderDataContext } from '@/app/(StepsLayout)/layout';
 import { getAPI } from '@/services/fetchAPI';
@@ -53,10 +54,20 @@ const langs = {
     ua: 'Не знайдено',
     en: 'Not Found',
   },
-  teklifNo: {
-    tr: 'Teklif no',
-    ua: 'Тендер №',
-    en: 'Quotation No',
+  faturaNo: {
+    tr: 'Fatura No',
+    ua: 'Номер рахунку',
+    en: 'Invoice No',
+  },
+  belgeName: {
+    tr: 'Belge',
+    ua: 'документ',
+    en: 'Document',
+  },
+  belgeDescription: {
+    tr: 'Fatura',
+    ua: 'Накладна',
+    en: 'Invoice',
   },
   invoice: {
     tr: 'Fatura',
@@ -89,9 +100,9 @@ const langs = {
     en: 'Grand Total',
   },
   indirmeButonu: {
-    tr: 'Teklifi İndir',
-    ua: 'Завантажити пропозицію',
-    en: 'Download Offer',
+    tr: 'Faturayı İndir',
+    ua: 'Завантажити Рахунок',
+    en: 'Download Invoice',
   },
 };
 
@@ -102,6 +113,9 @@ const PrintFaturaBelgesi = ({ data, lang, stepByStepData }) => {
   const [indirimOrani, setIndirimOrani] = useState(0);
   const [kdvliFirma, setKdvliFirma] = useState(false);
   const [kdvOrani, setKdvOrani] = useState(0);
+
+  const printRef = useRef(null);
+
   const getCompany = async () => {
     const response = await getAPI('/company');
     const filteredCompany = response.data.filter(
@@ -109,6 +123,17 @@ const PrintFaturaBelgesi = ({ data, lang, stepByStepData }) => {
     )[0];
     setCompanyInformation(filteredCompany);
   };
+
+  {
+    /* Sayfanın print özelliğini tetikleyip yazdılacak divin referansını veriyorum content'de, ve pageStyle ile kenarlardan margin veriyoruz */
+  }
+
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+    onBeforePrint: () => console.log('BBBB'),
+    onAfterPrint: () => console.log('AAA'),
+    pageStyle: `margin: 2.5%`,
+  });
 
   useEffect(() => {
     getCompany();
@@ -391,38 +416,16 @@ const PrintFaturaBelgesi = ({ data, lang, stepByStepData }) => {
 
   return (
     <div className='flex flex-col h-fit overflow-auto gap-6 relative m-auto w-[29.7cm]'>
-      <div className='flex items-center'>
-        <div className='max-w-md mx-2'>
-          <Label>İndirim Oranını Ekleyiniz</Label>
-          <Input
-            type='number'
-            placeholder='0'
-            min='0'
-            onChange={(e) => setIndirimOrani(e.target.value)}
-          />
+      <button
+        className='px-8 py-2 w-[29.7cm] bg-green-500 text-white font-bold rounded-md hover:opacity-75 transition-all duration-200 active:bg-green-400'
+        onClick={handlePrint}
+      >
+        <div className='flex justify-center gap-4 items-center'>
+          <span className='text-lg'>{langs.indirmeButonu[lang]}</span>{' '}
+          <FaPrint size={20} />
         </div>
-        <div className='max-w-md mx-2 flex items-center gap-3'>
-          <Label>KDV'li Şirket mi?</Label>
-          <Checkbox
-            checked={kdvliFirma}
-            onCheckedChange={(value) => {
-              setKdvliFirma(value);
-            }}
-          />
-        </div>
-        {kdvliFirma && (
-          <div className='max-w-md mx-2'>
-            <Label>KDV Oranını Ekleyiniz</Label>
-            <Input
-              type='number'
-              placeholder='0'
-              min='0'
-              onChange={(e) => setKdvOrani(e.target.value)}
-            />
-          </div>
-        )}
-      </div>
-      <div className='a4 overflow-y-auto'>
+      </button>
+      <div ref={printRef} className='a4 overflow-y-auto mx-2'>
         {/* Header */}
         <header className='flex items-center justify-end mb-6 px-4'>
           <Image
@@ -453,30 +456,27 @@ const PrintFaturaBelgesi = ({ data, lang, stepByStepData }) => {
           <thead className='h-[50px] w-full'>
             <tr>
               <th>
-                <span className='text-[10pt] text-[#000] font-bold'>
-                  {langs.teklifNo[lang]}:
+                <span className='text-[10pt] text-[#000] font-bold flex'>
+                  {langs.belgeName[lang]}: {langs.belgeDescription[lang]}
                 </span>
               </th>
               <th>
                 <span className='text-[10pt] text-[#000] font-bold'>
-                  {details.order_no}
-                </span>
-              </th>
-              <th />
-              <th />
-              <th>
-                <span className='text-[10pt] text-[#000] font-bold'>
-                  {langs.date[lang]}:
+                  {langs.faturaNo[lang]}: FAT-{details.order_no}
                 </span>
               </th>
               <th>
                 <span className='text-[10pt] text-[#000] font-bold'>
-                  {todayDate()}
+                  {langs.date[lang]}: {todayDate()}
                 </span>
+              </th>
+              <th>
+                <span className='text-[10pt] text-[#000] font-bold'></span>
               </th>
             </tr>
           </thead>
-
+        </table>
+        <table className='w-full break-inside-auto'>
           <thead className='border border-black [&_tr_th]:text-center  [&_tr_th]:text-black'>
             <tr className='h-8'>
               <th className='px-1 w-fit !font-serif'>{langs.order[lang]}</th>
@@ -602,7 +602,15 @@ const PrintFaturaBelgesi = ({ data, lang, stepByStepData }) => {
         </footer>
       </div>
 
-      <p>Teslim Tutanağını Oluştur</p>
+      <button
+        className='px-8 py-2 w-[29.7cm] bg-green-500 text-white font-bold rounded-md hover:opacity-75 transition-all duration-200 active:bg-green-400'
+        onClick={handlePrint}
+      >
+        <div className='flex justify-center gap-4 items-center'>
+          <span className='text-lg'>{langs.indirmeButonu[lang]}</span>{' '}
+          <FaPrint size={20} />
+        </div>
+      </button>
     </div>
   );
 };
