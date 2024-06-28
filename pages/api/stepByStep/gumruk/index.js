@@ -2,6 +2,7 @@ import {
   updateDataByMany,
   updateDataByAny,
   createNewData,
+  deleteDataByAny,
 } from '@/services/serviceOperations';
 import { getToken } from 'next-auth/jwt';
 
@@ -36,7 +37,7 @@ const handler = async (req, res) => {
       }
 
       // Seçilmeyen ürünlerin `gumruk` alanını false yap
-      await updateDataByMany(
+      const update = await updateDataByMany(
         'StepByStep',
         {
           orderCode: orderCode,
@@ -44,6 +45,9 @@ const handler = async (req, res) => {
         },
         {
           gumruk: false, // Seçilmeyenler için gumruk false
+          teslimTutanagi: false,
+          teslimTutanagiNo: null,
+          teslimTutanagiKodu: null,
         }
       );
 
@@ -71,8 +75,15 @@ const handler = async (req, res) => {
           stepName: 'Gümrük',
           gumruk: false,
           teslimEdildi: false,
+          teslimTutanagi: false,
+          teslimTutanagiNo: null,
+          teslimTutanagiKodu: null,
         }
       );
+
+      const deleted = await deleteDataByAny('TeslimTutanagi', {
+        orderId: item.id,
+      });
 
       const responseLog = await createNewData('Logs', {
         role: userRole,
