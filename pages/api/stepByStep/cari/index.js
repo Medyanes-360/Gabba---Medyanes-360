@@ -24,6 +24,7 @@ const handler = async (req, res) => {
       const {
         onOdemeMiktari,
         onOdemeMiktariAciklamasi,
+        tahminiTeslimTarihi,
         orderCode,
         step,
         stepName,
@@ -58,6 +59,7 @@ const handler = async (req, res) => {
             stepName,
             tedarikciAciklama,
             tedarikciId,
+            tahminiTeslimTarihi,
           },
           orderData
         );
@@ -93,6 +95,7 @@ const handler = async (req, res) => {
           },
           {
             onOdemeMiktari: onOdemeMiktari,
+            tahminiTeslimTarihi: tahminiTeslimTarihi,
           }
         );
 
