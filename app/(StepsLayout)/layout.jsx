@@ -6,6 +6,7 @@ import { useState, useEffect, createContext, useContext } from 'react';
 import LoadingScreen from '@/components/other/dashboardLoading';
 import AddCariPayment from '@/components/stepbystep/AddCariPayment';
 import ShowEachProductStep from '@/components/stepbystep/ShowEachProductStep';
+import ShowFaturaBelgesi from '@/components/stepbystep/ShowFaturaBelgesi';
 
 const LoadingContext = createContext();
 const StepByStepDataContext = createContext();
@@ -154,11 +155,13 @@ const StepsLayout = ({ children }) => {
   const getCariPayments = async () => {
     const response = await getAPI(`/stepByStep/cariPayments?orderCode=${id}`);
     setCariPayments(response.data);
-    const total = response.data.reduce(
-      (sum, item) => sum + item.odemeMiktari,
-      0
-    );
-    setCariPaymentsTotalAmount(total);
+    if (response.data?.length > 0) {
+      const total = response.data.reduce(
+        (sum, item) => sum + item.odemeMiktari ?? 0,
+        0
+      );
+      setCariPaymentsTotalAmount(total);
+    }
   };
 
   useEffect(() => {
@@ -275,9 +278,11 @@ const StepsLayout = ({ children }) => {
 
                                 const paidAmount =
                                   stepByStepData[0]?.onOdemeMiktari ?? 0;
+                                const ekstraUcretTotal =
+                                  stepByStepData[0]?.ekstraUcretTotal ?? 0;
                                 return (
                                   totalAmount +
-                                  stepByStepData[0]?.ekstraUcretTotal -
+                                  ekstraUcretTotal -
                                   (paidAmount + cariPaymentTotalAmount)
                                 );
                               })()}
@@ -315,6 +320,7 @@ const StepsLayout = ({ children }) => {
                   <ShowEachProductStep
                     orderData={orderData}
                     stepByStepData={stepByStepData}
+                    orderCode={id}
                   />
                   <AddCariPayment
                     orderData={orderData}
@@ -325,6 +331,7 @@ const StepsLayout = ({ children }) => {
                     getCariPayments={getCariPayments}
                     cariPaymentTotalAmount={cariPaymentTotalAmount}
                   />
+                  <ShowFaturaBelgesi id={id} />
                 </div>
                 <div className='py-6 h-full w-full pl-6 md:pl-0'>
                   {children}
