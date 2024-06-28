@@ -608,6 +608,7 @@ model StepByStep {
   stepName                 String
   onOdemeMiktari           Int
   onOdemeMiktariAciklamasi String
+  tahminiTeslimTarihi      DateTime?
   orderCode                String    @unique
   orderId                  String    @unique
   tedarikciAciklama        String
@@ -616,6 +617,9 @@ model StepByStep {
   tedarikciMaliyeti        Float     @default(0.0)
   ekstraUcretTotal         Float     @default(0.0)
   gumruk                   Boolean?  @default(false)
+  teslimTutanagi           Boolean?  @default(false)
+  teslimTutanagiKodu       String?   @unique
+  teslimTutanagiNo         Int?
   teslimEdildi             Boolean?  @default(false)
   tedarikciId              String
   createdAt                DateTime  @default(now())
@@ -659,4 +663,18 @@ model StepByStepCariPayments {
   odemeMiktariAciklamasi String?
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
+}
+
+model TeslimTutanagi {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  teslimTutanagiKodu String   @unique
+  orderCode          String   @unique
+  orderId            String   @unique
+  indirimOrani       Int?
+  kdvliFirma         Boolean? @default(false)
+  kdvOrani           Int?
+  teslimTutanagiNo   Int?
+  date               String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }
