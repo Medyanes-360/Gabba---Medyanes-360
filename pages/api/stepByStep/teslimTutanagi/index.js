@@ -47,7 +47,6 @@ const handler = async (req, res) => {
 
       if (teslimTutanaklari?.length > 0) {
         // Veritabanında bir değer var demektir.
-        console.log('teslimTutanagiNooooo: ', highestTeslimTutanagiNo);
         const teslimTutanagiNo = highestTeslimTutanagiNo[0].teslimTutanagiNo;
         const teslimTutanagiKodu = generateTeslimKod(
           matchedData[0].orderCode,
@@ -62,7 +61,7 @@ const handler = async (req, res) => {
             indirimOrani: parseInt(indirimOrani),
             kdvliFirma: kdvliFirma,
             kdvOrani: parseInt(kdvOrani),
-            teslimTutanagiNo: parseInt(teslimTutanagiNo),
+            teslimTutanagiNo: parseInt(teslimTutanagiNo + 1),
             date: String(date),
           });
         });
