@@ -358,17 +358,12 @@ const PrintTest = ({ data, lang, stepByStepData, setStepByStepData, id }) => {
       );
 
       if (matchedData?.length > 0) {
-        console.log('product: ', product);
         total += product.totalPrice;
-        console.log('total: ', total);
         indirimliTutar += (product.totalPrice * indirimOrani) / 100;
       }
     });
 
     kdvHaricTutar = total - indirimliTutar;
-
-    console.log('kdv hariç tutar: ', kdvHaricTutar);
-
     tax = total * (kdvOrani / 100);
 
     const grandTotal = kdvHaricTutar + tax;
@@ -689,7 +684,13 @@ const PrintTest = ({ data, lang, stepByStepData, setStepByStepData, id }) => {
           </Button>
         </>
       ) : (
-        <p>Gümrükten geçen herhangi bir ürününüz yoktur!</p>
+        <p className='text-red-500 text-lg font-semibold text-center'>
+          {stepByStepData &&
+          stepByStepData?.every((item) => item.gumruk === true) &&
+          stepByStepData?.every((item) => item.teslimTutanagi === true)
+            ? 'Gümrükteki her ürünün teslim tutanağı oluşmuştur!'
+            : 'Gümrükten geçen herhangi bir ürününüz yoktur!'}
+        </p>
       )}
     </div>
   );
