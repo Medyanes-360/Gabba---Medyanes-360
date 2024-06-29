@@ -13,7 +13,6 @@ const Page = () => {
   const { id } = useParams();
 
   const { stepByStepData, setStepByStepData } = useStepByStepDataContext();
-  console.log('orderData: ', orderData);
   return (
     <div>
       {orderData && orderData?.orderCode?.length > 0 && (
