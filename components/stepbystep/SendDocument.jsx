@@ -6,6 +6,7 @@ import { Input } from '../ui/input';
 import { getAPI, postAPI } from '@/services/fetchAPI';
 import InvoiceJustButton from '../createOffer/orderOffer/PrintOrder/ButtonPrint';
 import { useLoadingContext } from '@/app/(StepsLayout)/layout';
+import { cn } from '@/lib/table/utils';
 
 const SendDocument = ({ id, lang }) => {
   const [orderData, setOrderData] = useState();
@@ -34,6 +35,10 @@ const SendDocument = ({ id, lang }) => {
       console.error('Error sending mail:', error);
     }
   };
+
+  const mailformat =
+    '[a-z0-9!#$%&’*+/=?^_`{|}~-]+(?:.[a-z0-9!#$%&’*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?';
+
   return (
     <div className='h-full w-full flex items-center justify-center'>
       <form
@@ -57,7 +62,14 @@ const SendDocument = ({ id, lang }) => {
               title={'Fişi Gör'}
             />
           )}
-          <Button className='flex flex-1' type='submit'>
+          <Button
+            className={cn(
+              'flex flex-1 cursor-not-allowed',
+              email.length > 6 && 'cursor-default'
+            )}
+            type='submit'
+            disabled={email?.match(mailformat) ? false : true}
+          >
             Fişi Gönder
           </Button>
         </div>
