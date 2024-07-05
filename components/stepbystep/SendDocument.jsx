@@ -7,6 +7,7 @@ import { getAPI, postAPI } from '@/services/fetchAPI';
 import InvoiceJustButton from '../createOffer/orderOffer/PrintOrder/ButtonPrint';
 import { useLoadingContext } from '@/app/(StepsLayout)/layout';
 import { cn } from '@/lib/table/utils';
+import { toast } from 'react-toastify';
 
 const SendDocument = ({ id, lang }) => {
   const [orderData, setOrderData] = useState();
@@ -31,8 +32,10 @@ const SendDocument = ({ id, lang }) => {
         orderCode: id,
         url: `https://gabba-medyanes-360.vercel.app/document?id=${id}&lang=${lang}`,
       });
+      toast.success('Mail başarıyla gönderildi!');
     } catch (error) {
       console.error('Error sending mail:', error);
+      toast.error('Mail gönderilirken bir hata gerçekleşti!');
     }
   };
 
@@ -65,7 +68,7 @@ const SendDocument = ({ id, lang }) => {
           <Button
             className={cn(
               'flex flex-1 cursor-not-allowed',
-              email.length > 6 && 'cursor-default'
+              email.length > 6 && 'cursor-pointer'
             )}
             type='submit'
             disabled={email?.match(mailformat) ? false : true}
