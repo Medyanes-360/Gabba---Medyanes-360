@@ -41,6 +41,16 @@ const langs = {
     ua: 'СУМА',
     en: 'TOTAL',
   },
+  indirimTutari: {
+    tr: 'İNDİRİM TUTARI',
+    ua: 'ССУМА ЗНИЖКИУМА',
+    en: 'DISCOUNT AMOUNT',
+  },
+  sonTutar: {
+    tr: 'SON TUTAR',
+    ua: 'ОСТАТОЧНА СУМА',
+    en: 'FINAL AMOUNT',
+  },
   notFound: {
     tr: 'Bulunamadı',
     ua: 'Не знайдено',
@@ -90,6 +100,8 @@ const langs = {
 
 const Invoice = ({ data, lang }) => {
   const printRef = useRef(null);
+  const [indirimOrani, setIndirimOrani] = useState(0);
+  const [kdvOrani, setKdvOrani] = useState(0);
 
   function filterDataByOrderId() {
     {
@@ -102,6 +114,7 @@ const Invoice = ({ data, lang }) => {
         phone: data.Müşteri[0].phoneNumber,
         adress: data.Müşteri[0].address,
         email: data.Müşteri[0].mailAddress,
+        father_name: data.Müşteri[0].father_name,
       },
       products: [],
     };
@@ -151,100 +164,114 @@ const Invoice = ({ data, lang }) => {
         /* Extralar içerisinde gezip orderId product id ile eşit olanların içerisinde gezip extras yani ürün özelliklerine bu datayı gödneriyoruz */
       }
       if (Array.isArray(data.Extralar) && data.Extralar.length > 0) {
-        data.Extralar?.filter((x_f) => x_f?.orderId === pr_id)?.forEach((x_k) => {
-          x_d = {
-            ...x_d,
-            extras: x_d?.extras
-              ? [
-                ...x_d.extras,
-                {
-                  name: 'Extra',
-                  value: x_k.extravalue,
-                },
-              ]
-              : [
-                {
-                  name: 'Extra',
-                  value: x_k.extravalue,
-                },
-              ],
-          };
-        });
+        data.Extralar?.filter((x_f) => x_f?.orderId === pr_id)?.forEach(
+          (x_k) => {
+            x_d = {
+              ...x_d,
+              extras: x_d?.extras
+                ? [
+                    ...x_d.extras,
+                    {
+                      name: 'Extra',
+                      value: x_k.extravalue,
+                    },
+                  ]
+                : [
+                    {
+                      name: 'Extra',
+                      value: x_k.extravalue,
+                    },
+                  ],
+            };
+          }
+        );
       }
 
       {
         /* Kunaşlar içerisinde gezip orderId - order id ile eşit olanların içerisinde gezip extras yani ürün özelliklerine bu datayı gödneriyoruz */
       }
       if (Array.isArray(data?.Kumaşlar) && data?.Kumaşlar.length > 0) {
-        data?.Kumaşlar?.filter((x_f) => x_f?.orderId === or_id)?.forEach((x_k) => {
-          x_d = {
-            ...x_d,
-            extras: x_d?.extras
-              ? [
-                ...x_d.extras,
-                {
-                  name: 'Kumaş',
-                  value: x_k.fabricType,
-                },
-              ]
-              : [
-                {
-                  name: 'Kumaş',
-                  value: x_k.fabricType,
-                },
-              ],
-          };
-        });
+        data?.Kumaşlar?.filter((x_f) => x_f?.orderId === or_id)?.forEach(
+          (x_k) => {
+            x_d = {
+              ...x_d,
+              extras: x_d?.extras
+                ? [
+                    ...x_d.extras,
+                    {
+                      name: 'Kumaş',
+                      value: x_k.fabricType,
+                    },
+                  ]
+                : [
+                    {
+                      name: 'Kumaş',
+                      value: x_k.fabricType,
+                    },
+                  ],
+            };
+          }
+        );
       }
 
       {
         /* Metaller içerisinde gezip orderId - order id ile eşit olanların içerisinde gezip extras yani ürün özelliklerine bu datayı gödneriyoruz */
       }
       if (Array.isArray(data?.Metaller) && data?.Metaller.length > 0) {
-        data.Metaller?.filter((x_f) => x_f.orderId === or_id)?.forEach((x_m) => {
-          x_d = {
-            ...x_d,
-            extras: x_d?.extras
-              ? [
-                ...x_d.extras,
-                {
-                  name: 'Metal',
-                  value: x_m.metalType,
-                },
-              ]
-              : [
-                {
-                  name: 'Metal',
-                  value: x_m.metalType,
-                },
-              ],
-          };
-        });
+        data.Metaller?.filter((x_f) => x_f.orderId === or_id)?.forEach(
+          (x_m) => {
+            x_d = {
+              ...x_d,
+              extras: x_d?.extras
+                ? [
+                    ...x_d.extras,
+                    {
+                      name: 'Metal',
+                      value: x_m.metalType,
+                    },
+                  ]
+                : [
+                    {
+                      name: 'Metal',
+                      value: x_m.metalType,
+                    },
+                  ],
+            };
+          }
+        );
       }
 
       {
         /* Renkler içerisinde gezip orderId - order id ile eşit olanların içerisinde gezip extras yani ürün özelliklerine bu datayı gödneriyoruz */
       }
       if (Array.isArray(data?.Renkler) && data?.Renkler.length > 0) {
-        data.Renkler.filter((x_f) => x_f && x_f?.orderId === or_id).forEach((x_m) => {
-          x_d = {
-            ...x_d,
-            extras: x_d?.extras
-              ? [
-                ...x_d.extras,
-                {
-                  name: 'Renk',
-                  value: x_m.colourHex === "" ? x_m.colourDescription : x_m.colourHex,
-                },
-              ]
-              : [
-                {
-                  name: 'Renk',
-                  value: x_m.colourHex === "" ? x_m.colourDescription : x_m.colourHex,
-                },
-              ],
-          };
-        });
+        data.Renkler.filter((x_f) => x_f && x_f?.orderId === or_id).forEach(
+          (x_m) => {
+            x_d = {
+              ...x_d,
+              extras: x_d?.extras
+                ? [
+                    ...x_d.extras,
+                    {
+                      name: 'Renk',
+                      value:
+                        x_m.colourHex === ''
+                          ? x_m.colourDescription
+                          : x_m.colourHex,
+                    },
+                  ]
+                : [
+                    {
+                      name: 'Renk',
+                      value:
+                        x_m.colourHex === ''
+                          ? x_m.colourDescription
+                          : x_m.colourHex,
+                    },
+                  ],
+            };
+          }
+        );
       }
 
       {
@@ -260,18 +287,18 @@ const Invoice = ({ data, lang }) => {
               ...x_d,
               extras: x_d?.extras
                 ? [
-                  ...x_d.extras,
-                  {
-                    name: 'Ölçü',
-                    value: formated,
-                  },
-                ]
+                    ...x_d.extras,
+                    {
+                      name: 'Ölçü',
+                      value: formated,
+                    },
+                  ]
                 : [
-                  {
-                    name: 'Ölçü',
-                    value: formated,
-                  },
-                ],
+                    {
+                      name: 'Ölçü',
+                      value: formated,
+                    },
+                  ],
             };
           });
       }
@@ -307,27 +334,59 @@ const Invoice = ({ data, lang }) => {
      tax = kdv,
      grandTotal = kdv dahil*/
   }
-  const calculateTotals = (taxRate, products) => {
+  const calculateTotals = (products) => {
     let total = 0;
+    let indirimliTutar = 0;
     let tax = 0;
+    let kdvHaricTutar = 0;
 
     products.forEach((product) => {
+      console.log('product.totalPrice: ', product.totalPrice);
       total += product.totalPrice;
+      indirimliTutar += (product.totalPrice * indirimOrani) / 100;
     });
 
-    tax = total * (taxRate / 100);
+    kdvHaricTutar = total - indirimliTutar;
 
-    const grandTotal = total + tax;
+    tax = total * (kdvOrani / 100);
 
+    const grandTotal = kdvHaricTutar + tax;
     return {
       total: formatCurrency(total),
       tax: formatCurrency(tax),
       grandTotal: formatCurrency(grandTotal),
+      indirimliTotal: formatCurrency(indirimliTutar),
+      kdvHaricTotal: formatCurrency(kdvHaricTutar),
+    };
+  };
+
+  const calculateIndirimOrani = (product, amount) => {
+    let productTotal = product * amount;
+    let indirimTotal = 0;
+    let kdvHaric = 0;
+    indirimTotal = (productTotal * indirimOrani) / 100;
+    kdvHaric = productTotal - indirimTotal;
+    return {
+      indirimTutar: formatCurrency(indirimTotal),
+      kdvHaricTutar: formatCurrency(kdvHaric),
     };
   };
 
   const details = filterDataByOrderId();
-  const total = calculateTotals(16, details.products);
+  const total = calculateTotals(details.products);
+
+  const todayDate = () => {
+    const today = new Date();
+
+    // Günü, ayı ve yılı al
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Aylar 0-11 arası olduğu için +1 eklenir
+    const year = today.getFullYear();
+
+    // İstenen formatta tarihi oluştur
+    const formattedDate = `${day}.${month}.${year}`;
+    return formattedDate;
+  };
 
   return (
     <div className='flex flex-col h-fit overflow-auto gap-6 relative m-auto w-[29.7cm]'>
@@ -365,6 +424,9 @@ const Invoice = ({ data, lang }) => {
             <span className='text-[13.5pt] text-[#000] font-bold'>
               {details.musteri.adress}
             </span>
+            <span className='text-[13.5pt] text-[#000] font-bold'>
+              {details.musteri.father_name}
+            </span>
           </div>
         </header>
 
@@ -383,20 +445,24 @@ const Invoice = ({ data, lang }) => {
               </th>
               <th />
               <th />
-              <th><span className='text-[10pt] text-[#000] font-bold'>
-                {langs.date[lang]}:
-              </span></th>
-              <th><span className='text-[10pt] text-[#000] font-bold'>
-                {data.Orders.map(
-                  (orders, index) =>
-                    index == 0 &&
-                    orders.createdAt
-                      .split('T')[0]
-                      .split('-')
-                      .reverse()
-                      .join('.')
-                )}
-              </span></th>
+              <th>
+                <span className='text-[10pt] text-[#000] font-bold'>
+                  {langs.date[lang]}:
+                </span>
+              </th>
+              <th>
+                <span className='text-[10pt] text-[#000] font-bold'>
+                  {data.Orders.map(
+                    (orders, index) =>
+                      index == 0 &&
+                      orders.createdAt
+                        .split('T')[0]
+                        .split('-')
+                        .reverse()
+                        .join('.')
+                  )}
+                </span>
+              </th>
             </tr>
           </thead>
 
@@ -408,6 +474,8 @@ const Invoice = ({ data, lang }) => {
               <th className='!font-serif'>{langs.price[lang]}</th>
               <th className='!font-serif'>{langs.quantity[lang]}</th>
               <th className='!font-serif'>{langs.total[lang]}</th>
+              <th className='!font-serif'>{langs.indirimTutari[lang]}</th>
+              <th className='!font-serif'>{langs.sonTutar[lang]}</th>
             </tr>
           </thead>
           <tbody className='[&_tr_td]:p-[6px] [&_tr_td]:text-center [&_tr_th]:text-[#000]'>
@@ -472,6 +540,20 @@ const Invoice = ({ data, lang }) => {
                 <td className='border border-black whitespace-nowrap'>
                   {formatCurrency(product.quantity * product.price)} грн
                 </td>
+                <td className='border border-black whitespace-nowrap'>
+                  {
+                    calculateIndirimOrani(product.quantity, product.price)
+                      .indirimTutar
+                  }{' '}
+                  грн
+                </td>
+                <td className='border border-black whitespace-nowrap'>
+                  {
+                    calculateIndirimOrani(product.quantity, product.price)
+                      .kdvHaricTutar
+                  }{' '}
+                  грн
+                </td>
               </tr>
             ))}
           </tbody>
@@ -484,41 +566,35 @@ const Invoice = ({ data, lang }) => {
               {langs.firmaBilgileri[lang]}
             </span>
             <span className='text-[10pt] text-[#000] font-bold'>
-              Фізична особа-підприємець Дурал Онур код за ЄДРПОУ 2896224270{' '}
+              {data && data.Company[0].name}
             </span>
             <span className='text-[10pt] text-[#000] font-bold'>
-              UA043052990000026008040126820, Банк АТ КБ "ПРИВАТБАНК", МФО 305299{' '}
+              {data && data.Company[0].address}
             </span>
             <span className='text-[10pt] text-[#000] font-bold'>
-              Україна, 76006, Івано-Франківська обл., м.Івано-Франківськ,
-              вул.Вовчинецька, будинок № 200, кв.7
+              {data && data.Company[0].vergino}
             </span>
           </div>
 
           <div className='flex flex-col items-end gap-2 mt-[24px]'>
-            <div className='flex items-center gap-6 px-1.5 w-[300px]'>
-              <span className='text-[#000] text-[13pt] font-bold'>
-                {langs.total[lang]} :
-              </span>
-              <p className='ml-auto text-[#000] text-[12pt] font-bold'>
-                {total.total} грн
-              </p>
-            </div>
-
-            <div className='flex items-center gap-6 px-1.5 w-[300px]'>
-              <span className='text-[#000] text-[13pt] font-bold'>
-                {langs.vergi[lang]} :
-              </span>
-              <p className='ml-auto text-[#000] text-[12pt] font-bold'>
-                {total.tax} грн
-              </p>
-            </div>
-
+            {data && data?.Company[0]?.kdvOrani > 0 && (
+              <div className='flex items-center gap-6 px-1.5 w-[300px]'>
+                <span className='text-[#000] text-[13pt] font-bold whitespace-nowrap'>
+                  {langs.kdvTutari[lang]} :
+                </span>
+                <p className='ml-auto text-[#000] text-[12pt] font-bold whitespace-nowrap'>
+                  {total.tax} грн
+                </p>
+              </div>
+            )}
             <div className='flex items-center gap-6 w-[300px] border-b border-b-black p-1.5 rounded-sm'>
-              <span className='text-[#000] text-[13pt] font-bold'>
-                {langs.genelToplam[lang]} :
+              <span className='text-[#000] text-[13pt] font-bold whitespace-nowrap'>
+                {data && data?.Company[0]?.kdvOrani > 0
+                  ? langs.genelToplam[lang]
+                  : langs.sonTutar[lang]}{' '}
+                :
               </span>
-              <p className='ml-auto text-[#000] text-[12pt] font-bold'>
+              <p className='ml-auto text-[#000] text-[12pt] font-bold whitespace-nowrap'>
                 {total.grandTotal} грн
               </p>
             </div>

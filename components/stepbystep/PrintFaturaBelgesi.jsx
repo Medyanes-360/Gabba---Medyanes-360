@@ -34,8 +34,8 @@ const langs = {
   },
   indirimTutari: {
     tr: 'İNDİRİM TUTARI',
-    ua: 'СУМА',
-    en: 'TOTAL',
+    ua: 'СУМА ЗНИЖКИ',
+    en: 'DISCOUNT AMOUNT',
   },
   sonTutar: {
     tr: 'SON TUTAR',
