@@ -157,6 +157,11 @@ const handler = async (req, res) => {
       const customerId = values.customerId;
       const customerName = values.customerName;
       const personelId = values.personelId;
+
+      const companyId = await getDataByUnique('Company', {
+        status: true,
+      });
+
       const orderNote = values.orderNote;
       const ordersStatus = values.ordersStatus;
       const productOrderStatus = values.productOrderStatus;
@@ -184,6 +189,7 @@ const handler = async (req, res) => {
             productOrderStatus: productOrderStatus,
             personelId: personelId,
             customerId: customerId,
+            companyId: companyId.id,
             productPrice: item.ProductPrice,
             productFeaturePrice: item.ProductFeaturePrice,
             productId: item.Product.id,
@@ -472,6 +478,15 @@ const handler = async (req, res) => {
               })
             );
 
+            const Company = await Promise.all(
+              matchingOrder.map(async (order) => {
+                const companyData = await getDataByUnique('Company', {
+                  id: order.companyId,
+                });
+                return companyData;
+              })
+            );
+
             const Personel = await Promise.all(
               matchingOrder.map(async (order) => {
                 const personelData = await getDataByUnique('User', {
@@ -492,6 +507,7 @@ const handler = async (req, res) => {
               Ürünler: Products,
               Müşteri: Customer,
               Personel: Personel,
+              Company: Company,
               Date: OfferOrdersResult.createdAt,
             });
           })
