@@ -56,13 +56,13 @@ const AddCariPayment = ({
                 Cari Kontrol ve Ek İşlemler
               </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent className='w-full max-w-4xl h-fit max-h-fit'>
+            <AlertDialogContent className='w-full max-w-7xl h-fit max-h-fit'>
               <AlertDialogCancel className='absolute w-10 h-10 -right-4 -top-5 bg-red-600 rounded-full hover:cursor-pointer transition-all duration-500 z-10 group'>
                 <span className='text-white text-xl group-hover:text-red-500 group-hover:transition-all group-hover:duration-500'>
                   x
                 </span>
               </AlertDialogCancel>
-              <div className='max-w-4xl h-fit max-h-[650px] overflow-y-auto px-2'>
+              <div className='max-w-7xl h-fit max-h-[650px] overflow-y-auto px-2'>
                 <AlertDialogHeader>
                   <AlertDialogTitle className='text-center'>
                     Cari Ek Ödeme
