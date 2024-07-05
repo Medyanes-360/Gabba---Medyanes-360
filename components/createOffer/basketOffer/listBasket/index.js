@@ -37,6 +37,7 @@ const ListBasket = ({
           personelId: data?.user?.id,
           customerId: '',
           customerName: '',
+          storeId: '',
         }}
         onSubmit={async (values, { resetForm }) => {
           setIsloading(true);
