@@ -81,7 +81,11 @@ const StepPage = () => {
   };
 
   return (
-    <div className='h-full w-full flex items-center justify-center'>
+    <div className='h-full w-full flex flex-col gap-10 items-center'>
+      <h1 className='font-semibold text-lg'>
+        Siparişin son güncel durumunu aşağıdan seçerek durum güncellemesi
+        sağlayabilirsiniz.
+      </h1>
       <form className='max-w-lg w-full flex flex-col gap-4'>
         {buttonData.map((button, index) => (
           <div
