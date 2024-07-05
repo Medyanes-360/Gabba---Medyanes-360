@@ -71,7 +71,10 @@ const AddCari = () => {
           );
         }
 
-        if (values.tahminiTeslimTarihi == undefined) {
+        if (
+          values.tahminiTeslimTarihi == undefined ||
+          values.tahminiTeslimTarihi == ''
+        ) {
           return toast.error('Tahmini teslim tarihi boş bırakılamaz.');
         }
 
