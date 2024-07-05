@@ -2,16 +2,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-
 import Image from 'next/image';
 import { FaPrint } from 'react-icons/fa6';
 import { useReactToPrint } from 'react-to-print';
-
-import { useOrderDataContext } from '@/app/(StepsLayout)/layout';
 import { getAPI } from '@/services/fetchAPI';
 const langs = {
   order: {
@@ -44,10 +37,10 @@ const langs = {
     ua: 'СУМА',
     en: 'TOTAL',
   },
-  kdvHaric: {
-    tr: 'KDV HARİÇ TUTAR',
-    ua: 'СУМА',
-    en: 'TOTAL',
+  sonTutar: {
+    tr: 'SON TUTAR',
+    ua: 'ОСТАТОЧНА СУМА',
+    en: 'FINAL AMOUNT',
   },
   notFound: {
     tr: 'Bulunamadı',
@@ -106,23 +99,21 @@ const langs = {
   },
 };
 
-const PrintFaturaBelgesi = ({ data, lang, stepByStepData }) => {
-  // const { orderData } = useOrderDataContext();
-  const [companyInformation, setCompanyInformation] = useState([]);
-
+const PrintFaturaBelgesi = ({ id, data, lang, stepByStepData }) => {
   const [indirimOrani, setIndirimOrani] = useState(0);
-  const [kdvliFirma, setKdvliFirma] = useState(false);
   const [kdvOrani, setKdvOrani] = useState(0);
+  const [fatura, setFatura] = useState([]);
 
   const printRef = useRef(null);
 
-  const getCompany = async () => {
-    const response = await getAPI('/company');
-    const filteredCompany = response.data.filter(
-      (item) => item.status === true
-    )[0];
-    setCompanyInformation(filteredCompany);
+  const faturaDate = async () => {
+    const response = await getAPI(`/fatura-belgesi?faturaNo=${id}`);
+    setFatura(response.data);
   };
+
+  useEffect(() => {
+    faturaDate();
+  }, []);
 
   {
     /* Sayfanın print özelliğini tetikleyip yazdılacak divin referansını veriyorum content'de, ve pageStyle ile kenarlardan margin veriyoruz */
@@ -130,14 +121,8 @@ const PrintFaturaBelgesi = ({ data, lang, stepByStepData }) => {
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
-    onBeforePrint: () => console.log('BBBB'),
-    onAfterPrint: () => console.log('AAA'),
     pageStyle: `margin: 2.5%`,
   });
-
-  useEffect(() => {
-    getCompany();
-  }, []);
 
   function filterDataByOrderId() {
     {
@@ -150,6 +135,7 @@ const PrintFaturaBelgesi = ({ data, lang, stepByStepData }) => {
         phone: data.Müşteri[0].phoneNumber,
         adress: data.Müşteri[0].address,
         email: data.Müşteri[0].mailAddress,
+        father_name: data.Müşteri[0].father_name,
       },
       products: [],
     };
@@ -415,203 +401,213 @@ const PrintFaturaBelgesi = ({ data, lang, stepByStepData }) => {
   };
 
   return (
-    <div className='flex flex-col h-fit overflow-auto gap-6 relative m-auto w-[29.7cm]'>
-      <button
-        className='px-8 py-2 w-[29.7cm] bg-green-500 text-white font-bold rounded-md hover:opacity-75 transition-all duration-200 active:bg-green-400'
-        onClick={handlePrint}
-      >
-        <div className='flex justify-center gap-4 items-center'>
-          <span className='text-lg'>{langs.indirmeButonu[lang]}</span>{' '}
-          <FaPrint size={20} />
+    <>
+      <div className='flex flex-col h-fit overflow-auto gap-6 relative m-auto w-[29.7cm]'>
+        <button
+          className='px-8 py-2 w-[29.7cm] bg-green-500 text-white font-bold rounded-md hover:opacity-75 transition-all duration-200 active:bg-green-400'
+          onClick={handlePrint}
+        >
+          <div className='flex justify-center gap-4 items-center'>
+            <span className='text-lg'>{langs.indirmeButonu[lang]}</span>{' '}
+            <FaPrint size={20} />
+          </div>
+        </button>
+        <div ref={printRef} className='a4 mx-2'>
+          {/* Header */}
+          <header className='flex items-center justify-end mb-6 px-4'>
+            <Image
+              src='/Logo.png'
+              width={300}
+              height={300}
+              alt=''
+              className='mr-auto'
+            />
+
+            <div className='flex flex-col gap-1'>
+              <span className='text-[#000] text-[19.125pt] font-bold'>
+                {details.musteri.name}
+              </span>
+              <span className='text-[13.5pt] text-[#000] font-bold'>
+                {details.musteri.phone}
+              </span>
+              <span className='text-[13.5pt] text-[#000] font-bold'>
+                {details.musteri.email}
+              </span>
+              <span className='text-[13.5pt] text-[#000] font-bold'>
+                {details.musteri.adress}
+              </span>
+              <span className='text-[13.5pt] text-[#000] font-bold'>
+                {details.musteri.father_name}
+              </span>
+            </div>
+          </header>
+
+          <table className='w-full break-inside-auto'>
+            <thead className='h-[50px] w-full'>
+              <tr>
+                <th>
+                  <span className='text-[10pt] text-[#000] font-bold flex'>
+                    {langs.belgeName[lang]}: {langs.belgeDescription[lang]}
+                  </span>
+                </th>
+                <th>
+                  <span className='text-[10pt] text-[#000] font-bold'>
+                    {langs.faturaNo[lang]}: FAT-
+                    {fatura ? fatura?.faturaNo : details.order_no}
+                  </span>
+                </th>
+                <th>
+                  <span className='text-[10pt] text-[#000] font-bold'>
+                    {langs.date[lang]}: {fatura ? fatura?.date : todayDate()}
+                  </span>
+                </th>
+                <th>
+                  <span className='text-[10pt] text-[#000] font-bold'></span>
+                </th>
+              </tr>
+            </thead>
+          </table>
+          <table className='w-full break-inside-auto'>
+            <thead className='border border-black [&_tr_th]:text-center  [&_tr_th]:text-black'>
+              <tr className='h-8'>
+                <th className='px-1 w-fit !font-serif'>{langs.order[lang]}</th>
+                <th className='!font-serif'>{langs.productFeatures[lang]}</th>
+                <th className='!font-serif'>{langs.quantity[lang]}</th>
+                <th className='!font-serif'>{langs.price[lang]}</th>
+                <th className='!font-serif'>{langs.total[lang]}</th>
+                <th className='!font-serif'>{langs.indirimTutari[lang]}</th>
+                <th className='!font-serif'>{langs.sonTutar[lang]}</th>
+              </tr>
+            </thead>
+            <tbody className='[&_tr_td]:p-[6px] [&_tr_td]:text-center [&_tr_th]:text-[#000]'>
+              {details?.products?.map((product, idx) => {
+                return (
+                  <tr
+                    key={idx}
+                    className='even:bg-[#F2F2F2] bg-white break-inside-avoid'
+                  >
+                    <td className='border border-black text-[13.5pt] text-[#000] font-bold'>
+                      {idx + 1}
+                    </td>
+                    <td className='border border-black overflow-hidden'>
+                      <div className='!max-h-fit overflow-hidden gap-2 flex flex-wrap'>
+                        <span className='px-2.5 py-1 text-[9pt] text-black border border-black rounded-md font-semibold rounded-full w-fit'>
+                          {product.name}
+                        </span>
+
+                        <span className='px-2.5 py-1 text-[9pt] text-black border border-black rounded-md font-semibold rounded-full w-fit'>
+                          {product.info}
+                        </span>
+
+                        {product?.extras?.map((feature, idx) => (
+                          <div
+                            key={'feature-' + idx}
+                            className='px-2 py-1 text-center align-middle flex gap-1 [&_span]:text-black border border-black rounded-full [&_span]:text-[10pt] items-center'
+                          >
+                            <span>{feature.value}</span>
+                          </div>
+                        ))}
+
+                        {product.note && product.note !== '' && (
+                          <div className='px-2 py-1 flex gap-1 [&_span]:text-black border border-black rounded-md [&_span]:text-[10pt] items-center w-full'>
+                            <span>{product.note}</span>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className='border border-black whitespace-nowrap'>
+                      {product.quantity} грн
+                    </td>
+                    <td className='border border-black whitespace-nowrap '>
+                      {formatCurrency(product.price)} грн
+                    </td>
+                    <td className='border border-black whitespace-nowrap'>
+                      {formatCurrency(product.quantity * product.price)} грн
+                    </td>
+                    <td className='border border-black whitespace-nowrap'>
+                      {
+                        calculateIndirimOrani(product.quantity, product.price)
+                          .indirimTutar
+                      }{' '}
+                      грн
+                    </td>
+                    <td className='border border-black whitespace-nowrap'>
+                      {
+                        calculateIndirimOrani(product.quantity, product.price)
+                          .kdvHaricTutar
+                      }{' '}
+                      грн
+                    </td>
+                  </tr>
+                );
+              })}
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>{langs.total[lang]} :</td>
+                <td> {total.total}</td>
+                <td>{total.indirimliTotal}</td>
+                <td>{total.kdvHaricTotal}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          {/* Footer */}
+          <footer className='flex justify-between break-inside-avoid mx-2'>
+            <div className='mt-[24px] flex flex-col h-full'>
+              <span className='text-[#000] text-[15pt] font-bold'>
+                {langs.firmaBilgileri[lang]}
+              </span>
+              <span className='text-[10pt] text-[#000] font-bold'>
+                {data && data.Company[0].name}
+              </span>
+              <span className='text-[10pt] text-[#000] font-bold'>
+                {data && data.Company[0].address}
+              </span>
+              <span className='text-[10pt] text-[#000] font-bold'>
+                {data && data.Company[0].vergino}
+              </span>
+            </div>
+
+            <div className='flex flex-col items-end gap-2 mt-[24px]'>
+              {data && data?.Company[0]?.kdvOrani > 0 && (
+                <div className='flex items-center gap-6 px-1.5 w-[300px]'>
+                  <span className='text-[#000] text-[13pt] font-bold whitespace-nowrap'>
+                    {langs.kdvTutari[lang]} :
+                  </span>
+                  <p className='ml-auto text-[#000] text-[12pt] font-bold whitespace-nowrap'>
+                    {total.tax} грн
+                  </p>
+                </div>
+              )}
+
+              <div className='flex items-center gap-6 w-[300px] border-b border-b-black p-1.5 rounded-sm'>
+                <span className='text-[#000] text-[13pt] font-bold whitespace-nowrap'>
+                  {data && data?.Company[0]?.kdvOrani > 0
+                    ? langs.genelToplam[lang]
+                    : langs.sonTutar[lang]}{' '}
+                  :
+                </span>
+                <p className='ml-auto text-[#000] text-[12pt] font-bold whitespace-nowrap'>
+                  {total.grandTotal} грн
+                </p>
+              </div>
+            </div>
+          </footer>
         </div>
-      </button>
-      <div ref={printRef} className='a4 overflow-y-auto mx-2'>
-        {/* Header */}
-        <header className='flex items-center justify-end mb-6 px-4'>
-          <Image
-            src='/Logo.png'
-            width={300}
-            height={300}
-            alt=''
-            className='mr-auto'
-          />
 
-          <div className='flex flex-col gap-1'>
-            <span className='text-[#000] text-[19.125pt] font-bold'>
-              {details.musteri.name}
-            </span>
-            <span className='text-[13.5pt] text-[#000] font-bold'>
-              {details.musteri.phone}
-            </span>
-            <span className='text-[13.5pt] text-[#000] font-bold'>
-              {details.musteri.email}
-            </span>
-            <span className='text-[13.5pt] text-[#000] font-bold'>
-              {details.musteri.adress}
-            </span>
+        <button
+          className='px-8 py-2 w-[29.7cm] bg-green-500 text-white font-bold rounded-md hover:opacity-75 transition-all duration-200 active:bg-green-400'
+          onClick={handlePrint}
+        >
+          <div className='flex justify-center gap-4 items-center'>
+            <span className='text-lg'>{langs.indirmeButonu[lang]}</span>{' '}
+            <FaPrint size={20} />
           </div>
-        </header>
-
-        <table className='w-full break-inside-auto'>
-          <thead className='h-[50px] w-full'>
-            <tr>
-              <th>
-                <span className='text-[10pt] text-[#000] font-bold flex'>
-                  {langs.belgeName[lang]}: {langs.belgeDescription[lang]}
-                </span>
-              </th>
-              <th>
-                <span className='text-[10pt] text-[#000] font-bold'>
-                  {langs.faturaNo[lang]}: FAT-{details.order_no}
-                </span>
-              </th>
-              <th>
-                <span className='text-[10pt] text-[#000] font-bold'>
-                  {langs.date[lang]}: {todayDate()}
-                </span>
-              </th>
-              <th>
-                <span className='text-[10pt] text-[#000] font-bold'></span>
-              </th>
-            </tr>
-          </thead>
-        </table>
-        <table className='w-full break-inside-auto'>
-          <thead className='border border-black [&_tr_th]:text-center  [&_tr_th]:text-black'>
-            <tr className='h-8'>
-              <th className='px-1 w-fit !font-serif'>{langs.order[lang]}</th>
-              <th className='!font-serif'>{langs.productFeatures[lang]}</th>
-              <th className='!font-serif'>{langs.quantity[lang]}</th>
-              <th className='!font-serif'>{langs.price[lang]}</th>
-              <th className='!font-serif'>{langs.total[lang]}</th>
-              <th className='!font-serif'>{langs.indirimTutari[lang]}</th>
-              <th className='!font-serif'>{langs.kdvHaric[lang]}</th>
-            </tr>
-          </thead>
-          <tbody className='[&_tr_td]:p-[6px] [&_tr_td]:text-center [&_tr_th]:text-[#000]'>
-            {details?.products?.map((product, idx) => {
-              const matchedProduct = console.log(details?.products);
-              return (
-                <tr
-                  key={idx}
-                  className='even:bg-[#F2F2F2] bg-white break-inside-avoid'
-                >
-                  <td className='border border-black text-[13.5pt] text-[#000] font-bold'>
-                    {idx + 1}
-                  </td>
-                  <td className='border border-black overflow-hidden'>
-                    <div className='!max-h-fit overflow-hidden gap-2 flex flex-wrap'>
-                      <span className='px-2.5 py-1 text-[9pt] text-black border border-black rounded-md font-semibold rounded-full w-fit'>
-                        {product.name}
-                      </span>
-
-                      <span className='px-2.5 py-1 text-[9pt] text-black border border-black rounded-md font-semibold rounded-full w-fit'>
-                        {product.info}
-                      </span>
-
-                      {product?.extras?.map((feature, idx) => (
-                        <div
-                          key={'feature-' + idx}
-                          className='px-2 py-1 text-center align-middle flex gap-1 [&_span]:text-black border border-black rounded-full [&_span]:text-[10pt] items-center'
-                        >
-                          <span>{feature.value}</span>
-                        </div>
-                      ))}
-
-                      {product.note && product.note !== '' && (
-                        <div className='px-2 py-1 flex gap-1 [&_span]:text-black border border-black rounded-md [&_span]:text-[10pt] items-center w-full'>
-                          <span>{product.note}</span>
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td className='border border-black whitespace-nowrap'>
-                    {product.quantity} грн
-                  </td>
-                  <td className='border border-black whitespace-nowrap '>
-                    {formatCurrency(product.price)} грн
-                  </td>
-                  <td className='border border-black whitespace-nowrap'>
-                    {formatCurrency(product.quantity * product.price)} грн
-                  </td>
-                  <td className='border border-black whitespace-nowrap'>
-                    {
-                      calculateIndirimOrani(product.quantity, product.price)
-                        .indirimTutar
-                    }
-                    грн
-                  </td>
-                  <td className='border border-black whitespace-nowrap'>
-                    {
-                      calculateIndirimOrani(product.quantity, product.price)
-                        .kdvHaricTutar
-                    }
-                    грн
-                  </td>
-                </tr>
-              );
-            })}
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td>{langs.total[lang]} :</td>
-              <td> {total.total}</td>
-              <td>{total.indirimliTotal}</td>
-              <td>{total.kdvHaricTotal}</td>
-            </tr>
-          </tbody>
-        </table>
-
-        {/* Footer */}
-        <footer className='flex justify-between break-inside-avoid mx-2'>
-          <div className='mt-[24px] flex flex-col h-full'>
-            <span className='text-[#000] text-[15pt] font-bold'>
-              {langs.firmaBilgileri[lang]}
-            </span>
-            <span className='text-[10pt] text-[#000] font-bold'>
-              {companyInformation && companyInformation.name}
-            </span>
-            <span className='text-[10pt] text-[#000] font-bold'>
-              {companyInformation && companyInformation.address}
-            </span>
-            <span className='text-[10pt] text-[#000] font-bold'>
-              Vergi no: {companyInformation && companyInformation.vergino}
-            </span>
-          </div>
-
-          <div className='flex flex-col items-end gap-2 mt-[24px]'>
-            <div className='flex items-center gap-6 px-1.5 w-[300px]'>
-              <span className='text-[#000] text-[13pt] font-bold'>
-                {langs.kdvTutari[lang]} :
-              </span>
-              <p className='ml-auto text-[#000] text-[12pt] font-bold'>
-                {total.tax} грн
-              </p>
-            </div>
-
-            <div className='flex items-center gap-6 w-[300px] border-b border-b-black p-1.5 rounded-sm'>
-              <span className='text-[#000] text-[13pt] font-bold'>
-                {langs.genelToplam[lang]} :
-              </span>
-              <p className='ml-auto text-[#000] text-[12pt] font-bold'>
-                {total.grandTotal} грн
-              </p>
-            </div>
-          </div>
-        </footer>
+        </button>
       </div>
-
-      <button
-        className='px-8 py-2 w-[29.7cm] bg-green-500 text-white font-bold rounded-md hover:opacity-75 transition-all duration-200 active:bg-green-400'
-        onClick={handlePrint}
-      >
-        <div className='flex justify-center gap-4 items-center'>
-          <span className='text-lg'>{langs.indirmeButonu[lang]}</span>{' '}
-          <FaPrint size={20} />
-        </div>
-      </button>
-    </div>
+    </>
   );
 };
 
