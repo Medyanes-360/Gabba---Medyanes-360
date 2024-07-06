@@ -327,7 +327,7 @@ model OfferOrder {
   id                  String   @id @default(auto()) @map("_id") @db.ObjectId
   customerId          String
   personelId          String
-  storeId             String
+  companyId           String
   orderCode           String   @unique
   invalidDate         DateTime
   stock               Int
@@ -449,6 +449,8 @@ model Company {
   bankahesapno String
   bankamfo     String
   iban         String
+
+  kdvOrani Float?
 
   ekstra1          String
   ekstra1English   String?
@@ -679,4 +681,12 @@ model TeslimTutanagi {
   date               String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+}
+
+model FaturaBelgesi {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  faturaNo  String   @unique
+  date      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
