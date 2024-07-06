@@ -4,6 +4,19 @@ import {
   createNewData,
 } from '@/services/serviceOperations';
 import { getToken } from 'next-auth/jwt';
+import nodemailer from 'nodemailer';
+
+export const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+});
+
+export const mailOptions = {
+  from: process.env.EMAIL,
+};
 
 const handler = async (req, res) => {
   try {
@@ -43,6 +56,30 @@ const handler = async (req, res) => {
           'Tedarikçi seçilirken bir hata oluştu, lütfen yetkili bir kişi ile iletişime geçiniz!'
         );
       }
+
+      const email = 'medyanes360@gmail.com';
+
+      //! Aşağıdaki kodlar geçicidir, değişecektir.
+      // mail gönderme işlemi
+      transporter.sendMail({
+        ...mailOptions,
+        subject: `Tedarikçiye Gönderilecek Mail`,
+        html: `
+                      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Gabba - Sipariş fişiniz</title>
+      </head>
+      <body>
+      <p>https://gabba-medyanes-360.vercel.app/document?id=${id}&lang=tr</p>
+      <p>Tedarikçi Açıklaması: ${tedarikciAciklama}</p>
+      </body>
+      </html>
+                      `,
+        to: email,
+      });
 
       const responseLog = await createNewData('Logs', {
         role: userRole,
