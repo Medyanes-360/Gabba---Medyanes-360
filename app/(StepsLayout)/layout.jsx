@@ -179,7 +179,12 @@ const StepsLayout = ({ children }) => {
         }}
       >
         <StepByStepDataContext.Provider
-          value={{ stepByStepData, setStepByStepData, orderData }}
+          value={{
+            stepByStepData,
+            setStepByStepData,
+            orderData,
+            cariPaymentTotalAmount,
+          }}
         >
           <div className='flex h-screen w-full overflow-hidden bg-background pb-4'>
             <LoadingScreen isloading={isLoading} />
