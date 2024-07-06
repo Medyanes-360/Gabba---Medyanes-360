@@ -27,8 +27,13 @@ const AddCari = () => {
   const { id } = useParams();
   const router = useRouter();
   const { isLoading, setIsLoading } = useLoadingContext();
-  const { stepByStepData, setStepByStepData, orderData } =
-    useStepByStepDataContext();
+
+  const {
+    stepByStepData,
+    setStepByStepData,
+    orderData,
+    cariPaymentTotalAmount,
+  } = useStepByStepDataContext();
   const [initialValues, setInitialValues] = useState({
     onOdemeMiktari: '',
     onOdemeMiktariAciklamasi: '',
@@ -69,6 +74,24 @@ const AddCari = () => {
           return toast.error(
             'Cariye işlenecek ön ödeme miktarı 0 veya negatif değer olamaz!'
           );
+        }
+
+        const totalAmount = orderData.Orders?.reduce((total, order) => {
+          return (
+            total +
+            (order.productPrice + order.productFeaturePrice) * order.stock
+          );
+        }, 0);
+
+        const paidAmount = stepByStepData[0]?.onOdemeMiktari ?? 0;
+        const ekstraUcretTotal = stepByStepData[0]?.ekstraUcretTotal ?? 0;
+        const musteriBorcu =
+          totalAmount +
+          ekstraUcretTotal -
+          (paidAmount + cariPaymentTotalAmount);
+
+        if (musteriBorcu - values.onOdemeMiktari < 0) {
+          return toast.error('Ön ödeme miktarı borçtan fazla olamaz!');
         }
 
         if (
