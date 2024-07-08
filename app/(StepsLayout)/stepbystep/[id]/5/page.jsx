@@ -72,6 +72,9 @@ const StepPage = () => {
       if (stepData) {
         const updatedDates = stepData.reduce((acc, item) => {
           acc[item.orderId] = {
+            minDate: item.tahminiTeslimTarihi
+              ? new Date(item.tahminiTeslimTarihi)
+              : undefined,
             selectedDate: item.urunCikisTarihi
               ? new Date(item.urunCikisTarihi)
               : undefined,
@@ -208,10 +211,16 @@ const StepPage = () => {
                             selected={props.values.dates[item.id]?.selectedDate}
                             onSelect={(newDate) => {
                               props.setFieldValue(`dates.${item.id}`, {
+                                minDate: props.values.dates[item.id]?.minDate,
                                 selectedDate: newDate,
                                 selectedOrdersId: item.id,
                               });
                             }}
+                            disabled={(date) =>
+                              date &&
+                              date <
+                                new Date(props.values.dates[item.id]?.minDate)
+                            }
                             initialFocus
                           />
                         </PopoverContent>
