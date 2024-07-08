@@ -157,10 +157,12 @@ const StepsLayout = ({ children }) => {
     setCariPayments(response.data);
     if (response.data?.length > 0) {
       const total = response.data.reduce(
-        (sum, item) => sum + item.odemeMiktari ?? 0,
+        (sum, item) => sum + (item.odemeMiktari ?? 0),
         0
       );
       setCariPaymentsTotalAmount(total);
+    } else {
+      setCariPaymentsTotalAmount(0);
     }
   };
 
