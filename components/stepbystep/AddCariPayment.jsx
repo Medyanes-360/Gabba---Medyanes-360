@@ -7,6 +7,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { FaRegEdit, FaTrash } from 'react-icons/fa';
 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -41,6 +42,24 @@ const AddCariPayment = ({
       return `${day}.${month}.${year}`;
     }
     return '';
+  }
+
+  async function handleDeletePayment(id) {
+    const isConfirmed = confirm('Cari silmek istediğinize emin misiniz?');
+    if (isConfirmed) {
+      setIsLoading(true);
+      const response = await postAPI('/stepByStep/cariPayments', id, 'DELETE');
+      if (response.status != 'success') {
+        setIsLoading(false);
+        return toast.error(
+          'Silme işlemi gerçekleştirilemedi! ',
+          response.message
+        );
+      } else {
+        getCariPayments();
+        setIsLoading(false);
+      }
+    }
   }
 
   return (
@@ -130,9 +149,16 @@ const AddCariPayment = ({
                               }, 0)}
                           </td>
                           <td>
-                            {stepByStepData &&
-                              (stepByStepData[0]?.onOdemeMiktari ?? 0) +
-                                cariPaymentTotalAmount}
+                            {stepByStepData ? (
+                              <>
+                                {(() => {
+                                  return (
+                                    (stepByStepData[0]?.onOdemeMiktari ?? 0) +
+                                    cariPaymentTotalAmount
+                                  );
+                                })()}
+                              </>
+                            ) : null}
                           </td>
                           <td>
                             {orderData ? (
@@ -196,9 +222,39 @@ const AddCariPayment = ({
                     enableReinitialize={true}
                     initialValues={initialValues}
                     onSubmit={async (values) => {
+                      const totalAmount = orderData.Orders?.reduce(
+                        (total, order) => {
+                          return (
+                            total +
+                            (order.productPrice + order.productFeaturePrice) *
+                              order.stock
+                          );
+                        },
+                        0
+                      );
+
+                      const paidAmount = stepByStepData[0]?.onOdemeMiktari ?? 0;
+                      const ekstraUcretTotal =
+                        stepByStepData[0]?.ekstraUcretTotal ?? 0;
+                      const musteriBorcu =
+                        totalAmount +
+                        ekstraUcretTotal -
+                        (paidAmount + cariPaymentTotalAmount);
+
+                      if (musteriBorcu == 0)
+                        return toast.warning(
+                          'Müşterinin borcu kalmamıştır. Ek ödeme giremezsiniz!'
+                        );
+
                       if (values.odemeMiktari <= 0) {
                         return toast.error(
                           'Cariye işlenecek ödeme miktarı 0 veya negatif değer olamaz!'
+                        );
+                      }
+
+                      if (musteriBorcu - values.odemeMiktari < 0) {
+                        return toast.error(
+                          'Ön ödeme miktarı borçtan fazla olamaz!'
                         );
                       }
 
@@ -303,6 +359,7 @@ const AddCariPayment = ({
                             <th className='py-2 px-4'>Ödeme Yapılan Tarih</th>
                             <th className='py-2 px-4'>Ödeme Ücreti</th>
                             <th className='py-2 px-4'>Açıklama</th>
+                            <th className='py-2 px-4'>İşlem</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -336,6 +393,31 @@ const AddCariPayment = ({
                                 </td>
                                 <td className='py-2 px-4'>
                                   {item.odemeMiktariAciklamasi}
+                                </td>
+                                <td className='py-2 px-4'>
+                                  <div className='flex justify-center items-center gap-3'>
+                                    <button
+                                      type='button'
+                                      className='border border-2 border-green-500 bg-green-500 rounded p-2 group hover:bg-white transition-all duration-500 ease-in-out hover:transition-all hover:duration-500 hover:ease-in-out'
+                                    >
+                                      <FaRegEdit
+                                        className='text-white group-hover:text-green-500 transition-all duration-500 ease-in-out group-hover:transition-all group-hover:duration-500 group-hover:ease-in-out'
+                                        size={20}
+                                      />
+                                    </button>
+                                    <button
+                                      type='button'
+                                      onClick={() =>
+                                        handleDeletePayment(item.id)
+                                      }
+                                      className='border border-2 border-red-500 bg-red-500 rounded p-2 group hover:bg-white transition-all duration-500 ease-in-out hover:transition-all hover:duration-500 hover:ease-in-out'
+                                    >
+                                      <FaTrash
+                                        className='text-white group-hover:text-red-500 transition-all duration-500 ease-in-out group-hover:transition-all group-hover:duration-500 group-hover:ease-in-out'
+                                        size={20}
+                                      />
+                                    </button>
+                                  </div>
                                 </td>
                               </tr>
                             ))}
