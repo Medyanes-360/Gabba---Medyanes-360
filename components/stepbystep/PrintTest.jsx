@@ -5,17 +5,13 @@ import { useState, useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'react-toastify';
+import { FaCheckCircle } from 'react-icons/fa';
 
 import Image from 'next/image';
-import { FaPrint } from 'react-icons/fa6';
 import ShowEachTeslimTutanagi from './ShowEachTeslimTutanagi';
 
-import {
-  useOrderDataContext,
-  useLoadingContext,
-} from '@/app/(StepsLayout)/layout';
+import { useLoadingContext } from '@/app/(StepsLayout)/layout';
 import { getAPI, postAPI } from '@/services/fetchAPI';
 const langs = {
   order: {
@@ -47,6 +43,11 @@ const langs = {
     tr: 'İNDİRİM TUTARI',
     ua: 'СУМА',
     en: 'TOTAL',
+  },
+  sonTutar: {
+    tr: 'SON TUTAR',
+    ua: 'ОСТАТОЧНА СУМА',
+    en: 'FINAL AMOUNT',
   },
   kdvHaric: {
     tr: 'KDV HARİÇ TUTAR',
@@ -103,24 +104,7 @@ const langs = {
 const PrintTest = ({ data, lang, stepByStepData, setStepByStepData, id }) => {
   // CONTEXT
   const { isLoading, setIsLoading } = useLoadingContext();
-
-  // const { orderData } = useOrderDataContext();
-  const [companyInformation, setCompanyInformation] = useState([]);
-
   const [indirimOrani, setIndirimOrani] = useState(0);
-  const [kdvliFirma, setKdvliFirma] = useState(false);
-  const [kdvOrani, setKdvOrani] = useState(0);
-  const getCompany = async () => {
-    const response = await getAPI('/company');
-    const filteredCompany = response.data.filter(
-      (item) => item.status === true
-    )[0];
-    setCompanyInformation(filteredCompany);
-  };
-
-  useEffect(() => {
-    getCompany();
-  }, []);
 
   function filterDataByOrderId() {
     {
@@ -364,6 +348,7 @@ const PrintTest = ({ data, lang, stepByStepData, setStepByStepData, id }) => {
     });
 
     kdvHaricTutar = total - indirimliTutar;
+    const kdvOrani = data && (data.Company[0].kdvOrani ?? 0);
     tax = total * (kdvOrani / 100);
 
     const grandTotal = kdvHaricTutar + tax;
@@ -428,8 +413,7 @@ const PrintTest = ({ data, lang, stepByStepData, setStepByStepData, id }) => {
     const response = await postAPI('/stepByStep/teslimTutanagi', {
       matchedData: matchedData,
       indirimOrani: indirimOrani,
-      kdvliFirma: kdvliFirma,
-      kdvOrani: kdvOrani,
+      kdvOrani: data.Company[0].kdvOrani,
       date: formattedDate,
     });
 
@@ -463,27 +447,6 @@ const PrintTest = ({ data, lang, stepByStepData, setStepByStepData, id }) => {
                 onChange={(e) => setIndirimOrani(e.target.value)}
               />
             </div>
-            <div className='max-w-md mx-2 flex items-center gap-3'>
-              <Label>KDV'li Şirket mi?</Label>
-              <Checkbox
-                checked={kdvliFirma}
-                onCheckedChange={(value) => {
-                  setKdvliFirma(value);
-                  setKdvOrani(0);
-                }}
-              />
-            </div>
-            {kdvliFirma && (
-              <div className='max-w-md mx-2'>
-                <Label>KDV Oranını Ekleyiniz</Label>
-                <Input
-                  type='number'
-                  placeholder='0'
-                  min='0'
-                  onChange={(e) => setKdvOrani(e.target.value)}
-                />
-              </div>
-            )}
           </div>
           <div className='a4 overflow-y-auto'>
             {/* Header */}
@@ -550,7 +513,7 @@ const PrintTest = ({ data, lang, stepByStepData, setStepByStepData, id }) => {
                   <th className='!font-serif'>{langs.price[lang]}</th>
                   <th className='!font-serif'>{langs.total[lang]}</th>
                   <th className='!font-serif'>{langs.indirimTutari[lang]}</th>
-                  <th className='!font-serif'>{langs.kdvHaric[lang]}</th>
+                  <th className='!font-serif'>{langs.sonTutar[lang]}</th>
                 </tr>
               </thead>
               <tbody className='[&_tr_td]:p-[6px] [&_tr_td]:text-center [&_tr_th]:text-[#000]'>
@@ -648,31 +611,36 @@ const PrintTest = ({ data, lang, stepByStepData, setStepByStepData, id }) => {
                   {langs.firmaBilgileri[lang]}
                 </span>
                 <span className='text-[10pt] text-[#000] font-bold'>
-                  {companyInformation && companyInformation.name}
+                  {data && data.Company[0].name}
                 </span>
                 <span className='text-[10pt] text-[#000] font-bold'>
-                  {companyInformation && companyInformation.address}
+                  {data && data.Company[0].address}
                 </span>
                 <span className='text-[10pt] text-[#000] font-bold'>
-                  Vergi no: {companyInformation && companyInformation.vergino}
+                  Vergi no: {data && data.Company[0].vergino}
                 </span>
               </div>
 
               <div className='flex flex-col items-end gap-2 mt-[24px]'>
-                <div className='flex items-center gap-6 px-1.5 w-[300px]'>
-                  <span className='text-[#000] text-[13pt] font-bold'>
-                    {langs.kdvTutari[lang]} :
-                  </span>
-                  <p className='ml-auto text-[#000] text-[12pt] font-bold'>
-                    {kdvliFirma ? total.tax : '0,00'} грн
-                  </p>
-                </div>
+                {data && data?.Company[0]?.kdvOrani > 0 && (
+                  <div className='flex items-center gap-6 px-1.5 w-[300px]'>
+                    <span className='text-[#000] text-[13pt] font-bold whitespace-nowrap'>
+                      {langs.kdvTutari[lang]} :
+                    </span>
+                    <p className='ml-auto text-[#000] text-[12pt] font-bold whitespace-nowrap'>
+                      {total.tax} грн
+                    </p>
+                  </div>
+                )}
 
                 <div className='flex items-center gap-6 w-[300px] border-b border-b-black p-1.5 rounded-sm'>
-                  <span className='text-[#000] text-[13pt] font-bold'>
-                    {langs.genelToplam[lang]} :
+                  <span className='text-[#000] text-[13pt] font-bold whitespace-nowrap'>
+                    {data && data?.Company[0]?.kdvOrani > 0
+                      ? langs.genelToplam[lang]
+                      : langs.sonTutar[lang]}{' '}
+                    :
                   </span>
-                  <p className='ml-auto text-[#000] text-[12pt] font-bold'>
+                  <p className='ml-auto text-[#000] text-[12pt] font-bold whitespace-nowrap'>
                     {total.grandTotal} грн
                   </p>
                 </div>
@@ -687,9 +655,14 @@ const PrintTest = ({ data, lang, stepByStepData, setStepByStepData, id }) => {
         <p className='text-red-500 text-lg font-semibold text-center'>
           {stepByStepData &&
           stepByStepData?.every((item) => item.gumruk === true) &&
-          stepByStepData?.every((item) => item.teslimTutanagi === true)
-            ? 'Gümrükteki her ürünün teslim tutanağı oluşmuştur!'
-            : 'Gümrükten geçen herhangi bir ürününüz yoktur!'}
+          stepByStepData?.every((item) => item.teslimTutanagi === true) ? (
+            <div className='text-green-500 text-xl font-semibold flex gap-3 justify-center items-center'>
+              <span>Gümrükteki her ürünün teslim tutanağı oluşmuştur!</span>
+              <FaCheckCircle className='text-green-500  ml-1' size='26' />
+            </div>
+          ) : (
+            'Hala gümrükten geçmeyen ürünler mevcut!'
+          )}
         </p>
       )}
     </div>
