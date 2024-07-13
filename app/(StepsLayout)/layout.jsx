@@ -7,6 +7,7 @@ import LoadingScreen from '@/components/other/dashboardLoading';
 import AddCariPayment from '@/components/stepbystep/AddCariPayment';
 import ShowEachProductStep from '@/components/stepbystep/ShowEachProductStep';
 import ShowFaturaBelgesi from '@/components/stepbystep/ShowFaturaBelgesi';
+import AddAnlasmaBelgesi from '@/components/stepbystep/AddAnlasmaBelgesi';
 
 const LoadingContext = createContext();
 const StepByStepDataContext = createContext();
@@ -329,6 +330,7 @@ const StepsLayout = ({ children }) => {
                     stepByStepData={stepByStepData}
                     orderCode={id}
                   />
+                  {/* Ekstra Cari ekleme ve düzenleme*/}
                   <AddCariPayment
                     orderData={orderData}
                     stepByStepData={stepByStepData}
@@ -338,6 +340,14 @@ const StepsLayout = ({ children }) => {
                     getCariPayments={getCariPayments}
                     cariPaymentTotalAmount={cariPaymentTotalAmount}
                   />
+                  {/* Anlaşma Belgesi Oluşturma */}
+                  <AddAnlasmaBelgesi
+                    orderData={orderData}
+                    stepByStepData={stepByStepData}
+                    setStepByStepData={setStepByStepData}
+                    id={id}
+                  />
+                  {/* Fatura Belgesini Gösterir*/}
                   <ShowFaturaBelgesi id={id} />
                 </div>
                 <div className='py-6 h-full w-full pl-6 md:pl-0'>
