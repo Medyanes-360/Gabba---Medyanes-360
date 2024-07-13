@@ -91,11 +91,13 @@ const handler = async (req, res) => {
         await updateDataByMany(
           'StepByStep',
           {
-            id: isExist.id,
+            orderCode: isExist[0].orderCode,
           },
           {
             onOdemeMiktari: onOdemeMiktari,
+            onOdemeMiktariAciklamasi: onOdemeMiktariAciklamasi,
             tahminiTeslimTarihi: tahminiTeslimTarihi,
+            step: isExist[0].step == 1.2 ? 2 : isExist[0].step,
           }
         );
 
