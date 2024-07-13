@@ -40,6 +40,11 @@ const langs = {
     ua: 'СУМА',
     en: 'TOTAL',
   },
+  sonTutar: {
+    tr: 'SON TUTAR',
+    ua: 'ОСТАТОЧНА СУМА',
+    en: 'FINAL AMOUNT',
+  },
   kdvHaric: {
     tr: 'KDV HARİÇ TUTAR',
     ua: 'СУМА',
@@ -98,14 +103,6 @@ const PrintTeslimTutanagi = ({ data, lang, stepByStepData, teslimKod }) => {
 
   const [teslimTutanagi, setTeslimTutanagi] = useState([]);
 
-  const getCompany = async () => {
-    const response = await getAPI('/company');
-    const filteredCompany = response.data.filter(
-      (item) => item.status === true
-    )[0];
-    setCompanyInformation(filteredCompany);
-  };
-
   const getTeslimTutanagiVerileri = async () => {
     const response = await getAPI(
       `/stepByStep/teslimTutanagi?teslimTutanagiKodu=${teslimKod}`
@@ -113,10 +110,7 @@ const PrintTeslimTutanagi = ({ data, lang, stepByStepData, teslimKod }) => {
     setTeslimTutanagi(response.data);
   };
 
-  console.log(teslimTutanagi[0]?.indirimOrani);
-
   useEffect(() => {
-    getCompany();
     getTeslimTutanagiVerileri();
   }, []);
 
@@ -131,6 +125,7 @@ const PrintTeslimTutanagi = ({ data, lang, stepByStepData, teslimKod }) => {
         phone: data.Müşteri[0].phoneNumber,
         adress: data.Müşteri[0].address,
         email: data.Müşteri[0].mailAddress,
+        father_name: data.Müşteri[0].father_name,
       },
       products: [],
     };
@@ -416,6 +411,9 @@ const PrintTeslimTutanagi = ({ data, lang, stepByStepData, teslimKod }) => {
             <span className='text-[13.5pt] text-[#000] font-bold'>
               {details.musteri.adress}
             </span>
+            <span className='text-[13.5pt] text-[#000] font-bold'>
+              {details.musteri.father_name}
+            </span>
           </div>
         </header>
 
@@ -429,7 +427,7 @@ const PrintTeslimTutanagi = ({ data, lang, stepByStepData, teslimKod }) => {
               </th>
               <th>
                 <span className='text-[10pt] text-[#000] font-bold'>
-                  {details.order_no}
+                  {teslimKod}
                 </span>
               </th>
               <th />
@@ -441,7 +439,7 @@ const PrintTeslimTutanagi = ({ data, lang, stepByStepData, teslimKod }) => {
               </th>
               <th>
                 <span className='text-[10pt] text-[#000] font-bold'>
-                  {'24.06.2024'}
+                  {teslimTutanagi?.map((item) => item?.date)}
                 </span>
               </th>
             </tr>
@@ -455,7 +453,7 @@ const PrintTeslimTutanagi = ({ data, lang, stepByStepData, teslimKod }) => {
               <th className='!font-serif'>{langs.price[lang]}</th>
               <th className='!font-serif'>{langs.total[lang]}</th>
               <th className='!font-serif'>{langs.indirimTutari[lang]}</th>
-              <th className='!font-serif'>{langs.kdvHaric[lang]}</th>
+              <th className='!font-serif'>{langs.sonTutar[lang]}</th>
             </tr>
           </thead>
           <tbody className='[&_tr_td]:p-[6px] [&_tr_td]:text-center [&_tr_th]:text-[#000]'>
@@ -546,31 +544,36 @@ const PrintTeslimTutanagi = ({ data, lang, stepByStepData, teslimKod }) => {
               {langs.firmaBilgileri[lang]}
             </span>
             <span className='text-[10pt] text-[#000] font-bold'>
-              {companyInformation && companyInformation.name}
+              {data && data.Company[0].name}
             </span>
             <span className='text-[10pt] text-[#000] font-bold'>
-              {companyInformation && companyInformation.address}
+              {data && data.Company[0].address}
             </span>
             <span className='text-[10pt] text-[#000] font-bold'>
-              Vergi no: {companyInformation && companyInformation.vergino}
+              Vergi no: {data && data.Company[0].vergino}
             </span>
           </div>
 
           <div className='flex flex-col items-end gap-2 mt-[24px]'>
-            <div className='flex items-center gap-6 px-1.5 w-[300px]'>
-              <span className='text-[#000] text-[13pt] font-bold'>
-                {langs.kdvTutari[lang]} :
-              </span>
-              <p className='ml-auto text-[#000] text-[12pt] font-bold'>
-                {teslimTutanagi[0]?.kdvliFirma ? total.tax : '0,00'} грн
-              </p>
-            </div>
+            {data && data?.Company[0]?.kdvOrani > 0 && (
+              <div className='flex items-center gap-6 px-1.5 w-[300px]'>
+                <span className='text-[#000] text-[13pt] font-bold whitespace-nowrap'>
+                  {langs.kdvTutari[lang]} :
+                </span>
+                <p className='ml-auto text-[#000] text-[12pt] font-bold whitespace-nowrap'>
+                  {total.tax} грн
+                </p>
+              </div>
+            )}
 
             <div className='flex items-center gap-6 w-[300px] border-b border-b-black p-1.5 rounded-sm'>
-              <span className='text-[#000] text-[13pt] font-bold'>
-                {langs.genelToplam[lang]} :
+              <span className='text-[#000] text-[13pt] font-bold whitespace-nowrap'>
+                {data && data?.Company[0]?.kdvOrani > 0
+                  ? langs.genelToplam[lang]
+                  : langs.sonTutar[lang]}{' '}
+                :
               </span>
-              <p className='ml-auto text-[#000] text-[12pt] font-bold'>
+              <p className='ml-auto text-[#000] text-[12pt] font-bold whitespace-nowrap'>
                 {total.grandTotal} грн
               </p>
             </div>
