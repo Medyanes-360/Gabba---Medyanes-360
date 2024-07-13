@@ -21,8 +21,7 @@ const handler = async (req, res) => {
 
   try {
     if (req.method === 'POST') {
-      const { matchedData, indirimOrani, kdvliFirma, kdvOrani, date } =
-        req.body;
+      const { matchedData, indirimOrani, kdvOrani, date } = req.body;
 
       const token = await getToken({
         req,
@@ -59,7 +58,6 @@ const handler = async (req, res) => {
             orderCode: item.orderCode,
             orderId: item.orderId,
             indirimOrani: parseInt(indirimOrani),
-            kdvliFirma: kdvliFirma,
             kdvOrani: parseInt(kdvOrani),
             teslimTutanagiNo: parseInt(teslimTutanagiNo + 1),
             date: String(date),
@@ -99,7 +97,6 @@ const handler = async (req, res) => {
             orderCode: item.orderCode,
             orderId: item.orderId,
             indirimOrani: parseInt(indirimOrani),
-            kdvliFirma: kdvliFirma,
             kdvOrani: parseInt(kdvOrani),
             teslimTutanagiNo: teslimTutanagiNo,
             date: String(date),
