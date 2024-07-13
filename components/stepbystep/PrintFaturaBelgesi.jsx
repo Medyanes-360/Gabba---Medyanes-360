@@ -353,7 +353,6 @@ const PrintFaturaBelgesi = ({ id, data, lang, stepByStepData }) => {
     let kdvHaricTutar = 0;
 
     products.forEach((product) => {
-      console.log('product.totalPrice: ', product.totalPrice);
       total += product.totalPrice;
       indirimliTutar += (product.totalPrice * indirimOrani) / 100;
     });
