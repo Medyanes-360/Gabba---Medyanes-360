@@ -186,6 +186,9 @@ const StepPage = () => {
                             selectedOrdersId: item.id,
                           });
                         }}
+                        disabled={(date) =>
+                          date && date < new Date(stepByStepData[0]?.createdAt)
+                        }
                         initialFocus
                       />
                     </PopoverContent>
