@@ -624,6 +624,7 @@ model StepByStep {
   teslimTutanagi           Boolean?  @default(false)
   teslimTutanagiKodu       String?   @unique
   teslimTutanagiNo         Int?
+  anlasmaBelgesi           Boolean?  @default(false)
   teslimEdildi             Boolean?  @default(false)
   tedarikciId              String
   createdAt                DateTime  @default(now())
@@ -689,4 +690,14 @@ model FaturaBelgesi {
   date      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model AnlasmaBelgesi {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderCode          String   @unique
+  anlasmaBelgesiKodu String   @unique
+  date               String
+  onOdemeMiktari     Int
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }
