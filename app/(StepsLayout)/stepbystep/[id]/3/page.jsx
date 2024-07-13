@@ -56,6 +56,7 @@ const StepPage = () => {
       if (stepData) {
         const updatedDates = stepData.reduce((acc, item) => {
           acc[item.orderId] = {
+            minDate: item.createdAt ? new Date(item.createdAt) : undefined,
             selectedDate: item.tedarikciYuklemeTarihi
               ? new Date(item.tedarikciYuklemeTarihi)
               : undefined,
