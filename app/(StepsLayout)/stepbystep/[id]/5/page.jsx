@@ -72,8 +72,8 @@ const StepPage = () => {
       if (stepData) {
         const updatedDates = stepData.reduce((acc, item) => {
           acc[item.orderId] = {
-            minDate: item.tahminiTeslimTarihi
-              ? new Date(item.tahminiTeslimTarihi)
+            minDate: item.tedarikciYuklemeTarihi
+              ? new Date(item.tedarikciYuklemeTarihi)
               : undefined,
             selectedDate: item.urunCikisTarihi
               ? new Date(item.urunCikisTarihi)
@@ -219,7 +219,9 @@ const StepPage = () => {
                             disabled={(date) =>
                               date &&
                               date <
-                                new Date(props.values.dates[item.id]?.minDate)
+                                new Date(
+                                  `${props.values.dates[item.id]?.minDate}`
+                                )
                             }
                             initialFocus
                           />
