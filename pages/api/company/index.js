@@ -55,15 +55,16 @@ const handler = async (req, res) => {
       const result = await handleDelete(req);
       return res.status(200).json(result);
     } else if (req.method === 'PUT') {
+      req.body.newData.kdvOrani = parseFloat(req.body.newData.kdvOrani);
       const financialManagementSpecial = await updateDataByMany(
         'Company',
         {
-          id: {
-            equals: req.body.id,
-          },
+          id: req.body.id,
         },
         req.body.newData
       );
+      console.log(financialManagementSpecial);
+
       if (!financialManagementSpecial || financialManagementSpecial.error) {
         throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4';
       }
@@ -76,6 +77,7 @@ const handler = async (req, res) => {
       const result = await handleDelete(req);
       return res.status(200).json(result);
     } else if (req.method === 'POST') {
+      req.body.newData.kdvOrani = parseFloat(req.body.newData.kdvOrani);
       req.body.newData.status = false;
       const financialManagementSpecial = await createNewData('Company', {
         ...req.body.newData,
