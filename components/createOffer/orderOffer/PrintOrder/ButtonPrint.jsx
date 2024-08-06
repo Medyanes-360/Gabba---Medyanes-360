@@ -558,7 +558,7 @@ const InvoiceJustButton = ({ data, lang, title }) => {
             {data && data?.Company[0]?.kdvOrani > 0 && (
               <div className='flex items-center gap-6 px-1.5 w-[300px]'>
                 <span className='text-[#000] text-[13pt] font-bold whitespace-nowrap'>
-                  {langs.kdvTutari[lang]} :
+                  {/* {langs.kdvTutari[lang]} : */}
                 </span>
                 <p className='ml-auto text-[#000] text-[12pt] font-bold whitespace-nowrap'>
                   {total.tax} грн
