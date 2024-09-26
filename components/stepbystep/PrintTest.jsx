@@ -7,8 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'react-toastify';
 import { FaCheckCircle } from 'react-icons/fa';
+import { FaAnglesRight, FaAnglesLeft } from 'react-icons/fa6';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import ShowEachTeslimTutanagi from './ShowEachTeslimTutanagi';
 
 import { useLoadingContext } from '@/app/(StepsLayout)/layout';
@@ -117,6 +119,7 @@ const PrintTest = ({ data, lang, stepByStepData, setStepByStepData, id }) => {
         phone: data.Müşteri[0].phoneNumber,
         adress: data.Müşteri[0].address,
         email: data.Müşteri[0].mailAddress,
+        father_name: data.Müşteri[0].father_name,
       },
       products: [],
     };
@@ -433,7 +436,7 @@ const PrintTest = ({ data, lang, stepByStepData, setStepByStepData, id }) => {
   );
 
   return (
-    <div className='flex flex-col h-fit overflow-auto gap-6 relative m-auto w-[29.7cm]'>
+    <div className='flex flex-col h-fit gap-6 relative m-auto w-[29.7cm]'>
       <ShowEachTeslimTutanagi id={id} />
       {filtered?.length > 0 ? (
         <>
@@ -471,6 +474,9 @@ const PrintTest = ({ data, lang, stepByStepData, setStepByStepData, id }) => {
                 </span>
                 <span className='text-[13.5pt] text-[#000] font-bold'>
                   {details.musteri.adress}
+                </span>
+                <span className='text-[13.5pt] text-[#000] font-bold'>
+                  {details.musteri.father_name}
                 </span>
               </div>
             </header>
@@ -652,18 +658,44 @@ const PrintTest = ({ data, lang, stepByStepData, setStepByStepData, id }) => {
           </Button>
         </>
       ) : (
-        <p className='text-red-500 text-lg font-semibold text-center'>
-          {stepByStepData &&
-          stepByStepData?.every((item) => item.gumruk === true) &&
-          stepByStepData?.every((item) => item.teslimTutanagi === true) ? (
-            <div className='text-green-500 text-xl font-semibold flex gap-3 justify-center items-center'>
-              <span>Gümrükteki her ürünün teslim tutanağı oluşmuştur!</span>
-              <FaCheckCircle className='text-green-500  ml-1' size='26' />
-            </div>
-          ) : (
-            'Hala gümrükten geçmeyen ürünler mevcut!'
-          )}
-        </p>
+        <>
+          <p className='text-red-500 text-lg font-semibold text-center'>
+            {stepByStepData &&
+            stepByStepData?.every((item) => item.gumruk === true) &&
+            stepByStepData?.every((item) => item.teslimTutanagi === true) ? (
+              <div className='text-green-500 text-xl font-semibold flex gap-3 justify-center items-center'>
+                <span>Gümrükteki her ürünün teslim tutanağı oluşmuştur!</span>
+                <FaCheckCircle className='text-green-500  ml-1' size='26' />
+                <Link
+                  href='./7.2'
+                  className='flex items-center justify-center whitespace-nowrap text-md ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full rounded gap-2 font-medium'
+                >
+                  Ek Ücret Adımına İlerle <FaAnglesRight size='20' />
+                </Link>
+              </div>
+            ) : (
+              <div className='flex flex-col'>
+                <span>Hala gümrükten geçmeyen ürünler mevcut!</span>
+
+                <div className='flex flex-col justify-between gap-4'>
+                  <Link
+                    href='./6'
+                    className='flex items-center justify-center whitespace-nowrap text-md ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full rounded gap-2 font-medium'
+                  >
+                    <FaAnglesLeft size='20' />
+                    Gümrük Adımına Geri Dön
+                  </Link>
+                  <Link
+                    href='./7.2'
+                    className='flex items-center justify-center whitespace-nowrap text-md ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full rounded gap-2 font-medium'
+                  >
+                    Ek Ücret Adımına İlerle <FaAnglesRight size='20' />
+                  </Link>
+                </div>
+              </div>
+            )}
+          </p>
+        </>
       )}
     </div>
   );
