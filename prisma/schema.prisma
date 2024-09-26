@@ -612,6 +612,7 @@ model StepByStep {
   stepName                 String
   onOdemeMiktari           Int
   onOdemeMiktariAciklamasi String
+  odemeYontemi             String
   tahminiTeslimTarihi      DateTime?
   orderCode                String    @unique
   orderId                  String    @unique

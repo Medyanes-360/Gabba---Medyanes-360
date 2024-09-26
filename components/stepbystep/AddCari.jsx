@@ -17,6 +17,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
@@ -43,6 +52,7 @@ const AddCari = () => {
     tedarikciAciklama: '',
     tedarikciId: '',
     tahminiTeslimTarihi: '',
+    odemeYontemi: '',
   });
 
   useEffect(() => {
@@ -58,6 +68,7 @@ const AddCari = () => {
           stepName: 'Tedarikçi Seç',
           tedarikciAciklama: '',
           tedarikciId: '',
+          odemeYontemi: data.odemeYontemi,
         });
       }
     }
@@ -107,6 +118,12 @@ const AddCari = () => {
           );
         }
 
+        if (
+          values.odemeYontemi.length <= 0 ||
+          values.odemeYontemi == undefined ||
+          values.odemeYontemi == ''
+        )
+          return toast.error('Ödeme yöntemi boş bırakılamaz!');
         setIsLoading(true);
 
         const response = await postAPI('/stepByStep/cari', values);
@@ -183,6 +200,34 @@ const AddCari = () => {
               value={props.values.onOdemeMiktariAciklamasi}
             />
           </div>
+          <Select
+            name='odemeYontemi'
+            onValueChange={(value) =>
+              props.setFieldValue('odemeYontemi', value)
+            }
+            value={props.values.odemeYontemi}
+          >
+            <SelectTrigger className='w-full'>
+              <SelectValue placeholder='Ödeme Yöntemi Seçiniz' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Ödeme Listesi</SelectLabel>
+                <SelectItem key='nakit' value='Nakit'>
+                  Nakit
+                </SelectItem>
+                <SelectItem key='krediKarti' value='Kredi Kartı'>
+                  Kredi Kartı
+                </SelectItem>
+                <SelectItem key='bankaKarti' value='Banka Kartı'>
+                  Banka Kartı
+                </SelectItem>
+                <SelectItem key='havaleOrEft' value='Havale / EFT'>
+                  Havale / EFT
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
           <Button type='submit'>Cariye işle</Button>
         </Form>
       )}
