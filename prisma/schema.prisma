@@ -1,0 +1,704 @@
+// Model Güncellendiğinde yapılacaklar:
+// 1-" npx prisma generate " bunu terminale yaz (enter!)
+// 2- VS Codu kapatıp yeniden aç.
+// ! Sırayla yaparsan gücelleme gerçekleşir.
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Measurements {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  firstValue String?
+
+  secondValue String?
+  unit        String?
+
+  oneRangeEnabled  Boolean
+  twoRangeEnabled  Boolean
+  manuelDefined    Boolean
+  translateEnabled Boolean?
+
+  turkish   String?
+  ukrainian String?
+  english   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Fabrics {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  fabricType        String
+  fabricDescription String?
+  fabricSwatch      String?
+
+  image String?
+
+  translateEnabled Boolean?
+  addSwatchEnabled Boolean?
+
+  fabricTypeTurkish   String?
+  fabricTypeUkrainian String?
+  fabricTypeEnglish   String?
+
+  fabricDescriptionTurkish   String?
+  fabricDescriptionUkrainian String?
+  fabricDescriptionEnglish   String?
+
+  fabricSwatchTurkish   String?
+  fabricSwatchUkrainian String?
+  fabricSwatchEnglish   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Metals {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  metalType        String
+  metalDescription String?
+  image            String?
+
+  translateEnabled Boolean?
+
+  metalTypeTurkish   String?
+  metalTypeUkrainian String?
+  metalTypeEnglish   String?
+
+  metalDescriptionTurkish   String?
+  metalDescriptionUkrainian String?
+  metalDescriptionEnglish   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Colors {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  colourType        String
+  colourDescription String?
+
+  translateEnabled    Boolean?
+  colourPickerEnabled Boolean?
+  colourHex           String?
+
+  colourTypeTurkish   String?
+  colourTypeUkrainian String?
+  colourTypeEnglish   String?
+
+  colourDescriptionTurkish   String?
+  colourDescriptionUkrainian String?
+  colourDescriptionEnglish   String?
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+}
+
+model Products {
+  id                     String           @id @default(auto()) @map("_id") @db.ObjectId
+  productCode            String
+  productName            String
+  productType            String
+  productPrice           String?
+  selectedCategoryKey    String
+  selectedCategoryValues String
+  productFeatures        ProductFeature[]
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
+
+  productNameTR     String?
+  productTypeTR     String?
+  productCategoryTR String?
+
+  productNameUA     String?
+  productTypeUA     String?
+  productCategoryUA String?
+
+  productNameEN     String?
+  productTypeEN     String?
+  productCategoryEN String?
+}
+
+model ProductFeature {
+  id                     String   @id @default(auto()) @map("_id") @db.ObjectId
+  index                  Int
+  feature                String
+  featureId              String
+  targetValue            String
+  checked                Boolean
+  value                  String?
+  imageValue             String?
+  extraValue             String?
+  product                Products @relation(fields: [productId], references: [id])
+  productId              String   @map("productId") @db.ObjectId
+  productName            String
+  productType            String
+  productPrice           String?
+  selectedCategoryKey    String
+  selectedCategoryValues String
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model Collections {
+  id                    String  @id @default(auto()) @map("_id") @db.ObjectId
+  collectionCode        String
+  collectionName        String
+  collectionType        String
+  collectionDescription String?
+
+  collectionNameTR        String?
+  collectionTypeTR        String?
+  collectionDescriptionTR String?
+
+  collectionNameUA        String?
+  collectionTypeUA        String?
+  collectionDescriptionUA String?
+
+  collectionNameEN        String?
+  collectionTypeEN        String?
+  collectionDescriptionEN String?
+}
+
+model CollectionProducts {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  collectionId String
+  productId    String
+  productCode  String
+  productName  String
+}
+
+model CollectionImages {
+  id              String  @id @default(auto()) @map("_id") @db.ObjectId
+  collectionId    String?
+  collectionImage String?
+}
+
+model FinancialManagement {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  operationName   String
+  priceType       String
+  condition       Boolean
+  conditionType   String?
+  conditionValue  String?
+  conditionValue2 String?
+  mathOperator    String
+  finalPrice      String
+  orderValue      Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model FinancialManagementSpecial {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  financialManagementId String
+  mathOperatorSpecial   String
+  conditionValueSpecial String
+  ozelBaremValue        Int
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model OfferBasketColors {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  colourId  String
+  productId String
+  basketId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OfferBasketFabrics {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  fabricsId String
+  productId String
+  basketId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OfferBasketMetals {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  metalId   String
+  productId String
+  basketId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OfferBasketMeasurements {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  measurementId String
+  productId     String
+  basketId      String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model OfferBasketExtra {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  extraId   String
+  productId String
+  basketId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  companyName String?
+
+  name          String?
+  nameEnglish   String?
+  nameUkrainian String?
+  nameTurkish   String?
+
+  surname          String?
+  surnameEnglish   String?
+  surnameUkrainian String?
+  surnameTurkish   String?
+
+  phoneNumber String @unique
+
+  address          String?
+  addressEnglish   String?
+  addressUkrainian String?
+  addressTurkish   String?
+
+  mailAddress String? @unique
+
+  store   Store?  @relation(fields: [storeId], references: [id])
+  storeId String? @unique @map("storeId") @db.ObjectId
+
+  OfferBasket OfferBasket[]
+
+  maxTax String?
+  role   String?
+  salary String?
+  bonus  String?
+
+  managerComment          String?
+  managerCommentEnglish   String?
+  managerCommentUkrainian String?
+  managerCommentTurkish   String?
+
+  password String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Customer {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  surname      String
+  mailAddress  String @unique
+  father_name  String
+  address      String
+  company_name String
+  phoneNumber  String @unique
+}
+
+model OfferBasket {
+  id                  String  @id @default(auto()) @map("_id") @db.ObjectId
+  stock               Int
+  orderNote           String?
+  productId           String
+  productPrice        Float
+  productFeaturePrice Float
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OfferOrder {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  customerId          String
+  personelId          String
+  companyId           String
+  orderCode           String   @unique
+  invalidDate         DateTime
+  stock               Int
+  orderNote           String?
+  ordersStatus        String
+  productOrderStatus  String
+  productId           String
+  productPrice        Float
+  productFeaturePrice Float
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model OfferOrderColors {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  colourId  String
+  orderId   String
+  productId String
+  orderCode String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OfferOrderMetals {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  metalId   String
+  orderId   String
+  productId String
+  orderCode String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OfferOrderMeasurements {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  measurementId String
+  orderId       String
+  productId     String
+  orderCode     String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model OfferOrderFabrics {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  fabricsId String
+  orderId   String
+  productId String
+  orderCode String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OfferOrderExtra {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  extraId   String
+  orderId   String
+  productId String
+  orderCode String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Store {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  nameEnglish   String?
+  nameUkrainian String?
+  nameTurkish   String?
+
+  company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?  @unique @map("companyId") @db.ObjectId
+
+  country          String
+  countryEnglish   String?
+  countryUkrainian String?
+  countryTurkish   String?
+
+  state          String
+  stateEnglish   String?
+  stateUkrainian String?
+  stateTurkish   String?
+
+  phone_number String
+
+  maximum_discount_rate String
+  maximum_bonus_rate    String
+
+  description          String
+  descriptionEnglish   String?
+  descriptionUkrainian String?
+  descriptionTurkish   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User[]
+}
+
+model Company {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name String @unique
+
+  yetkili String
+
+  tel1 String
+  tel2 String
+
+  email1 String
+  email2 String
+
+  address          String
+  addressEnglish   String?
+  addressUkrainian String?
+  addressTurkish   String?
+
+  vergino      String
+  banka        String
+  bankahesapno String
+  bankamfo     String
+  iban         String
+
+  kdvOrani Float?
+
+  ekstra1          String
+  ekstra1English   String?
+  ekstra1Ukrainian String?
+  ekstra1Turkish   String?
+
+  ekstra2          String
+  ekstra2English   String?
+  ekstra2Ukrainian String?
+  ekstra2Turkish   String?
+
+  ekstra3          String
+  ekstra3English   String?
+  ekstra3Ukrainian String?
+  ekstra3Turkish   String?
+
+  status Boolean @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Store     Store?
+}
+
+model Expense {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  store String
+
+  payment_company_info          String
+  payment_company_infoEnglish   String?
+  payment_company_infoUkrainian String?
+  payment_company_infoTurkish   String?
+
+  date String
+
+  payment_type String
+
+  expense_name          String
+  expense_nameEnglish   String?
+  expense_nameUkrainian String?
+  expense_nameTurkish   String?
+
+  currency          String
+  currencyEnglish   String?
+  currencyUkrainian String?
+  currencyTurkish   String?
+
+  exchange_rate          String
+  exchange_rateEnglish   String?
+  exchange_rateUkrainian String?
+  exchange_rateTurkish   String?
+
+  expense_amount          String
+  expense_amountEnglish   String?
+  expense_amountUkrainian String?
+  expense_amountTurkish   String?
+
+  description          String
+  descriptionEnglish   String?
+  descriptionUkrainian String?
+  descriptionTurkish   String?
+}
+
+model Stock {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  stock Int
+
+  orderNote           String?
+  productId           String
+  storeId             String
+  productPrice        Float
+  productFeaturePrice Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StockColors {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  colourId  String
+  productId String
+  stockId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StockFabrics {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  fabricsId String
+  productId String
+  stockId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StockMetals {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  metalId   String
+  productId String
+  stockId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StockMeasurements {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  measurementId String
+  productId     String
+  stockId       String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model StockExtra {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  extraId   String
+  productId String
+  stockId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Supplier {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  yetkiliisim1          String
+  yetkiliisim1English   String?
+  yetkiliisim1Ukrainian String?
+  yetkiliisim1Turkish   String?
+
+  yetkilitelefon1 String?
+  yetkiliemail1   String?
+
+  yetkiliisim2          String
+  yetkiliisim2English   String?
+  yetkiliisim2Ukrainian String?
+  yetkiliisim2Turkish   String?
+
+  yetkilitelefon2 String?
+  yetkiliemail2   String?
+
+  firma          String
+  firmaEnglish   String?
+  firmaUkrainian String?
+  firmaTurkish   String?
+
+  adres          String
+  adresEnglish   String?
+  adresUkrainian String?
+  adresTurkish   String?
+
+  vergino     String?
+  sirkettel   String?
+  sirketemail String?
+}
+
+model StepByStep {
+  id                       String    @id @default(auto()) @map("_id") @db.ObjectId
+  step                     Float
+  stepName                 String
+  onOdemeMiktari           Int
+  onOdemeMiktariAciklamasi String
+  odemeYontemi             String
+  tahminiTeslimTarihi      DateTime?
+  orderCode                String    @unique
+  orderId                  String    @unique
+  tedarikciAciklama        String
+  tedarikciYuklemeTarihi   DateTime?
+  urunCikisTarihi          DateTime?
+  tedarikciMaliyeti        Float     @default(0.0)
+  ekstraUcretTotal         Float     @default(0.0)
+  gumruk                   Boolean?  @default(false)
+  teslimTutanagi           Boolean?  @default(false)
+  teslimTutanagiKodu       String?   @unique
+  teslimTutanagiNo         Int?
+  anlasmaBelgesi           Boolean?  @default(false)
+  teslimEdildi             Boolean?  @default(false)
+  tedarikciId              String
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+}
+
+model StepByStepEkstralar {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderCode   String   @unique
+  price       Float
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Logs {
+  id                       String    @id @default(auto()) @map("_id") @db.ObjectId
+  role                     String
+  userId                   String
+  onOdemeMiktari           Int?
+  onOdemeMiktariAciklamasi String?
+  tedarikciId              String?
+  tedarikciAciklama        String?
+  orderId                  String?
+  tedarikciYuklemeTarihi   DateTime?
+  urunCikisTarihi          DateTime?
+  tedarikciMaliyeti        Float?    @default(0.0)
+  teslimEdildi             Boolean?
+  step                     Float
+  stepName                 String
+  orderCode                String    @unique
+  ordersStatus             String?
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+}
+
+model StepByStepCariPayments {
+  id                     String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderCode              String   @unique
+  odemeMiktari           Int?
+  odemeMiktariAciklamasi String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model TeslimTutanagi {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  teslimTutanagiKodu String   @unique
+  orderCode          String   @unique
+  orderId            String   @unique
+  indirimOrani       Int?
+  kdvliFirma         Boolean? @default(false)
+  kdvOrani           Int?
+  teslimTutanagiNo   Int?
+  date               String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model FaturaBelgesi {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  faturaNo  String   @unique
+  date      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AnlasmaBelgesi {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderCode          String   @unique
+  anlasmaBelgesiKodu String   @unique
+  date               String
+  onOdemeMiktari     Int
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
