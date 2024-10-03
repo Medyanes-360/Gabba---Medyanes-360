@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 import prisma from "@/lib/prisma";
 import { getAPI, postAPI } from "@/services/fetchAPI";
-=======
-import prisma from '@/lib/prisma';
-import { getAPI, postAPI } from '@/services/fetchAPI';
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
 import {
   createNewData,
   createNewDataMany,
@@ -14,28 +9,17 @@ import {
   deleteDataByAny,
   deleteDataByMany,
   updateDataByAny,
-<<<<<<< HEAD
 } from "@/services/serviceOperations";
 import { getToken } from "next-auth/jwt";
-=======
-} from '@/services/serviceOperations';
-import { getToken } from 'next-auth/jwt';
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
 
 function generateOrderCode(customerName) {
   const orderDate = new Date();
   // Sipariş tarihini al
   var orderTime =
     orderDate.getHours() +
-<<<<<<< HEAD
     "" +
     orderDate.getMinutes() +
     "" +
-=======
-    '' +
-    orderDate.getMinutes() +
-    '' +
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
     orderDate.getSeconds();
   var orderDay = orderDate.getDate();
   var orderMonth = orderDate.getMonth() + 1; // Ay 0 ile başlar, bu nedenle +1 ekliyoruz
@@ -48,13 +32,8 @@ function generateOrderCode(customerName) {
 
   // Rastgele 2 harf oluşturma fonksiyonu
   function generateRandomChars(length) {
-<<<<<<< HEAD
     var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     var randomChars = "";
-=======
-    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    var randomChars = '';
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
 
     for (var i = 0; i < length; i++) {
       var randomIndex = Math.floor(Math.random() * characters.length);
@@ -84,21 +63,12 @@ const handler = async (req, res) => {
   const userRole = token && token?.user?.role;
   const userId = token && token?.user?.id;
   try {
-<<<<<<< HEAD
     if (req.method === "POST") {
       const { basketData, values, processType, deletedOrderCode } = req.body;
 
       // Teklifler sayfasından silme işlemi yapılırsa
       if (processType === "delete") {
         const findOrderCode = await getDataByUniqueMany("OfferOrder", {
-=======
-    if (req.method === 'POST') {
-      const { basketData, values, processType, deletedOrderCode } = req.body;
-
-      // Teklifler sayfasından silme işlemi yapılırsa
-      if (processType === 'delete') {
-        const findOrderCode = await getDataByUniqueMany('OfferOrder', {
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
           orderCode: deletedOrderCode,
         });
 
@@ -106,20 +76,12 @@ const handler = async (req, res) => {
           throw findOrderCode.error;
         }
 
-<<<<<<< HEAD
         const deleteStepByStep = await deleteDataByMany("StepByStep", {
-=======
-        const deleteStepByStep = await deleteDataByMany('StepByStep', {
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
           orderCode: deletedOrderCode,
         });
 
         const deleteStepByStepEkstralar = await deleteDataByMany(
-<<<<<<< HEAD
           "StepByStepEkstralar",
-=======
-          'StepByStepEkstralar',
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
           {
             orderCode: deletedOrderCode,
           }
@@ -127,7 +89,6 @@ const handler = async (req, res) => {
 
         const result = await Promise.all(
           findOrderCode.map(async (item) => {
-<<<<<<< HEAD
             const deletedOrder = deleteDataByAny("OfferOrder", {
               id: item.id,
             });
@@ -137,44 +98,21 @@ const handler = async (req, res) => {
             });
 
             const deletedFabrics = deleteDataByMany("OfferOrderFabrics", {
-=======
-            const deletedOrder = deleteDataByAny('OfferOrder', {
-              id: item.id,
-            });
-
-            const deletedColors = deleteDataByMany('OfferOrderColors', {
-              orderCode: item.orderCode,
-            });
-
-            const deletedFabrics = deleteDataByMany('OfferOrderFabrics', {
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
               orderCode: item.orderCode,
             });
 
             const deletedMeasurements = deleteDataByMany(
-<<<<<<< HEAD
               "OfferOrderMeasurements",
-=======
-              'OfferOrderMeasurements',
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
               {
                 orderCode: item.orderCode,
               }
             );
 
-<<<<<<< HEAD
             const deletedMetals = deleteDataByMany("OfferOrderMetals", {
               orderCode: item.orderCode,
             });
 
             const deletedExtras = deleteDataByMany("OfferOrderExtra", {
-=======
-            const deletedMetals = deleteDataByMany('OfferOrderMetals', {
-              orderCode: item.orderCode,
-            });
-
-            const deletedExtras = deleteDataByMany('OfferOrderExtra', {
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
               orderCode: item.orderCode,
             });
 
@@ -210,15 +148,9 @@ const handler = async (req, res) => {
         }
 
         return res.status(200).json({
-<<<<<<< HEAD
           status: "success",
           data: result,
           message: "Tekliften ürün başarıyla silindi.",
-=======
-          status: 'success',
-          data: result,
-          message: 'Tekliften ürün başarıyla silindi.',
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
         });
       }
 
@@ -226,11 +158,7 @@ const handler = async (req, res) => {
       const customerName = values.customerName;
       const personelId = values.personelId;
 
-<<<<<<< HEAD
       const companyId = await getDataByUnique("Company", {
-=======
-      const companyId = await getDataByUnique('Company', {
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
         status: true,
       });
 
@@ -239,11 +167,7 @@ const handler = async (req, res) => {
       const productOrderStatus = values.productOrderStatus;
 
       if (personelId == undefined || personelId == null) {
-<<<<<<< HEAD
         throw new Error("Hesabınıza giriş yapmanız gerekiyor!");
-=======
-        throw new Error('Hesabınıza giriş yapmanız gerekiyor!');
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
       }
 
       // 10 gün eklemek için yeni bir tarih oluştur
@@ -272,11 +196,7 @@ const handler = async (req, res) => {
           };
 
           const responseCreateOrder = await createNewData(
-<<<<<<< HEAD
             "OfferOrder",
-=======
-            'OfferOrder',
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
             orderData
           );
 
@@ -297,11 +217,7 @@ const handler = async (req, res) => {
               });
             });
             const createdColors = await createNewDataMany(
-<<<<<<< HEAD
               "OfferOrderColors",
-=======
-              'OfferOrderColors',
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
               colourData
             );
             if (!createdColors || createdColors?.error) {
@@ -322,11 +238,7 @@ const handler = async (req, res) => {
               });
             });
             const createdMetals = await createNewDataMany(
-<<<<<<< HEAD
               "OfferOrderMetals",
-=======
-              'OfferOrderMetals',
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
               metalData
             );
             if (!createdMetals || createdMetals?.error) {
@@ -347,11 +259,7 @@ const handler = async (req, res) => {
               });
             });
             const createdMeasurements = await createNewDataMany(
-<<<<<<< HEAD
               "OfferOrderMeasurements",
-=======
-              'OfferOrderMeasurements',
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
               measurementData
             );
             if (!createdMeasurements || createdMeasurements?.error) {
@@ -372,11 +280,7 @@ const handler = async (req, res) => {
               });
             });
             const createdFabrics = await createNewDataMany(
-<<<<<<< HEAD
               "OfferOrderFabrics",
-=======
-              'OfferOrderFabrics',
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
               fabricData
             );
             if (!createdFabrics || createdFabrics?.error) {
@@ -397,11 +301,7 @@ const handler = async (req, res) => {
               });
             });
             const createdExtras = await createNewDataMany(
-<<<<<<< HEAD
               "OfferOrderExtra",
-=======
-              'OfferOrderExtra',
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
               extraData
             );
             if (!createdExtras || createdExtras?.error) {
@@ -410,13 +310,8 @@ const handler = async (req, res) => {
           }
 
           // Gelen id ile birlikte sepetteki ürünü sil
-<<<<<<< HEAD
           const deletedBasket = await postAPI("/createOffer/basket", {
             processType: "delete",
-=======
-          const deletedBasket = await postAPI('/createOffer/basket', {
-            processType: 'delete',
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
             id: item.id,
           });
           if (!deletedBasket || deletedBasket?.error) {
@@ -427,7 +322,6 @@ const handler = async (req, res) => {
       );
 
       return res.status(200).json({
-<<<<<<< HEAD
         status: "success",
         message: "Teklif başarıyla oluşturuldu.",
       });
@@ -442,22 +336,6 @@ const handler = async (req, res) => {
         const OfferOrderMeasurements = getAllData("OfferOrderMeasurements");
         const OfferOrderMetals = getAllData("OfferOrderMetals");
         const OfferOrderExtra = getAllData("OfferOrderExtra");
-=======
-        status: 'success',
-        message: 'Teklif başarıyla oluşturuldu.',
-      });
-    }
-
-    if (req.method === 'GET') {
-      if (req.method === 'GET') {
-        const OfferOrders = getAllData('OfferOrder');
-
-        const OfferOrderColors = getAllData('OfferOrderColors');
-        const OfferOrderFabrics = getAllData('OfferOrderFabrics');
-        const OfferOrderMeasurements = getAllData('OfferOrderMeasurements');
-        const OfferOrderMetals = getAllData('OfferOrderMetals');
-        const OfferOrderExtra = getAllData('OfferOrderExtra');
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
 
         const [
           OfferOrdersResult,
@@ -476,15 +354,11 @@ const handler = async (req, res) => {
         ]);
 
         if (!OfferOrdersResult || OfferOrdersResult?.error) {
-<<<<<<< HEAD
           console.error("OfferOrdersResult error:", OfferOrdersResult?.error);
           throw new Error(
             "OfferOrdersResult hatası: " +
               (OfferOrdersResult?.error?.message || "Bilinmeyen hata")
           );
-=======
-          throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4';
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
         }
 
         // Benzersiz orderCode'ları saklamak için bir dizi oluştur
@@ -601,11 +475,7 @@ const handler = async (req, res) => {
 
             const Customer = await Promise.all(
               matchingOrder.map(async (order) => {
-<<<<<<< HEAD
                 const customerData = await getDataByUnique("Customer", {
-=======
-                const customerData = await getDataByUnique('Customer', {
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
                   id: order.customerId,
                 });
                 return customerData;
@@ -614,11 +484,7 @@ const handler = async (req, res) => {
 
             const Company = await Promise.all(
               matchingOrder.map(async (order) => {
-<<<<<<< HEAD
                 const companyData = await getDataByUnique("Company", {
-=======
-                const companyData = await getDataByUnique('Company', {
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
                   id: order.companyId,
                 });
                 return companyData;
@@ -627,11 +493,7 @@ const handler = async (req, res) => {
 
             const Personel = await Promise.all(
               matchingOrder.map(async (order) => {
-<<<<<<< HEAD
                 const personelData = await getDataByUnique("User", {
-=======
-                const personelData = await getDataByUnique('User', {
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
                   id: order.personelId,
                 });
                 return personelData;
@@ -656,32 +518,18 @@ const handler = async (req, res) => {
         );
 
         return res.status(200).json({
-<<<<<<< HEAD
           status: "success",
           data: combinetData,
           message: "Siparişler başarıyla getirildi.",
-=======
-          status: 'success',
-          data: combinetData,
-          message: 'Siparişler başarıyla getirildi.',
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
         });
       }
     }
 
-<<<<<<< HEAD
     if (req.method === "PUT") {
       const { orderCode, ordersStatus } = req.body;
 
       const updated = await updateDataByAny(
         "OfferOrder",
-=======
-    if (req.method === 'PUT') {
-      const { orderCode, ordersStatus } = req.body;
-
-      const updated = await updateDataByAny(
-        'OfferOrder',
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
         {
           orderCode: orderCode,
         },
@@ -690,39 +538,23 @@ const handler = async (req, res) => {
         }
       );
 
-<<<<<<< HEAD
       const responseLog = await createNewData("Logs", {
         role: userRole,
         userId: userId,
         step: 99,
         stepName: "Sipariş Durumu",
-=======
-      const responseLog = await createNewData('Logs', {
-        role: userRole,
-        userId: userId,
-        step: 99,
-        stepName: 'Sipariş Durumu',
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
         orderCode: orderCode,
         ordersStatus: ordersStatus,
       });
 
       return res
         .status(200)
-<<<<<<< HEAD
         .json({ status: "success", message: "Güncelleme başarılı!" });
-=======
-        .json({ status: 'success', message: 'Güncelleme başarılı!' });
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
     }
   } catch (error) {
     return res
       .status(500)
-<<<<<<< HEAD
       .json({ status: "error", error, message: error.message });
-=======
-      .json({ status: 'error', error, message: error.message });
->>>>>>> a966b0688f2c568b087175c111823997b30fa9ef
   }
 };
 
